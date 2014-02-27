@@ -1,37 +1,36 @@
 from Node import Node
 import sys
-
-def parseLine(line,isRouter):		
+# import OSC
+import time, threading
+nodes = dict()
+isRouter = None
+def parseLine(params,isRouter):		
 
 		if isRouter:
 			node = Node("Router",params)
 			node.trimParams()
-			node.printParams()
-			# return
-			pass
+			# node.printParams()
+			return node
+			
 		
 		elif not isRouter:
 			node = Node("Client",params)
 			node.trimParams()
-			node.printParams()
-			# return
-			pass	
+			# node.printParams()
+			return node
+			# pass	
 
+def readFile(fileName):
 
-if __name__ == '__main__' :
-	fileName = sys.argv[1]
-	csv = open(fileName, 'r')
-	isRouter = None
+	for line in fileName:
 	
-	for line in csv:
-		
 		line.strip()
 		line = line.replace("\r\n"," ")
 		params = line.split(',')
 
-		if len(params) <2 :
+		if len(params) <7 :
 			continue
-		print params
+		# print params
 		if(line < 2 ):
 			continue
 		
@@ -45,7 +44,43 @@ if __name__ == '__main__' :
 			isRouter = False
 			continue 
 		
-		parseLine(line,isRouter)
+		if params[0] in nodes:	
+			# print nodes[params[0]].hasTimeChanged(params[2])
+			params[2] = params[2].strip()
+			if nodes[params[0]].hasTimeChanged(params[2]):
+
+				if isRouter:
+					nodes[params[0]].updateRouterNode(params)
+				elif not isRouter:
+					nodes[params[0]].updateClientNode(params)
+		else:
+			n =  parseLine(params,isRouter)
+			nodes[n.BSSID] = n
+
+		# print len(nodes)
+if __name__ == '__main__' :
+
+	fileName = sys.argv[1]
+
+	try :
+	    while 1 :
+
+			time.sleep(1)
+			print "test"
+
+			csv = open(fileName, 'r')
+
+			readFile(csv)
+
+			csv.close()
+
+
+	except KeyboardInterrupt :
+		    print "\nClosing OSCServer."
+		    # mine.s.close()
+		    print "Waiting for Server-thread to finish"
+		    # mine.st.join() ##!!!
+		    print "Done"
 
 
 		

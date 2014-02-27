@@ -28,7 +28,7 @@ class Node(object):
             self.Privacy = params[5]
             self.Power = -int(params[8])
             self.ESSID = params[13]    
-            self.probedESSID = " "        
+            self.probedESSID = " "     
 
         else:
             # print "Client"
@@ -71,57 +71,46 @@ class Node(object):
             # print self.ip
         self.ESSID = self.ESSID.strip()
         self.probedESSID = self.probedESSID
-
-
-    # def addRouterNode(self, line):
-    # 	params = line.split(",")
-    # 	self.kind = "Router"
-    # 	self.BSSID = params[0]
-    # 	self.firstTimeSeen = params[1]
-    # 	self.lastTimeSeen = params[2]
-    # 	self.channel = int(params[3])
-    # 	self.Power = int(params[8])
-    # 	self.ESSID = params[13]
-
-    # def addClientNode(self, line):
-    # 	params = line.split(",")
-    # 	self.type = "Client"
-    # 	self.BSSID = params[0]
-    # 	self.firstTimeSeen = params[1]
-    # 	self.lastTimeSeen = params[2]
-    # 	self.channel = int(params[3])
-    # 	self.Power = int(params[8])
-    #  	#TODO: make list of all networks
-    # 	self.probedESSID = params[13]	 
 	
-	# def updateRouterNode(self, line):
- #        params = line.split(",")
- #        self.type = "Router"
- #        self.BSSID = params[0]
- #        self.firstTimeSeen = params[1]
- #        self.lastTimeSeen = params[2]
- #        self.channel = int(params[3])
- #        self.Power = int(params[8])
- #        self.ESSID = params[13]
-	
-	# def updateClientNode(self, line):
-	# 	params = line.split(",")
-	# 	self.type = "Client"
-	# 	self.BSSID = params[0]
-	# 	self.firstTimeSeen = params[1]
-	# 	self.lastTimeSeen = params[2]
-	# 	self.channel = int(params[3])
-	# 	self.Power = int(params[8])
-	#  	#TODO: make list of all networks
-	# 	self.probedESSID = params[13]	 
+    def updateRouterNode(self, params):
+        print "Updating Router : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
+        self.kind = "Router"
+        self.BSSID = params[0]
+        self.firstTimeSeen = params[1]
+        self.lastTimeSeen = params[2]
+        self.Channel = int(params[3])
+        self.Speed = int(params[4])
+        self.Privacy = params[5]
+        self.Power = -int(params[8])
+        self.ESSID = params[13]    
+        self.probedESSID = " "  
 
+    def updateClientNode(self, params):
+    	self.kind = "Client"
+        self.BSSID = params[0]
+        self.firstTimeSeen = params[1]
+        self.lastTimeSeen = params[2]
+        self.Channel =  -1
+        self.Speed = -1
+        self.Privacy = " "
+        # print params[8]
+        self.Power = -int(params[3])
+        #TODO: make list of all networks
+        self.ESSID = " "
+        self.probedESSID = params[6:] 
+
+    def hasTimeChanged(self, newTime): 
+        if self.lastTimeSeen == newTime:
+            return False
+        else:
+            return True
+
+# TODO: Add params
 #     //    string Cipher;
 #     //    string Authentication;
 #     //    int numBeacons;
 #     //    int numIV;
-    
-#     //Client only
-    
+#     //Client only    
 # //    Station MAC,
 # //   int  numPackets;
 
