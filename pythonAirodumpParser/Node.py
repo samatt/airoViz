@@ -17,7 +17,7 @@ class Node(object):
             self.probedESSID = " "
 
         elif kind == "Router":
-            print "Router"
+            # print "Router"
             # params = line.split(",")
             self.kind = "Router"
             self.BSSID = params[0]
@@ -26,12 +26,12 @@ class Node(object):
             self.Channel = int(params[3])
             self.Speed = int(params[4])
             self.Privacy = params[5]
-            self.Power = int(params[8])
+            self.Power = -int(params[8])
             self.ESSID = params[13]    
             self.probedESSID = " "        
 
         else:
-            print "Client"
+            # print "Client"
             # params = line.split(",")
             self.kind = "Client"
             self.BSSID = params[0]
@@ -41,10 +41,10 @@ class Node(object):
             self.Speed = -1
             self.Privacy = " "
             # print params[8]
-            self.Power = int(params[3])
+            self.Power = -int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6]   
+            self.probedESSID = params[6:]   
 
     def printParams(self):
         print self.kind
@@ -70,7 +70,7 @@ class Node(object):
         self.Power
             # print self.ip
         self.ESSID = self.ESSID.strip()
-        self.probedESSID = self.probedESSID.strip()
+        self.probedESSID = self.probedESSID
 
 
     # def addRouterNode(self, line):
