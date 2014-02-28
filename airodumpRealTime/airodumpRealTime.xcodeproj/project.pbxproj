@@ -196,6 +196,8 @@
 		D8BC77E918C1243F00E2628E /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
 		D8BC77EA18C1243F00E2628E /* OscReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscReceiver.cpp; sourceTree = "<group>"; };
 		D8BC77EB18C1243F00E2628E /* OscReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscReceiver.h; sourceTree = "<group>"; };
+		D8BC77FA18C1333E00E2628E /* airodumpGlobals.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airodumpGlobals.h; sourceTree = "<group>"; };
+		D8BC77FD18C1349700E2628E /* airodumpEvents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = airodumpEvents.h; sourceTree = "<group>"; };
 		D9BFFBBF4CC43DEE890B3C3E /* OscTypes.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = OscTypes.cpp; path = ../../../addons/ofxOsc/libs/oscpack/src/osc/OscTypes.cpp; sourceTree = SOURCE_ROOT; };
 		DD476420FBC881796F865BB5 /* ofxEasingSine.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxEasingSine.h; path = ../../../addons/ofxTween/src/Easings/ofxEasingSine.h; sourceTree = SOURCE_ROOT; };
 		DF49D76C45D5DB505A234880 /* ofxOscMessage.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxOscMessage.cpp; path = ../../../addons/ofxOsc/src/ofxOscMessage.cpp; sourceTree = SOURCE_ROOT; };
@@ -538,6 +540,8 @@
 				D8BC77E918C1243F00E2628E /* Node.h */,
 				D8BC77EA18C1243F00E2628E /* OscReceiver.cpp */,
 				D8BC77EB18C1243F00E2628E /* OscReceiver.h */,
+				D8BC77FA18C1333E00E2628E /* airodumpGlobals.h */,
+				D8BC77FD18C1349700E2628E /* airodumpEvents.h */,
 			);
 			name = airodumpSrc;
 			path = ../../airodumpSrc;

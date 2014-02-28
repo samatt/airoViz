@@ -8,16 +8,17 @@ class oscSender(object):
 		print "Started server on port : " + str(port)
 
 	def newNode(self,args):
-		self.client.send( OSCMessage("/new", str(args) ) )
+		self.client.send( OSCMessage("/new", args ) )
+		# print "new"
 
 	def updateNode(self,args):
-		self.client.send( OSCMessage("/update/", args ) )
+		self.client.send( OSCMessage("/update", args ) )
+		# print "update"
 
 	def removeNode(self,args):
-		self.client.send( OSCMessage("/remove/Router", args ) )
+		self.client.send( OSCMessage("/remove", args ) )
 
 	def closeConnection(self):
-
 		if(kind == "Router"):
 			self.client.send( OSCMessage("/quit", args ) )
 	

@@ -10,25 +10,19 @@
 
 #include "ofxOsc.h"
 #include "ofMain.h"
+#include "airodumpEvents.h"
+#include "airodumpGlobals.h"
 
-typedef enum{
-    kind =0,
-    BSSID,
-    firsTimeSeen,
-    lastTimeSeen,
-    Channel,
-    Speed,
-    Privacy,
-    Power,
-    probedESSID
-    
-}NodeParmas;
+
 
 class OscReceiver{
 public:
     OscReceiver();
     ofxOscReceiver receiver;
+    void setup();
     void update();
     
+    AirodumpEvents& getEvents();
+    AirodumpEvents events;
 };
 

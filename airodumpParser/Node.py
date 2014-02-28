@@ -89,6 +89,7 @@ class Node(object):
         self.Power = -int(params[8])
         self.ESSID = params[13]    
         self.probedESSID = " "  
+        self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.ESSID]
 
     def updateClientNode(self, params):
         print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2] + " networks : " 
@@ -105,6 +106,7 @@ class Node(object):
         #TODO: make list of all networks
         self.ESSID = " "
         self.probedESSID = params[6:] 
+        self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power)," ".join(self.probedESSID)]
 
 
     def hasTimeChanged(self, newTime): 

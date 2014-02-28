@@ -24,6 +24,10 @@ Node::Node(){
     probedESSID = " ";
 }
 
+Node::Node(string args){
+    
+}
+
 void Node::setTimeString(string dateTime, bool firsTime){
     if (firsTime) {
         firstTimeSeen = convertDateAndTime(dateTime);

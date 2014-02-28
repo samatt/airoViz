@@ -7,30 +7,43 @@
 //
 #include "OscReceiver.h"
 
+
+//class testApp;
 OscReceiver::OscReceiver(){
-    receiver.setup(5656);
+    
 }
 
+void OscReceiver::setup(){
+    receiver.setup(8000);
+}
 void OscReceiver::update(){
     while(receiver.hasWaitingMessages()){
-//        cout<<"has message"<<endl;
 		ofxOscMessage m;
-//        m.get
 		receiver.getNextMessage(&m);
-//        cout<<m.getAddress()<<endl;
+        cout<<m.getAddress()<<endl;
 		if(m.getAddress() == "/new"){
         
-            cout<<"new :"<<m.getArgAsString(0)<<endl;
-            
+            string params = m.getArgAsString(0);
+            AirodumpEventArgs args(params);
+            ofNotifyEvent(events.nodeAdded, args);
 		}
 		else if(m.getAddress() == "/update"){
-            cout<<"update :"<<m.getArgAsString(0)<<endl;
+            string params = m.getArgAsString(0);
+            AirodumpEventArgs args(params);
+            ofNotifyEvent(events.nodeUpdated, args);
 		}
 		else if(m.getAddress() == "/remove"){
-            cout<<"update : "<<m.getArgAsString(0)<<endl;
+
+            string params = m.getArgAsString(0);
+            AirodumpEventArgs args(params);
+            ofNotifyEvent(events.nodeRemoved, args);
 		}
         else if(m.getAddress() == "/quit"){
             cout<<"quit : "<<" : "<<m.getArgAsString(0)<<endl;
         }
 	}
+}
+
+AirodumpEvents& OscReceiver::getEvents(){
+    return events;
 }

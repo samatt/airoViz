@@ -6,28 +6,13 @@
 //
 //
 #include "ofMain.h"
-
-typedef enum{
-    Client =0,
-    Router,
-    
-}NodeType;
-
-struct DateAndTime{
-    
-    int second;
-    int minute;
-    int hour;
-    int day;
-    int month;
-    int year;
-    
-};
+#include "airodumpGlobals.h"
 
 
 class Node{
 public:
     Node();
+    Node(string args);
     
     
     NodeType type;

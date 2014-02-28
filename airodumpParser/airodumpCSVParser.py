@@ -11,7 +11,6 @@ def parseLine(params,isRouter):
 		if isRouter:
 			node = Node("Router",params)
 			node.trimParams()
-			sender.newNode(node.wrapForOsc())
 			# node.printParams()
 			return node
 			
@@ -19,7 +18,6 @@ def parseLine(params,isRouter):
 		elif not isRouter:
 			node = Node("Client",params)
 			node.trimParams()
-			sender.newNode(node.wrapForOsc())
 			# node.printParams()
 			return node
 			# pass	
@@ -61,28 +59,34 @@ def readFile(fileName):
 		if params[0] in routers and isRouter:
 
 			if routers[params[0]].hasTimeChanged(params[2]):
-				# print params	
-				routers[params[0]].updateRouterNode(params)			
+				# print param
+				print "Router " +  routers[params[0]].BSSID + " updated"
+				routers[params[0]].updateRouterNode(params)	
+				sender.updateNode(routers[params[0]].wrapForOsc())		
 		
 		elif params[0] in clients and not isRouter:
 
 			if clients[params[0]].hasTimeChanged(params[2]):
+
+				print  "Client " + clients[params[0]] .BSSID+ " updated"
 			 	clients[params[0]].updateClientNode(params)
-		
+				sender.updateNode(clients[params[0]].wrapForOsc())		
 		else:
 			if isRouter:
 				n =  parseLine(params,isRouter)
 				routers[n.BSSID] = n
+				sender.newNode(n.wrapForOsc())
 			else:
 				n =  parseLine(params,isRouter)
 				clients[n.BSSID] = n
+				sender.newNode(n.wrapForOsc())
 
 
 		# print len(nodes)
 if __name__ == '__main__' :
 
 	fileName = sys.argv[1]
-	sender = oscSender(5656)
+	sender = oscSender(8000)
 	try :
 	    while 1 :
 

@@ -1,6 +1,10 @@
 #pragma once
 
 #include "ofMain.h"
+#include "Node.h"
+#include "OscReceiver.h"
+//#include "airodumpEvents.h"
+#include "airodumpGlobals.h"
 
 class testApp : public ofBaseApp{
 
@@ -8,7 +12,7 @@ class testApp : public ofBaseApp{
 		void setup();
 		void update();
 		void draw();
-
+        void exit();
 		void keyPressed(int key);
 		void keyReleased(int key);
 		void mouseMoved(int x, int y );
@@ -18,5 +22,14 @@ class testApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
-		
+        void nodeAdded(AirodumpEventArgs& args);
+        void nodeUpdated(AirodumpEventArgs& args);
+        void nodeRemoved(AirodumpEventArgs& args);
+    
+	
+        vector<Node> nodes;
+        OscReceiver receiver;
+//        AirodumpEvents events;
+    
+    
 };
