@@ -13,23 +13,24 @@ OscReceiver::OscReceiver(){
 
 void OscReceiver::update(){
     while(receiver.hasWaitingMessages()){
-        // cout<<"has message"<<endl;
+//        cout<<"has message"<<endl;
 		ofxOscMessage m;
+//        m.get
 		receiver.getNextMessage(&m);
-        
+//        cout<<m.getAddress()<<endl;
 		if(m.getAddress() == "/new"){
-
-//            cout<<currentTopic<<" : "<<m.getArgAsString(3)<<endl;
+        
+            cout<<"new :"<<m.getArgAsString(0)<<endl;
             
 		}
 		else if(m.getAddress() == "/update"){
-
+            cout<<"update :"<<m.getArgAsString(0)<<endl;
 		}
 		else if(m.getAddress() == "/remove"){
-
+            cout<<"update : "<<m.getArgAsString(0)<<endl;
 		}
         else if(m.getAddress() == "/quit"){
-
+            cout<<"quit : "<<" : "<<m.getArgAsString(0)<<endl;
         }
 	}
 }

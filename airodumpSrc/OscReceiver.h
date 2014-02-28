@@ -11,7 +11,18 @@
 #include "ofxOsc.h"
 #include "ofMain.h"
 
-
+typedef enum{
+    kind =0,
+    BSSID,
+    firsTimeSeen,
+    lastTimeSeen,
+    Channel,
+    Speed,
+    Privacy,
+    Power,
+    probedESSID
+    
+}NodeParmas;
 
 class OscReceiver{
 public:
