@@ -1,4 +1,4 @@
-
+    
 
 class Node(object):
 
@@ -30,7 +30,8 @@ class Node(object):
             self.Privacy = params[5]
             self.Power = -int(params[8])
             self.ESSID = params[13]    
-            self.probedESSID = " "     
+            self.probedESSID = " "
+            self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.ESSID]
 
         else:
             # print "Client"
@@ -46,7 +47,8 @@ class Node(object):
             self.Power = -int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:]   
+            self.probedESSID = params[6:]
+            self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power)," ".join(self.probedESSID)]
 
     def printParams(self):
         print self.kind
@@ -110,6 +112,10 @@ class Node(object):
             return False
         else:
             return True
+
+    def wrapForOsc(self):
+        return " , ".join(self.forOSC)
+
 
 # TODO: Add params
 #     //    string Cipher;
