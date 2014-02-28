@@ -10,9 +10,9 @@ class oscSender(object):
 	def newNode(self,kind,args):
 		
 		if(kind == "Router"):
-			self.client.send( OSCMessage("/new/Router", args ) )
+			self.client.send( OSCMessage("/new/Router", str(args) ) )
 		elif(kind == "Client"):
-			self.client.send( OSCMessage("/new/Client", args ) )
+			self.client.send( OSCMessage("/new/Client", str(args) ) )
 
 	def updateNode(self,kind,args):
 		
@@ -28,3 +28,10 @@ class oscSender(object):
 			self.client.send( OSCMessage("/remove/Router", args ) )
 		elif(kind == "Client"):
 			self.client.send( OSCMessage("/remove/Client", args ) )
+
+	def closeConnection(self):
+		pass
+		if(kind == "Router"):
+			self.client.send( OSCMessage("/quit/Router", args ) )
+		elif(kind == "Client"):
+			self.client.send( OSCMessage("/quit/Client", args ) )
