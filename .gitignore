@@ -5,3 +5,13 @@
 /airodumpParser/.DS_Store
 
 /airodumpSketch/.DS_Store
+
+/airodumpRealTime/.DS_Store
+
+/airodumpRealTime/bin/airodumpRealTimeDebug.app/Contents/Info.plist
+/airodumpRealTime/bin/airodumpRealTimeDebug.app/Contents/MacOS/
+/airodumpRealTime/bin/airodumpRealTimeDebug.app/Contents/PkgInfo
+
+/airodumpRealTime/bin/data/.gitkeep
+
+.DS_Store
