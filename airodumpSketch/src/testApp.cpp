@@ -40,14 +40,12 @@ void testApp::setup(){
 
     
     bool isRouter;
-    ifs.open("/Users/surya/Desktop/Kali/sharedTest1-01.csv");
     
     dataFile = ofFile("/Users/surya/Desktop/Kali/sharedTest1-01.csv");
 
     buffer  = dataFile.readToBuffer();
 
     while (! buffer.isLastLine()) {
-        
         
         Node n;
         string line = buffer.getNextLine();
@@ -116,15 +114,13 @@ void testApp::setup(){
 
     }
     
-//    file.
-    
 }
 
 
 
 //--------------------------------------------------------------
 void testApp::update(){
-    char line[1024];
+
 
     
 }

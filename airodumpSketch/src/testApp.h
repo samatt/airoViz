@@ -4,6 +4,7 @@
 #include "Node.h"
 #include <fstream>
 #include <iostream>
+#include "OscReceiver.h"
 
 class testApp : public ofBaseApp{
 
@@ -28,7 +29,6 @@ class testApp : public ofBaseApp{
         int x,y;
         ofFile dataFile;
         ofBuffer buffer;
-//        Poco::File file;
-//    std::ifstream  stream()//"/Users/surya/Desktop/Kali/sharedTest1-01.csv");
-    std::ifstream ifs;// ("test.txt", std::ifstream::in);
+
+
 };
