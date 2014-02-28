@@ -23,8 +23,8 @@
 		933A2227713C720CEFF80FD9 /* tinyxml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2B40EDA85BEB63E46785BC29 /* tinyxml.cpp */; };
 		9D44DC88EF9E7991B4A09951 /* tinyxmlerror.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 832BDC407620CDBA568B713D /* tinyxmlerror.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
-		D8BC77D918C1233E00E2628E /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8BC77D518C1233E00E2628E /* Node.cpp */; };
-		D8BC77DA18C1233E00E2628E /* OscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8BC77D718C1233E00E2628E /* OscReceiver.cpp */; };
+		D8BC77F818C1246000E2628E /* Node.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8BC77F418C1246000E2628E /* Node.cpp */; };
+		D8BC77F918C1246000E2628E /* OscReceiver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D8BC77F618C1246000E2628E /* OscReceiver.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -183,10 +183,10 @@
 		D8BC77C618C0247800E2628E /* ofxOscReceiver.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxOscReceiver.h; sourceTree = "<group>"; };
 		D8BC77C718C0247800E2628E /* ofxOscSender.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ofxOscSender.cpp; sourceTree = "<group>"; };
 		D8BC77C818C0247800E2628E /* ofxOscSender.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ofxOscSender.h; sourceTree = "<group>"; };
-		D8BC77D518C1233E00E2628E /* Node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Node.cpp; sourceTree = "<group>"; };
-		D8BC77D618C1233E00E2628E /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
-		D8BC77D718C1233E00E2628E /* OscReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscReceiver.cpp; sourceTree = "<group>"; };
-		D8BC77D818C1233E00E2628E /* OscReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscReceiver.h; sourceTree = "<group>"; };
+		D8BC77F418C1246000E2628E /* Node.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Node.cpp; sourceTree = "<group>"; };
+		D8BC77F518C1246000E2628E /* Node.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Node.h; sourceTree = "<group>"; };
+		D8BC77F618C1246000E2628E /* OscReceiver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = OscReceiver.cpp; sourceTree = "<group>"; };
+		D8BC77F718C1246000E2628E /* OscReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscReceiver.h; sourceTree = "<group>"; };
 		DD476420FBC881796F865BB5 /* ofxEasingSine.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxEasingSine.h; path = ../../../addons/ofxTween/src/Easings/ofxEasingSine.h; sourceTree = SOURCE_ROOT; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -542,24 +542,16 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		D8BC77D318C1233E00E2628E /* airodumpVS */ = {
+		D8BC77F318C1246000E2628E /* airodumpSrc */ = {
 			isa = PBXGroup;
 			children = (
-				D8BC77D418C1233E00E2628E /* src */,
+				D8BC77F418C1246000E2628E /* Node.cpp */,
+				D8BC77F518C1246000E2628E /* Node.h */,
+				D8BC77F618C1246000E2628E /* OscReceiver.cpp */,
+				D8BC77F718C1246000E2628E /* OscReceiver.h */,
 			);
-			name = airodumpVS;
-			path = ../../airodumpVS;
-			sourceTree = "<group>";
-		};
-		D8BC77D418C1233E00E2628E /* src */ = {
-			isa = PBXGroup;
-			children = (
-				D8BC77D518C1233E00E2628E /* Node.cpp */,
-				D8BC77D618C1233E00E2628E /* Node.h */,
-				D8BC77D718C1233E00E2628E /* OscReceiver.cpp */,
-				D8BC77D818C1233E00E2628E /* OscReceiver.h */,
-			);
-			path = src;
+			name = airodumpSrc;
+			path = ../../airodumpSrc;
 			sourceTree = "<group>";
 		};
 		E4328144138ABC890047C5CB /* Products */ = {
@@ -595,8 +587,8 @@
 		E4B69E1C0A3A1BDC003C02F2 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				D8BC77D318C1233E00E2628E /* airodumpVS */,
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
+				D8BC77F318C1246000E2628E /* airodumpSrc */,
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
 			);
@@ -705,7 +697,7 @@
 				933A2227713C720CEFF80FD9 /* tinyxml.cpp in Sources */,
 				9D44DC88EF9E7991B4A09951 /* tinyxmlerror.cpp in Sources */,
 				5A4349E9754D6FA14C0F2A3A /* tinyxmlparser.cpp in Sources */,
-				D8BC77DA18C1233E00E2628E /* OscReceiver.cpp in Sources */,
+				D8BC77F918C1246000E2628E /* OscReceiver.cpp in Sources */,
 				168C43F69AF6A8042EA0B13F /* easing_terms_of_use.html in Sources */,
 				9266028E1AECBB027ABF64D8 /* ofxEasing.cpp in Sources */,
 				5E0DBDE5736DEB3A5886B3F1 /* ofxEasingBack.cpp in Sources */,
@@ -715,7 +707,7 @@
 				6E062274743F6716A9AD4395 /* ofxEasingElastic.cpp in Sources */,
 				59EEACB88F062457FF86492C /* ofxEasingExpo.cpp in Sources */,
 				152EAECABD008D84AF7F27F8 /* ofxEasingLinear.cpp in Sources */,
-				D8BC77D918C1233E00E2628E /* Node.cpp in Sources */,
+				D8BC77F818C1246000E2628E /* Node.cpp in Sources */,
 				6D7B53ED56654ABBF2FF13B1 /* ofxEasingQuad.cpp in Sources */,
 				85A41526FDFA1A8CDAEE81F7 /* ofxEasingQuart.cpp in Sources */,
 				7E769097DE6561633305B24C /* ofxEasingQuint.cpp in Sources */,
