@@ -1,6 +1,6 @@
 from Node import Node
 import sys
-# import OSC
+from oscSender import oscSender
 import time, threading
 routers = dict()
 clients = dict()
@@ -80,7 +80,7 @@ def readFile(fileName):
 if __name__ == '__main__' :
 
 	fileName = sys.argv[1]
-
+	sender = oscSender(5656)
 	try :
 	    while 1 :
 
