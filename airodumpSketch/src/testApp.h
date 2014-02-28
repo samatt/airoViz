@@ -2,8 +2,6 @@
 
 #include "ofMain.h"
 #include "Node.h"
-#include <fstream>
-#include <iostream>
 #include "OscReceiver.h"
 
 class testApp : public ofBaseApp{
