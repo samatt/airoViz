@@ -11,7 +11,7 @@ def parseLine(params,isRouter):
 		if isRouter:
 			node = Node("Router",params)
 			node.trimParams()
-			sender.newNode("Router",node)
+			sender.newNode(node.wrapForOsc())
 			# node.printParams()
 			return node
 			
@@ -19,7 +19,7 @@ def parseLine(params,isRouter):
 		elif not isRouter:
 			node = Node("Client",params)
 			node.trimParams()
-			sender.newNode("Client",node)
+			sender.newNode(node.wrapForOsc())
 			# node.printParams()
 			return node
 			# pass	
