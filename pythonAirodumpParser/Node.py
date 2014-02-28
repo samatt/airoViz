@@ -1,3 +1,5 @@
+
+
 class Node(object):
 
     def __init__(self, kind="Router", params = list()):
@@ -81,11 +83,14 @@ class Node(object):
         self.Channel = int(params[3])
         self.Speed = int(params[4])
         self.Privacy = params[5]
+        # print params[8]
         self.Power = -int(params[8])
         self.ESSID = params[13]    
         self.probedESSID = " "  
 
     def updateClientNode(self, params):
+        print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2] + " networks : " 
+        print params[6:]
     	self.kind = "Client"
         self.BSSID = params[0]
         self.firstTimeSeen = params[1]
@@ -98,6 +103,7 @@ class Node(object):
         #TODO: make list of all networks
         self.ESSID = " "
         self.probedESSID = params[6:] 
+
 
     def hasTimeChanged(self, newTime): 
         if self.lastTimeSeen == newTime:

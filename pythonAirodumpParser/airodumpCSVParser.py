@@ -2,7 +2,9 @@ from Node import Node
 import sys
 # import OSC
 import time, threading
-nodes = dict()
+routers = dict()
+clients = dict()
+
 isRouter = None
 def parseLine(params,isRouter):		
 
@@ -28,9 +30,11 @@ def readFile(fileName):
 		line = line.replace("\r\n"," ")
 		params = line.split(',')
 
-		if len(params) <7 :
+		if len(params) <6 :
 			continue
-		# print params
+		
+
+
 		if(line < 2 ):
 			continue
 		
@@ -43,19 +47,34 @@ def readFile(fileName):
 
 			isRouter = False
 			continue 
-		
-		if params[0] in nodes:	
-			# print nodes[params[0]].hasTimeChanged(params[2])
-			params[2] = params[2].strip()
-			if nodes[params[0]].hasTimeChanged(params[2]):
 
-				if isRouter:
-					nodes[params[0]].updateRouterNode(params)
-				elif not isRouter:
-					nodes[params[0]].updateClientNode(params)
+		# if isRouter:
+		# 	print "ROUTER: "
+		# else:
+		# 	print "CLIENT: "
+		
+		# print params
+		params[2] = params[2].strip()
+		
+		if params[0] in routers and isRouter:
+
+			if routers[params[0]].hasTimeChanged(params[2]):
+				# print params	
+				routers[params[0]].updateRouterNode(params)			
+		
+		elif params[0] in clients and not isRouter:
+
+			if clients[params[0]].hasTimeChanged(params[2]):
+			 	clients[params[0]].updateClientNode(params)
+		
 		else:
-			n =  parseLine(params,isRouter)
-			nodes[n.BSSID] = n
+			if isRouter:
+				n =  parseLine(params,isRouter)
+				routers[n.BSSID] = n
+			else:
+				n =  parseLine(params,isRouter)
+				clients[n.BSSID] = n
+
 
 		# print len(nodes)
 if __name__ == '__main__' :
@@ -69,9 +88,7 @@ if __name__ == '__main__' :
 			print "test"
 
 			csv = open(fileName, 'r')
-
 			readFile(csv)
-
 			csv.close()
 
 
