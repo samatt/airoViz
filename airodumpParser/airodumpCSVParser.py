@@ -60,7 +60,7 @@ def readFile(fileName):
 
 			if routers[params[0]].hasTimeChanged(params[2]):
 				# print param
-				print "Router " +  routers[params[0]].BSSID + " updated"
+				# print "Router " +  routers[params[0]].BSSID + " updated"
 				routers[params[0]].updateRouterNode(params)	
 				sender.updateNode(routers[params[0]].wrapForOsc(),params[0],"Router")		
 		
@@ -68,7 +68,7 @@ def readFile(fileName):
 
 			if clients[params[0]].hasTimeChanged(params[2]):
 
-				print  "Client " + clients[params[0]] .BSSID+ " updated"
+				# print  "Client " + clients[params[0]] .BSSID+ " updated"
 			 	clients[params[0]].updateClientNode(params)
 				sender.updateNode(clients[params[0]].wrapForOsc(), params[0], "Client")		
 		else:

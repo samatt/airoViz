@@ -29,14 +29,14 @@ Node::Node(string args){
     
     if( params[N_KIND] == "Router"){
         type = Router;
-        ESSID = params[N_ESSID];
+        ESSID = trim(params[N_ESSID]);
         
     }
     else{
         type = Client;
         probedESSID = ofSplitString(params[N_ESSID], " ");
     }
-    BSSID = params[N_BSSID];
+    BSSID = trim(params[N_BSSID]);
     
     setTimeString(params[N_FIRSTTIME],true);
     setTimeString(params[N_LASTTIME],false);
@@ -49,17 +49,20 @@ Node::Node(string args){
 
 void Node::updateNode(string args){
     vector<string> params = ofSplitString(args, ",");
-    
+    params[N_KIND] =trim(params[N_KIND]);
     if( params[N_KIND] == "Router"){
         type = Router;
-        ESSID = params[N_ESSID];
+        ESSID = trim(params[N_ESSID]);
         
     }
     else{
         type = Client;
-        probedESSID = ofSplitString(params[N_ESSID], " ");
+        if(ofSplitString(params[N_ESSID], " ").size() >0){
+            probedESSID  =ofSplitString(params[N_ESSID], " ");
+        }
+
     }
-    BSSID = params[N_BSSID];
+    BSSID = trim(params[N_BSSID]);
     
     setTimeString(params[N_FIRSTTIME],true);
     setTimeString(params[N_LASTTIME],false);

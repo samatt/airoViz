@@ -9,17 +9,17 @@ class oscSender(object):
 
 	def newNode(self,args,BSSID,kind):
 		msg = OSCMessage("/new" )
-		msg.append(kind)
+		msg.append(kind.strip())
 		msg.append(args)
-		msg.append(BSSID) 
+		msg.append(BSSID.strip()) 
 		self.client.send(msg)
 		# print "new"
 
 	def updateNode(self,args,BSSID,kind):
 		msg =  OSCMessage("/update")
-		msg.append(kind)
+		msg.append(kind.strip())
 		msg.append(args)
-		msg.append(BSSID) 
+		msg.append(BSSID.strip()) 
 		self.client.send(msg)
 		# print "update"
 
