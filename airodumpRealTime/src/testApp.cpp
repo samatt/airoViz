@@ -15,6 +15,7 @@ void testApp::setup(){
 //--------------------------------------------------------------
 void testApp::update(){
     receiver.update();
+    updateIndices();
 
     
 }
@@ -63,6 +64,8 @@ void testApp::draw(){
                     int routerIndex = routerMapIndex[routerID];
                     string networkName = nodes[routerIndex].ESSID;
                     ofDrawBitmapString(nodes[index].BSSID + "\n" + networkName, ofPoint(x,y));
+                    ofSetColor(ofColor::white);
+                    ofDrawBitmapString("\n" + networkName, ofPoint(x,y));
                 }
                 
             }
@@ -160,7 +163,7 @@ void testApp::nodeRemoved(AirodumpEventArgs& args){
     }
     
     ofLog()<<"[ nodeRemoved ] "<<ID<<endl;
-    updateIndices();
+
     
 }
 

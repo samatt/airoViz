@@ -25,7 +25,7 @@ class Node(object):
             self.kind = "Router"
             self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
-            self.lastTimeSeen = params[2]
+            self.lastTimeSeen = params[2].strip()
             self.Channel = int(params[3])
             self.Speed = int(params[4])
             self.Privacy = params[5]
@@ -42,7 +42,7 @@ class Node(object):
             self.kind = "Client"
             self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
-            self.lastTimeSeen = params[2]
+            self.lastTimeSeen = params[2].strip()
             self.Channel =  -1
             self.Speed = -1
             self.Privacy = " "
@@ -87,8 +87,9 @@ class Node(object):
         # print "Updating Router : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
         # self.kind = "Router"
         # self.BSSID = params[0]
+        self.alive = True
         self.firstTimeSeen = params[1]
-        self.lastTimeSeen = params[2]
+        self.lastTimeSeen = params[2].strip()
         self.Channel = int(params[3])
         self.Speed = int(params[4])
         self.Privacy = params[5]
@@ -100,7 +101,8 @@ class Node(object):
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
 
     def updateClientNode(self, params):
-        print "Updating Client : " + self.BSSID 
+        print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
+        self.alive = True
         print params[6:]
     	# self.kind = "Client"
         # self.BSSID = params[0]
@@ -122,6 +124,7 @@ class Node(object):
         if self.lastTimeSeen == newTime:
             return False
         else:
+            print "Time changed "+ self.lastTimeSeen + " to " + newTime
             return True
 
     def wrapForOsc(self):
