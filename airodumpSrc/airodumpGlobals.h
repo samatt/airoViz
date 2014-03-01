@@ -16,6 +16,7 @@
     N_SPEED,
     N_PRIVACY,
     N_POWER,
+    N_AP,
     N_ESSID
     
 };

@@ -104,10 +104,11 @@ def readFile(fileName):
 				routers[n.BSSID] = n
 				# routerBSSID.append(params[0])
 				# print routers.keys()
-				# print "adding routers" 
+				print "add routers" 
 				routerBSSID[params[0]] = 1
 				sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
 			else:
+				print "add clients"
 				n =  parseLine(params,isRouter)
 				clients[n.BSSID] = n
 				clientBSSID[params[0]] = 1
@@ -118,9 +119,9 @@ def killNodes():
 	#no longer deleteing the nodes, just turning them off for oF. input file never deletes so hard to tell when to stop
  	# print len(clientBSSID)  
  	# print len(routerBSSID) 
-	print clientBSSID.values() 
-	print "							"
-	print  routerBSSID.values() 
+	# print clientBSSID.values() 
+	# print "							"
+	# print  routerBSSID.values() 
 	# print routers.keys()
 	
 	count = 10
@@ -131,24 +132,24 @@ def killNodes():
 	  if k in clientBSSID:
 	  	if clientBSSID[k] > count:
 	  		if clients[k].alive == True:
-			  	print "removeNode print" + k
+			  	print "remove client" + k
 				sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
 				clientBSSID[k] = 0
 				clients[k].alive = False
 			else:
-				print "Already dead router: " + k
+				print "dead client: " + k
 		# del clients[k]	  	
 
 	for k, v in routerBSSID.iteritems():
 	  if k in routerBSSID:
 	  	if routerBSSID[k] > count:
 		  	if routers[k].alive == True:
-			  	print "removeRouter " + k
+			  	print "remove router " + k
 				sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
 				routerBSSID[k] = 0
 				routers[k].alive = False
 			else:
-				print "Already dead client: " + k
+				print "dead router: " + k
 
 if __name__ == '__main__' :
 	notFirsTime = False

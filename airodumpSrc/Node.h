@@ -27,7 +27,7 @@ public:
     int Power;
     string IP;
     string ESSID;
-    
+    string AP;
     string firstTimeString;
     string lastTimeString;
     //    string Cipher;
