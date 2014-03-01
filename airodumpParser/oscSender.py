@@ -23,11 +23,11 @@ class oscSender(object):
 		self.client.send(msg)
 		# print "update"
 
-	def removeNode(self,args, kind):
+	def removeNode(self,args,BSSID, kind):
 		msg =  OSCMessage("/remove")
-		msg.append(kind)
+		msg.append(kind.strip())
 		msg.append(args)
-		msg.append(BSSID) 
+		msg.append(BSSID.strip())  
 		self.client.send(msg)
 
 	def closeConnection(self):
