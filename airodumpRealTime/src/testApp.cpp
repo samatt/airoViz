@@ -33,9 +33,9 @@ void testApp::draw(){
             else{
                 c = ofColor::chartreuse;
                 
-                if (nodes[i].probedESSID.size() <= 0 ) {
-                    continue;
-                }
+//                if (nodes[i].probedESSID.size() <= 0 ) {
+//                    continue;
+//                }
             }
             
             float r = ofMap(nodes[i].Power, 10, 80, 5, 10);
@@ -48,13 +48,13 @@ void testApp::draw(){
             }
             else{
                 ofSetColor(255);
-                ofDrawBitmapString(nodes[i].probedESSID[ofRandom(nodes[i].probedESSID.size() - 1)], ofPoint(x,y));
+                ofDrawBitmapString(nodes[i].BSSID,ofPoint(x,y));//probedESSID[ofRandom(nodes[i].probedESSID.size() - 1)], ofPoint(x,y));
             }
-            
+        
             y +=  30 ;
             
             if(y > ofGetHeight() -20){
-                x += 80;
+                x += 200;
                 y = 10;
                 
             }
@@ -81,7 +81,7 @@ void testApp::nodeAdded(AirodumpEventArgs& args){
 }
 //--------------------------------------------------------------
 void testApp::nodeUpdated(AirodumpEventArgs& args){
-    cout<<"updated : "<<args.type<<endl;
+
     
     if(args.type == "Router"){
      
@@ -104,12 +104,14 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
         }
     }
     
-    cout<<args.params<<endl;
+    ofLog()<<"[ nodeUpdated ] "<<args.params<<endl;
 }
 //--------------------------------------------------------------
 void testApp::nodeRemoved(AirodumpEventArgs& args){
     cout<<"removed"<<endl;
-    cout<<args.params<<endl;    
+    cout<<args.params<<endl;
+    
+    
 }
 
 
@@ -124,9 +126,14 @@ void testApp::exit(){
 void testApp::keyPressed(int key){
 //    cout<<clientMapIndex.size()<<endl;
     if(key == 'f'){
-        ofToggleFullscreen();        
+        ofToggleFullscreen();
     }
-
+    
+    if(key == ' '){
+        for (int i = 0; i<nodes.size(); i++) {
+            cout<<""
+        }
+    }
 }
 
 //--------------------------------------------------------------
