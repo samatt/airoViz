@@ -5,9 +5,9 @@ import time, threading
 routers = dict()
 clients = dict()
 
-routerBSSID = []
+routerBSSID = dict()
 # newrouter
-clientBSSID = []
+clientBSSID = dict()
 
 isRouter = None
 def parseLine(params,isRouter):		
@@ -56,100 +56,94 @@ def readFile(fileName):
 		params[0] = params[0].strip()
 		
 		if params[0] in routers and isRouter:
-			#collect ID (key) of all exisiting routers
-			routerBSSID.append(params[0])	
-			# print  "HERE"
-			if routers[params[0]].hasTimeChanged(params[2]):
-				# print param
-				# print "Router " +  routers[params[0]].BSSID + " updated"
-				routers[params[0]].updateRouterNode(params)	
-				sender.updateNode(routers[params[0]].wrapForOsc(),params[0],"Router")
+			if  routers[params[0]].alive:
+				#collect ID (key) of all exisiting routers
 				
+				# print  "HERE"
+				if routers[params[0]].hasTimeChanged(params[2]):
+					# print param
+					# print "Router " +  routers[params[0]].BSSID + " updated"
+					routers[params[0]].updateRouterNode(params)	
+					sender.updateNode(routers[params[0]].wrapForOsc(),params[0],"Router")
+					routerBSSID[params[0]] = 0
+				else:
+					if params[0] in routerBSSID:
+						routerBSSID[params[0]] += 1
+					else:
+						print 'wtf?'
+			else:
+				if routers[params[0]].hasTimeChanged(params[2]):
+					routers[params[0]].updateRouterNode(params)
+					# doing new node as it was previously 'dead' and that message was sent to the oF app
+					sender.newNode(routers[params[0]].wrapForOsc(), params[0], "Router")		
 		
 		elif params[0] in clients and not isRouter:
+			if clients[params[0]].alive:
 
-			#collect ID (key) of all exisiting clients
-			clientBSSID.append(params[0])
-			# print clientBSSID
-			# print  "THERE"
 
-			if clients[params[0]].hasTimeChanged(params[2]):
+				if clients[params[0]].hasTimeChanged(params[2]):
 
-				# print  "Client " + clients[params[0]] .BSSID+ " updated"
-			 	clients[params[0]].updateClientNode(params)
-				sender.updateNode(clients[params[0]].wrapForOsc(), params[0], "Client")		
-				
-				
+					# print  "Client " + clients[params[0]] .BSSID+ " updated"
+				 	clients[params[0]].updateClientNode(params)
+					sender.updateNode(clients[params[0]].wrapForOsc(), params[0], "Client")
+					clientBSSID[params[0]] = 0
+				else:
+					if params[0] in clientBSSID:
+						clientBSSID[params[0]] += 1
+					else:
+						print 'wtf?'
+			else:
+				if clients[params[0]].hasTimeChanged(params[2]):
+					clients[params[0]].updateClientNode(params)
+					# doing new node as it was previously 'dead' and that message was sent to the oF app
+					sender.newNode(clients[params[0]].wrapForOsc(), params[0], "Client")
 
 		else:
 			if isRouter:
 				n =  parseLine(params,isRouter)
 				routers[n.BSSID] = n
-				routerBSSID.append(params[0])
+				# routerBSSID.append(params[0])
 				# print routers.keys()
-				print "adding routers" 
+				# print "adding routers" 
+				routerBSSID[params[0]] = 1
 				sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
 			else:
 				n =  parseLine(params,isRouter)
 				clients[n.BSSID] = n
-				clientBSSID.append(params[0])
+				clientBSSID[params[0]] = 1
 				sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
 
 
-def deleteDeadNodes():
+def killNodes():
+	#no longer deleteing the nodes, just turning them off for oF. input file never deletes so hard to tell when to stop
+ 	# print len(clientBSSID)  
+ 	# print len(routerBSSID) 
+	print clientBSSID.values() 
+	print "							"
+	print  routerBSSID.values() 
+	# print routers.keys()
 	
- 	print len(clientBSSID)  
- 	print len(routerBSSID) 
-	print clientBSSID 
-	print clients.keys()
-	print  routerBSSID 
-	print routers.keys()
-	
-	clientsCopy = clients;
-	routersCopy = routers;
+	count = 10
 	delClients = []
 	delRouters = []
 
-	for k, v in clientsCopy.iteritems():
-	  if k not in clientBSSID:
-	  	print "removeNode " + k
-		sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
-		delClients.append(k)
+	for k, v in clientBSSID.iteritems():
+	  if k in clientBSSID:
+	  	if clientBSSID[k] > count:
+		  	print "removeNode print" + k
+			sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
+			clientBSSID[k] = 0
+			clients[k].alive = False
 		# del clients[k]	  	
 
-	for k, v in routersCopy.iteritems():
-	  if k not in routerBSSID:
-	  	print "removeClient " + k
-		sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
-		delRouters.append(k)
-		# del routers[k]	  			
+	for k, v in routerBSSID.iteritems():
+	  if k in routerBSSID:
+	  	if routerBSSID[k] > count:
+		  	print "removeRouter " + k
+			sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
+			routerBSSID[k] = 0
+			routers[k].alive = False
 
-	
-	for k in delClients:
-		del clients[k]
-	
-	for k in delRouters:
-		del routers[k]		
-	# for i in clientBSSID:
-	# 	if i in clients:
-	# 		pass		
-	# 	else:
-	# 		# print "Removing Client ID: " +i
-	# 		sender.removeNode(clients[i].wrapForOsc(),clients[i].BSSID,"Client")
-	# 		del clients[i]
-
-	# for i in routerBSSID:
-	# 	if i in routers:
-	# 		pass
-	# 	else:
-	# 		# print "Removing Router ID: " + i
-	# 		sender.removeNode(routers[i].wrapForOsc(),routers[i].BSSID,"Router")
-	# 		del routers[i]
-		
-	del routerBSSID [:]
-	del clientBSSID [:]
-	print len(clients)
-	print len(routers)
 if __name__ == '__main__' :
 	notFirsTime = False
 	fileName = sys.argv[1]
@@ -164,7 +158,7 @@ if __name__ == '__main__' :
 			csv = open(fileName, 'r')
 			readFile(csv)
 			if notFirsTime:
-				deleteDeadNodes()
+				killNodes()
 			csv.close()
 			notFirsTime = True
 
