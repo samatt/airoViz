@@ -121,10 +121,10 @@ class Node(object):
 
 
     def hasTimeChanged(self, newTime): 
-        if self.lastTimeSeen == newTime:
+        if self.lastTimeSeen.strip() == newTime.strip():
             return False
         else:
-            print "Time changed "+ self.lastTimeSeen + " to " + newTime
+            # print "Time changed "+ self.lastTimeSeen + " to " + newTime
             return True
 
     def wrapForOsc(self):

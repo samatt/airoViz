@@ -43,8 +43,9 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 		if ID not in clients:
 			return False
 
+		# print "////"+clients[ID].lastTimeSeen + "////"+ lastTime+"////"
 		if not clients[ID].hasTimeChanged(lastTime):
-			print "Time hasnt changed"
+			# print "Time hasnt changed"
 			return False
 
 		if clients[ID].alive:
@@ -167,7 +168,9 @@ def killNodes():
 				clients[k].alive = False
 
 	for k, v in routerIdleCount.iteritems():
+	  
 	  if k in routerIdleCount:
+	  	
 	  	if v > count:
 		  	if routers[k].alive == True:
 			  	print "remove router " + k
