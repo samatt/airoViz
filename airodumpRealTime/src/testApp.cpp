@@ -4,16 +4,18 @@
 void testApp::setup(){
 
     receiver.setup();
+    ofEnableAlphaBlending();
     ofAddListener(receiver.getEvents().nodeAdded, this, &testApp::nodeAdded);
     ofAddListener(receiver.getEvents().nodeUpdated, this, &testApp::nodeUpdated);
     ofAddListener(receiver.getEvents().nodeRemoved, this, &testApp::nodeRemoved);
-
+    ofEnableBlendMode(OF_BLENDMODE_ADD);
 
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
     receiver.update();
+    updateIndices();
     
 }
 
@@ -25,36 +27,37 @@ void testApp::draw(){
         ofBackground(0);
         x = 10;
         y = 10;
-        for (int i =0; i<nodes.size(); i++) {
+        for (int i =0; i<activeNodes.size(); i++) {
+            int index = activeNodes[i];
             ofColor c = ofColor(0, 0, 0);
-            if(nodes[i].type == Router){
+            if(nodes[index].type == Router){
                 c = ofColor::cyan;
             }
             else{
                 c = ofColor::chartreuse;
                 
-//                if (nodes[i].probedESSID.size() <= 0 ) {
-//                    continue;
-//                }
+                if (nodes[i].probedESSID.size() <= 1 ) {
+                    continue;
+                }
             }
             
-            float r = ofMap(nodes[i].Power, 10, 80, 5, 10);
+            float r = ofMap(nodes[index].Power, 1, 80, 1, 10);
             ofSetColor(c);
-            ofCircle(x, y, r);
+            ofCircle(x, y, r,0.5);
             
-            if (nodes[i].type == Router) {
+            if (nodes[index].type == Router) {
                 ofSetColor(255);
-                ofDrawBitmapString(nodes[i].ESSID, ofPoint(x,y));
+                ofDrawBitmapString(nodes[index].ESSID, ofPoint(x,y));
             }
             else{
                 ofSetColor(255);
-                ofDrawBitmapString(nodes[i].BSSID,ofPoint(x,y));//probedESSID[ofRandom(nodes[i].probedESSID.size() - 1)], ofPoint(x,y));
+                ofDrawBitmapString(nodes[index].probedESSID[0], ofPoint(x,y));
             }
         
             y +=  30 ;
             
             if(y > ofGetHeight() -20){
-                x += 200;
+                x += 180;
                 y = 10;
                 
             }
@@ -65,18 +68,16 @@ void testApp::draw(){
 }
 //--------------------------------------------------------------
 void testApp::nodeAdded(AirodumpEventArgs& args){
-//    Node n = ;
-    nodes.push_back(Node(args.params));
-//    Node* n1 = &nodes[nodes.size() -1];
-    
 
+    string ID = trim(args.BSSID);
     if(args.type == "Router"){
-        routerMapIndex[args.BSSID] = nodes.size()-1;
+        routerMapIndex[args.BSSID] = nodes.size();
     }
     else{
-        clientMapIndex[args.BSSID] = nodes.size()-1;
+        clientMapIndex[args.BSSID] = nodes.size();
     }
  
+    nodes.push_back(Node(args.params));
     cout<<"added  "<<args.type<<" : "<<args.BSSID<<endl;//args.params<<endl;
 }
 //--------------------------------------------------------------
@@ -86,6 +87,7 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
     if(args.type == "Router"){
      
         if (routerMapIndex.find(args.BSSID) != routerMapIndex.end()) {
+            int index = clientMapIndex[args.BSSID];
             nodes[routerMapIndex[args.BSSID]].updateNode(args.params);
 
         }
@@ -96,7 +98,8 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
     }
     else{
         if (clientMapIndex.find(args.BSSID) != clientMapIndex.end()) {
-            nodes[clientMapIndex[args.BSSID]].updateNode(args.params);
+            int index = clientMapIndex[args.BSSID];
+            nodes[index].updateNode(args.params);
 
         }
         else{
@@ -104,16 +107,48 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
         }
     }
     
+
     ofLog()<<"[ nodeUpdated ] "<<args.params<<endl;
 }
+
 //--------------------------------------------------------------
 void testApp::nodeRemoved(AirodumpEventArgs& args){
-    cout<<"removed"<<endl;
-    cout<<args.params<<endl;
+    string ID = trim(args.BSSID);
+    if(args.type == "Router"){
+
+        if (routerMapIndex.find(ID) != routerMapIndex.end()) {
+            int index = routerMapIndex[ID];
+            nodes[index].alive = false;
+
+        }
+        else{
+            ofLogError()<<" Router : "<<ID<< " not found. It shouldn't be updating"<<endl;
+        }
+        
+    }
+    else{
+        if (clientMapIndex.find(ID) != clientMapIndex.end()) {
+            int index = clientMapIndex[ID];
+            nodes[index].alive = false;
+        }
+        else{
+            ofLogError()<<" Client : "<<ID<< " not found. It shouldn't be updating"<<endl;
+        }
+    }
     
+    ofLog()<<"[ nodeRemoved ] "<<ID<<endl;
     
 }
 
+//--------------------------------------------------------------
+void testApp::updateIndices(){
+    activeNodes.clear();
+    for (int i =0 ; i<nodes.size(); i++) {
+        if (nodes[i].alive) {
+            activeNodes.push_back(i);
+        }
+    }
+}
 
 //--------------------------------------------------------------
 void testApp::exit(){
@@ -131,7 +166,7 @@ void testApp::keyPressed(int key){
     
     if(key == ' '){
         for (int i = 0; i<nodes.size(); i++) {
-            cout<<""
+            cout<<i<<" : "<<nodes[i].firstTimeString<<" : "<<nodes[i].BSSID<< endl;
         }
     }
 }

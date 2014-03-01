@@ -25,12 +25,15 @@ public:
     void nodeAdded(AirodumpEventArgs& args);
     void nodeUpdated(AirodumpEventArgs& args);
     void nodeRemoved(AirodumpEventArgs& args);
+    void updateIndices();
     
 	
     vector<Node> nodes;
+    vector <int> activeNodes;
     OscReceiver receiver;
     map<string, int> clientMapIndex;
     map<string, int> routerMapIndex;
+    vector<pair<int, int> > indexPairs;
     //        AirodumpEvents events;
     int maxPower, minPower;
     ofVec2f currentPos;

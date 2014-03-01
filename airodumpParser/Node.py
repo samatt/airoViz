@@ -17,12 +17,13 @@ class Node(object):
             self.ip = " "    
             self.ESSID = " "    
             self.probedESSID = " "
+            self.alive = None
 
         elif kind == "Router":
             # print "Router"
             # params = line.split(",")
             self.kind = "Router"
-            self.BSSID = params[0]
+            self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
             self.lastTimeSeen = params[2]
             self.Channel = int(params[3])
@@ -32,12 +33,13 @@ class Node(object):
             self.ESSID = params[13]    
             self.probedESSID = " "
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.ESSID]
+            self.alive = True;
 
         else:
             # print "Client"
             # params = line.split(",")
             self.kind = "Client"
-            self.BSSID = params[0]
+            self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
             self.lastTimeSeen = params[2]
             self.Channel =  -1
@@ -49,6 +51,7 @@ class Node(object):
             self.ESSID = " "
             self.probedESSID = params[6:]
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power)," ".join(self.probedESSID)]
+            self.alive = True;
 
     def printParams(self):
         print self.kind
@@ -62,6 +65,7 @@ class Node(object):
         # print self.ip
         print self.ESSID
         print self.probedESSID
+        print self.alive
 
     def trimParams(self):
         self.kind = self.kind.strip()
@@ -78,8 +82,8 @@ class Node(object):
 	
     def updateRouterNode(self, params):
         print "Updating Router : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
-        self.kind = "Router"
-        self.BSSID = params[0]
+        # self.kind = "Router"
+        # self.BSSID = params[0]
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
         self.Channel = int(params[3])
@@ -94,8 +98,8 @@ class Node(object):
     def updateClientNode(self, params):
         print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2] + " networks : " 
         print params[6:]
-    	self.kind = "Client"
-        self.BSSID = params[0]
+    	# self.kind = "Client"
+        # self.BSSID = params[0]
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
         self.Channel =  -1

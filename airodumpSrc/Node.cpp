@@ -21,6 +21,7 @@ Node::Node(){
     Power = -1;
     IP = " ";
     ESSID = " ";
+    alive = false;
 //    probedESSID = " ";
 }
 
@@ -44,11 +45,16 @@ Node::Node(string args){
     Channel =  ofToInt(params[N_CHANNEL]);
     Speed = ofToInt(params[N_SPEED]);
     Power = ofToInt(params[N_POWER]);
+    alive = true;
 
 }
 
 void Node::updateNode(string args){
     vector<string> params = ofSplitString(args, ",");
+    if(params.size() <  8){
+        ofLogError()<<"Funky args : "<<args<<endl;
+        return;
+    }
     params[N_KIND] =trim(params[N_KIND]);
     if( params[N_KIND] == "Router"){
         type = Router;
@@ -62,6 +68,8 @@ void Node::updateNode(string args){
         }
 
     }
+    
+    alive = true;
     BSSID = trim(params[N_BSSID]);
     
     setTimeString(params[N_FIRSTTIME],true);

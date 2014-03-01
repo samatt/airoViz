@@ -22,6 +22,7 @@ public:
     int Channel;
     int Speed;
     string Privacy;
+    bool alive;
 
     int Power;
     string IP;
