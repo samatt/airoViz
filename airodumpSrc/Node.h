@@ -19,7 +19,7 @@ public:
     string BSSID;
     DateAndTime firstTimeSeen;
     DateAndTime lastTimeSeen;
-    int channel;
+    int Channel;
     int Speed;
     string Privacy;
 
@@ -35,11 +35,12 @@ public:
     //    int numIV;
     
     //Client only
-    string probedESSID;
+    vector<string> probedESSID;
 //    Station MAC,
 //   int  numPackets;
 
 
+    void updateNode(string args);
     DateAndTime convertDateAndTime(string dateTime);
     void setFirstTimeSeen(string dateTime);
     void setLastTimeSeen(string dateTime);

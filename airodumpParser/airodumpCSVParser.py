@@ -62,7 +62,7 @@ def readFile(fileName):
 				# print param
 				print "Router " +  routers[params[0]].BSSID + " updated"
 				routers[params[0]].updateRouterNode(params)	
-				sender.updateNode(routers[params[0]].wrapForOsc())		
+				sender.updateNode(routers[params[0]].wrapForOsc(),params[0],"Router")		
 		
 		elif params[0] in clients and not isRouter:
 
@@ -70,16 +70,16 @@ def readFile(fileName):
 
 				print  "Client " + clients[params[0]] .BSSID+ " updated"
 			 	clients[params[0]].updateClientNode(params)
-				sender.updateNode(clients[params[0]].wrapForOsc())		
+				sender.updateNode(clients[params[0]].wrapForOsc(), params[0], "Client")		
 		else:
 			if isRouter:
 				n =  parseLine(params,isRouter)
 				routers[n.BSSID] = n
-				sender.newNode(n.wrapForOsc())
+				sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
 			else:
 				n =  parseLine(params,isRouter)
 				clients[n.BSSID] = n
-				sender.newNode(n.wrapForOsc())
+				sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
 
 
 		# print len(nodes)

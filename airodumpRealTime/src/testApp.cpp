@@ -22,7 +22,9 @@ void testApp::draw(){
 }
 //--------------------------------------------------------------
 void testApp::nodeAdded(AirodumpEventArgs& args){
-    cout<<"added"<<endl;//args.params<<endl;
+    Node n = Node(args.params);
+    nodes.push_back(n);
+    cout<<"added  "<<args.type<<" : "<<args.BSSID<<endl;//args.params<<endl;
 }
 //--------------------------------------------------------------
 void testApp::nodeUpdated(AirodumpEventArgs& args){

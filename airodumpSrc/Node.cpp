@@ -13,7 +13,7 @@ Node::Node(){
     BSSID = " ";
 //    firstTimeSeen = " ";
 //    lastTimeSeen = " ";
-    channel  = -1;
+    Channel  = -1;
     Speed = -1;
     Privacy = " ";
     
@@ -21,11 +21,52 @@ Node::Node(){
     Power = -1;
     IP = " ";
     ESSID = " ";
-    probedESSID = " ";
+//    probedESSID = " ";
 }
 
 Node::Node(string args){
+    vector<string> params = ofSplitString(args, ",");
     
+    if( params[N_KIND] == "Router"){
+        type = Router;
+        ESSID = params[N_ESSID];
+        
+    }
+    else{
+        type = Client;
+        probedESSID = ofSplitString(params[N_ESSID], " ");
+    }
+    BSSID = params[N_BSSID];
+    
+    setTimeString(params[N_FIRSTTIME],true);
+    setTimeString(params[N_LASTTIME],false);
+    
+    Channel =  ofToInt(params[N_CHANNEL]);
+    Speed = ofToInt(params[N_SPEED]);
+    Power = ofToInt(params[N_POWER]);
+
+}
+
+void Node::updateNode(string args){
+    vector<string> params = ofSplitString(args, ",");
+    
+    if( params[N_KIND] == "Router"){
+        type = Router;
+        ESSID = params[N_ESSID];
+        
+    }
+    else{
+        type = Client;
+        probedESSID = ofSplitString(params[N_ESSID], " ");
+    }
+    BSSID = params[N_BSSID];
+    
+    setTimeString(params[N_FIRSTTIME],true);
+    setTimeString(params[N_LASTTIME],false);
+    
+    Channel =  ofToInt(params[N_CHANNEL]);
+    Speed = ofToInt(params[N_SPEED]);
+    Power = ofToInt(params[N_POWER]);
 }
 
 void Node::setTimeString(string dateTime, bool firsTime){
@@ -41,6 +82,7 @@ void Node::setTimeString(string dateTime, bool firsTime){
 
 DateAndTime Node::convertDateAndTime(string dateTime){
     
+    dateTime = trim(dateTime);
     vector<string> strings;
     DateAndTime curTime;
     strings = ofSplitString(dateTime, " ");

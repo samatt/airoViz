@@ -7,18 +7,29 @@ class oscSender(object):
 		self.client.connect( ("localhost", port) )
 		print "Started server on port : " + str(port)
 
-	def newNode(self,args):
-		self.client.send( OSCMessage("/new", args ) )
+	def newNode(self,args,BSSID,kind):
+		msg = OSCMessage("/new" )
+		msg.append(kind)
+		msg.append(args)
+		msg.append(BSSID) 
+		self.client.send(msg)
 		# print "new"
 
-	def updateNode(self,args):
-		self.client.send( OSCMessage("/update", args ) )
+	def updateNode(self,args,BSSID,kind):
+		msg =  OSCMessage("/update")
+		msg.append(kind)
+		msg.append(args)
+		msg.append(BSSID) 
+		self.client.send(msg)
 		# print "update"
 
-	def removeNode(self,args):
-		self.client.send( OSCMessage("/remove", args ) )
+	def removeNode(self,args, kind):
+		msg =  OSCMessage("/remove")
+		msg.append(kind)
+		msg.append(args)
+		msg.append(BSSID) 
+		self.client.send(msg)
 
 	def closeConnection(self):
-		if(kind == "Router"):
-			self.client.send( OSCMessage("/quit", args ) )
+		self.client.send( OSCMessage("/quit", args ) )
 	
