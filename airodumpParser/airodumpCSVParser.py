@@ -130,19 +130,25 @@ def killNodes():
 	for k, v in clientBSSID.iteritems():
 	  if k in clientBSSID:
 	  	if clientBSSID[k] > count:
-		  	print "removeNode print" + k
-			sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
-			clientBSSID[k] = 0
-			clients[k].alive = False
+	  		if clients[k].alive == True:
+			  	print "removeNode print" + k
+				sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
+				clientBSSID[k] = 0
+				clients[k].alive = False
+			else:
+				print "Already dead router: " + k
 		# del clients[k]	  	
 
 	for k, v in routerBSSID.iteritems():
 	  if k in routerBSSID:
 	  	if routerBSSID[k] > count:
-		  	print "removeRouter " + k
-			sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
-			routerBSSID[k] = 0
-			routers[k].alive = False
+		  	if routers[k].alive == True:
+			  	print "removeRouter " + k
+				sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
+				routerBSSID[k] = 0
+				routers[k].alive = False
+			else:
+				print "Already dead client: " + k
 
 if __name__ == '__main__' :
 	notFirsTime = False

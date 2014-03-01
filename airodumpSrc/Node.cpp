@@ -51,10 +51,7 @@ Node::Node(string args){
 
 void Node::updateNode(string args){
     vector<string> params = ofSplitString(args, ",");
-    if(params.size() <  8){
-        ofLogError()<<"Funky args : "<<args<<endl;
-        return;
-    }
+
     params[N_KIND] =trim(params[N_KIND]);
     if( params[N_KIND] == "Router"){
         type = Router;

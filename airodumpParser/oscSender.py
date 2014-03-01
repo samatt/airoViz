@@ -16,6 +16,8 @@ class oscSender(object):
 		# print "new"
 
 	def updateNode(self,args,BSSID,kind):
+		if BSSID == " ":
+			return 
 		msg =  OSCMessage("/update")
 		msg.append(kind.strip())
 		msg.append(args)
