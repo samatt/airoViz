@@ -30,6 +30,7 @@ public:
     string AP;
     string firstTimeString;
     string lastTimeString;
+    int indexAP;
     //    string Cipher;
     //    string Authentication;
     //    int numBeacons;

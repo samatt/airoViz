@@ -106,14 +106,14 @@ class Node(object):
         print params[6:]
     	# self.kind = "Client"
         # self.BSSID = params[0]
+        # print params[8]
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
         self.Channel =  -1
         self.Speed = -1
         self.Privacy = " "
-        # print params[8]
+        
         self.Power = -int(params[3])
-        #TODO: make list of all networks
         self.AP = params[5]
         self.ESSID = " "
         self.probedESSID = params[6:] 

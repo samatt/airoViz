@@ -43,9 +43,8 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 		if ID not in clients:
 			return False
 
-		# print "////"+clients[ID].lastTimeSeen + "////"+ lastTime+"////"
 		if not clients[ID].hasTimeChanged(lastTime):
-			# print "Time hasnt changed"
+			print "Time hasnt changed"
 			return False
 
 		if clients[ID].alive:
@@ -148,20 +147,19 @@ def readFile(fileName):
 
 
 def killNodes():
+
 	#no longer deleteing the nodes, just turning them off for oF. input file never deletes so hard to tell when to stop
- 	# print len(clientIdleCount)  
- 	# print len(routerIdleCount) 
-	# print clientIdleCount.values() 
-	# print "							"
-	# print  routerIdleCount.values() 
-	# print routers.keys()
 	
-	count = 10
+	count = 40
 
 	for k, v in clientIdleCount.iteritems():
+	  
 	  if k in clientIdleCount:
+	  
 	  	if v > count:
+	  
 	  		if clients[k].alive == True:
+	
 			  	print "remove client" + k
 				sender.removeNode(clients[k].wrapForOsc(),clients[k].BSSID,"Client")
 				clientIdleCount[k] = 1

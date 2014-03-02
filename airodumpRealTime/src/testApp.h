@@ -39,5 +39,10 @@ public:
     ofVec2f currentPos;
     int x,y;
     
+    int numAliveRouters, numAliveClients;
+    
+     map<string, ofPoint>routerPos;
+    
+    map<string,vector<int> > routerClientLinks;
     
 };
