@@ -79,6 +79,7 @@ void Node::updateNode(string args){
     setTimeString(params[N_FIRSTTIME],true);
     setTimeString(params[N_LASTTIME],false);
     
+    updateDuration();
     Channel =  ofToInt(params[N_CHANNEL]);
     Speed = ofToInt(params[N_SPEED]);
     Power = ofToInt(params[N_POWER]);
@@ -133,8 +134,10 @@ void Node::updateDuration(){
         s = ofGetSeconds() - lastTimeSeen.second;
     }
     
-//    h *= 3600;
-//    m *= 60;
+    cout<<"Duration : "<<h<<" : "<<m<<" : "<<s<<endl;
+    h *= 3600;
+    m *= 60;
+    
     duration = h + m + s;
     
 }

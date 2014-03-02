@@ -35,8 +35,8 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 		if not routers[ID].hasTimeChanged(lastTime):
 			return False
 
-		if routers[ID].alive:
-			return False		
+		# if routers[ID].alive:
+			# return False		
 
 		return True
 
@@ -44,11 +44,11 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 		if ID not in clients:
 			return False
 
-		if not clients[ID].hasTimeChanged(lastTime):
-			return False
+		# if not clients[ID].hasTimeChanged(lastTime):
+			# return False
 
-		if clients[ID].alive:
-			return False		
+		# if clients[ID].alive:
+			# return False		
 
 		return True
 
@@ -192,7 +192,7 @@ class MyHandler(LoggingEventHandler):
 			if ".kismet.csv" not in event.src_path and "kismet.netxml" not in event.src_path and ".cap" not in event.src_path:
 				csv = open(event.src_path, 'r')
 				readFile(csv)
-				killNodes()
+				# killNodes()
 				csv.close()		
 				print "Reading File!"
 				print event.src_path

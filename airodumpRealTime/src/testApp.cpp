@@ -76,11 +76,12 @@ void testApp::draw(){
                 else{
 
                     string ID = "\n" + nodes[activeNodes[cIdx[0]]].BSSID;
+                    ID += " : "+ofToString(nodes[activeNodes[cIdx[i]]].duration);
                     
                     ofColor c = ofColor::whiteSmoke;
-                    float hue = ofMap(n.getDuration(), 0, 60, ofColor::red.getHue(), ofColor::blue.getHue());
+                    float hue = ofMap(nodes[activeNodes[cIdx[i]]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
                     ofColor c1;
-                    cout<<hue<<","<<n.getDuration()<<endl;
+//                    cout<<hue<<","<<n.getDuration()<<endl;
                     c1.setHsb(hue, 128, 128);
                     ofSetColor(c1);
                     
@@ -89,18 +90,19 @@ void testApp::draw(){
                     for (int i = 1 ; i<cIdx.size(); i++) {
                         
                         string ID;
-                        ID= "\n\n\n";
+                        ID= "\n\n";
                         for (int j = 1 ; j<i; j++) {
                             ID += "\n";
                         }
 
                         ID += nodes[activeNodes[cIdx[i]]].BSSID;
+                        ID += " : "+ofToString(nodes[activeNodes[cIdx[i]]].duration);
                         
 
 
-                        float hue = ofMap(n.getDuration(), 0, 60, ofColor::red.getHue(), ofColor::blue.getHue());
+                        float hue = ofMap(nodes[activeNodes[cIdx[i]]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
                         ofColor c1;
-                        cout<<hue<<","<<n.getDuration()<<endl;
+//                        cout<<hue<<","<<n.getDuration()<<endl;
                         c1.setHsb(hue, 128, 128);
                         ofSetColor(c1);
                         

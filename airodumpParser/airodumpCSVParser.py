@@ -2,6 +2,7 @@ from Node import Node
 import sys
 from oscSender import oscSender
 import time, threading
+
 routers = dict()
 clients = dict()
 
