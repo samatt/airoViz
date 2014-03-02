@@ -133,8 +133,8 @@ void Node::updateDuration(){
         s = ofGetSeconds() - lastTimeSeen.second;
     }
     
-    h *= 3600;
-    m *= 60;
+//    h *= 3600;
+//    m *= 60;
     duration = h + m + s;
     
 }
