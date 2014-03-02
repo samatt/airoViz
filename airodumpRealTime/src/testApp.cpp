@@ -25,12 +25,12 @@ void testApp::update(){
     
     for(int i =0; i<activeNodes.size(); i++){
         
-        Node n = nodes[activeNodes[i]];
-        
+        Node& n = nodes[activeNodes[i]];
+        n.updateDuration();
         if (n.type == Router) {
             routerPos[n.BSSID] = ofPoint(routerX,routerY);
         }
-        
+
         routerX +=  200 ;
         
         if(routerX > ofGetWidth() -90){
@@ -45,7 +45,7 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
 
-    
+//    cout<<ofGetHours()<<" : "<<ofGetMinutes()<<" : "<<ofGetSeconds()<<endl;
     if(activeNodes.size()>0){
 
         ofBackground(0);
@@ -53,14 +53,14 @@ void testApp::draw(){
         y = 10;
         
         for (int i =0; i<activeNodes.size(); i++) {
-            Node n  = nodes[activeNodes[i]];
+            Node& n  = nodes[activeNodes[i]];
             
             if (n.type == Router) {
                 stringstream ss;
 
                 ofSetColor(ofColor::lightSkyBlue);
 //                ss<<n.ESSID<<endl;
-                ofDrawBitmapString(n.ESSID, routerPos[n.BSSID]);
+                ofDrawBitmapString(n.ESSID +"\n", routerPos[n.BSSID]);
                 
                 
 
@@ -69,19 +69,44 @@ void testApp::draw(){
                 vector<int> cIdx = routerClientLinks[n.BSSID];
                 if (cIdx.size() == 0) {
                     ofSetColor(ofColor::grey);
-                    ss<<"\nNo Clients"<<endl;
+                    ss<<"No Clients"<<endl;
                     ofDrawBitmapString(ss.str(), routerPos[n.BSSID]);
                     
                 }
                 else{
-                    ofSetColor(ofColor::whiteSmoke);
-                    ss<<"\n"<<nodes[activeNodes[cIdx[0]]].BSSID<<endl;
-                    for (int i = 1 ; i<cIdx.size(); i++) {
-                        string ID = nodes[activeNodes[cIdx[i]]].BSSID;
-                        ss<< ID<<endl;
+
+                    string ID = "\n" + nodes[activeNodes[0]].BSSID +"\n";
+                    
+                    ofColor c = ofColor::whiteSmoke;
+                    float sat = ofMap(n.getDuration(), 0, 3600, 0, 255);
+                    ofColor c1;
+                    c1.setHsb(c.getHue(), 255 - sat, c.getBrightness());
+                    ofSetColor(c1);
+                    
+                    ofDrawBitmapString(ID, routerPos[n.BSSID]);
+                    
+                    for (int i = 0 ; i<cIdx.size(); i++) {
+                        
+                        string ID;
+                        
+                        for (int j = 0 ; j<i; j++) {
+                            ID += "\n";
+                        }
+
+                        ID += nodes[activeNodes[cIdx[i]]].BSSID;
+                        
+
+                        ofColor c = ofColor::whiteSmoke;
+                        int sat = ofMap(n.getDuration(), 0, 100, 0, 255);
+                        ofColor c1;
+                        cout<<sat<<endl;
+                        c1.setHsb(c.getHue(), 255 - sat, c.getBrightness());
+                        ofSetColor(c1);
+                        
+                        ofDrawBitmapString(ID, routerPos[n.BSSID]);
                     }
                     
-                    ofDrawBitmapString(ss.str(), routerPos[n.BSSID]);
+                    
                 }
                 
 
@@ -258,10 +283,6 @@ void testApp::updateIndices(){
         if (nodes[i].type == Router) {
             
             numAliveRouters++;
-            
-//            if (routerClientLinks.find(nodes[i].type)) {
-//                <#statements#>
-//            }
         }
         else{
             
@@ -278,7 +299,7 @@ void testApp::updateIndices(){
     }
     
 
-    cout<<"num nodes removed:"<<x<<endl;
+//    cout<<"num nodes removed:"<<x<<endl;
 }
 
 //--------------------------------------------------------------

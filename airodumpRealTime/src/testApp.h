@@ -30,6 +30,7 @@ public:
 	
     vector<Node> nodes;
     vector <int> activeNodes;
+    vector<int> timeSortedIndices;
     OscReceiver receiver;
     map<string, int> clientMapIndex;
     map<string, int> routerMapIndex;
@@ -41,8 +42,7 @@ public:
     
     int numAliveRouters, numAliveClients;
     
-     map<string, ofPoint>routerPos;
-    
+    map<string, ofPoint>routerPos;
     map<string,vector<int> > routerClientLinks;
     
 };

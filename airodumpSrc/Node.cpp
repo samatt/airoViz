@@ -47,7 +47,7 @@ Node::Node(string args){
     
     setTimeString(params[N_FIRSTTIME],true);
     setTimeString(params[N_LASTTIME],false);
-    
+    duration = 0;
     Channel =  ofToInt(params[N_CHANNEL]);
     Speed = ofToInt(params[N_SPEED]);
     Power = ofToInt(params[N_POWER]);
@@ -116,4 +116,29 @@ DateAndTime Node::convertDateAndTime(string dateTime){
     curTime.second = ofToInt(t[2]);
     
     return curTime;
+}
+
+void Node::updateDuration(){
+    
+    int h =0;
+    int m = 0;
+    int s = 0;;
+    if (ofGetHours() > lastTimeSeen.hour) {
+        h = ofGetHours() - lastTimeSeen.hour;
+    }
+    if (ofGetMinutes() > lastTimeSeen.minute) {
+        m = ofGetMinutes() - lastTimeSeen.minute;
+    }
+    if (ofGetSeconds() > lastTimeSeen.second) {
+        s = ofGetSeconds() - lastTimeSeen.second;
+    }
+    
+    h *= 3600;
+    m *= 60;
+    duration = h + m + s;
+    
+}
+
+int Node::getDuration(){
+    return duration;
 }

@@ -2,29 +2,29 @@ from Node import Node
 import sys
 from oscSender import oscSender
 import time, threading
+from watchdog.observers import Observer
+from watchdog.events import LoggingEventHandler
+
+
+
 routers = dict()
 clients = dict()
-
 routerIdleCount = dict()
-# newrouter
 clientIdleCount = dict()
 
-isRouter = None
+
 def parseLine(params,isRouter):		
 
 		if isRouter:
 			node = Node("Router",params)
 			node.trimParams()
-			# node.printParams()
 			return node
-			
-		
+					
 		elif not isRouter:
 			node = Node("Client",params)
 			node.trimParams()
-			# node.printParams()
 			return node
-			# pass
+
 
 def isAliveAndTimeChanged(kind,ID,lastTime):
 	if kind == "Router":
@@ -45,7 +45,6 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 			return False
 
 		if not clients[ID].hasTimeChanged(lastTime):
-			print "Time hasnt changed"
 			return False
 
 		if clients[ID].alive:
@@ -96,20 +95,20 @@ def addNewNode(kind,ID, params):
 	
 	else:
 		
-		print "add clients"
+		# print "add clients"
 		n =  parseLine(params,False)
 		clients[n.BSSID] = n
 		clientIdleCount[ID] = 1
 		sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
 
 def readFile(fileName):
-
+	isRouter = None
 	for line in fileName:
 	
 		line.strip()
 		line = line.replace("\r\n"," ")
 		params = line.split(',')
-
+		# print params
 		if len(params) <6 :
 			continue
 
@@ -157,7 +156,7 @@ def killNodes():
 	#no longer deleteing the nodes, just turning them off for oF. input file never deletes so hard to tell when to stop
 	print clientIdleCount.values()
 	print routerIdleCount.values()
-	count = 10
+	count = 100
 
 	for k, v in clientIdleCount.iteritems():
 	  
@@ -182,103 +181,52 @@ def killNodes():
 				sender.removeNode(routers[k].wrapForOsc(),routers[k].BSSID,"Router")
 				routerIdleCount[k] = 1
 				routers[k].alive = False
-			
+
+
+class MyHandler(LoggingEventHandler):
+
+    def on_modified(self, event):
+    	if not event.is_directory:
+			print event.src_path
+
+			if ".kismet.csv" not in event.src_path and "kismet.netxml" not in event.src_path and ".cap" not in event.src_path:
+				csv = open(event.src_path, 'r')
+				readFile(csv)
+				killNodes()
+				csv.close()		
+				print "Reading File!"
+				print event.src_path
+			else:
+				print "Ignoring file : "+event.src_path 
+
+ #    def on_created(self,event):
+ #    	print "Created"
+	# def on_deleted(self,event):
+	# 	print "Deleted"
+
 
 if __name__ == '__main__' :
 
-	fileName = sys.argv[1]
+   	event_handler = MyHandler()
+   	path = sys.argv[1] if len(sys.argv) > 1 else '.'
+    
+	observer = Observer()
+	observer.schedule(event_handler, path, recursive=True)
+	observer.start()	
+	
 	sender = oscSender(8000)
+	
 	try :
-	    while 1 :
+	    while True :
 
 			time.sleep(1)
-			
-			print "test"
-
-			csv = open(fileName, 'r')
-			readFile(csv)
-			killNodes()
-			csv.close()
-			
-
+			# csv = open(path, 'r')
+			# readFile(csv)
+			# killNodes()
+			# csv.close()
 
 	except KeyboardInterrupt :
-		    print "\nClosing OSCServer."
-		    # mine.s.close()
-		    # print "Waiting for Server-thread to finish"
-		    # mine.st.join() ##!!!
-		    print "Done"
+		observer.stop()
+		observer.join()
+		print "Done"
 
-
-########OLD CODE
-		# if ID in routers and isRouter:
-		# 	if  routers[ID].alive:
-		# 		#collect ID (key) of all exisiting routers
-				
-		# 		# print  "HERE"
-		# 		if routers[ID].hasTimeChanged(lastTime):
-		# 			# print param
-		# 			# print "Router " +  routers[ID].BSSID + " updated"
-		# 			routers[ID].updateRouterNode(params)	
-		# 			sender.updateNode(routers[ID].wrapForOsc(),ID,"Router")
-		# 			routerIdleCount[ID] = 0
-		# 		else:
-		# 			if ID in routerIdleCount:
-		# 				routerIdleCount[ID] += 1
-		# 			else:
-		# 				print 'wtf?'
-		# 	else:
-		# 		if routers[ID].hasTimeChanged(lastTime):
-		# 			routers[ID].updateRouterNode(params)
-		# 			# doing new node as it was previously 'dead' and that message was sent to the oF app
-		# 			sender.newNode(routers[ID].wrapForOsc(), ID, "Router")		
-		
-		# elif ID in clients and not isRouter:
-		# 	if clients[ID].alive:
-
-
-		# 		if clients[ID].hasTimeChanged(lastTime):
-
-		# 			# print  "Client " + clients[ID] .BSSID+ " updated"
-		# 		 	clients[ID].updateClientNode(params)
-		# 			sender.updateNode(clients[ID].wrapForOsc(), ID, "Client")
-		# 			clientIdleCount[ID] = 0
-		# 		else:
-		# 			if ID in clientIdleCount:
-		# 				clientIdleCount[ID] += 1
-		# 			else:
-		# 				print 'wtf?'
-		# 	else:
-		# 		if clients[ID].hasTimeChanged(lastTime):
-		# 			clients[ID].updateClientNode(params)
-		# 			# doing new node as it was previously 'dead' and that message was sent to the oF app
-		# 			sender.newNode(clients[ID].wrapForOsc(), ID, "Client")
-
-		# else:
-			# if isRouter:
-			# 	n =  parseLine(params,isRouter)
-			# 	routers[n.BSSID] = n
-			# 	# routerIdleCount.append(ID)
-			# 	# print routers.keys()
-			# 	print "add routers" 
-			# 	routerIdleCount[ID] = 1
-			# 	sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
-			# else:
-			# 	print "add clients"
-			# 	n =  parseLine(params,isRouter)
-			# 	clients[n.BSSID] = n
-			# 	clientIdleCount[ID] = 1
-			# 	sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
-#########		
-
-	# test = ['EC:55:F9:5A:3B:F2', '2014-02-24 18:52:20', '2014-02-24 19:02:54',  '1',  '54', 'WPA' , 'TKIP','PSK', '-93','1','0','0','0','0','0','9', 'U10C022FC']
-	# node1 = Node("Router",test);
-	# node1.printParams()
-	# node1 = Node(test);
-	# node1.printParams()
-	# test2 = [' 54:26:96:D5:44:A5 ', '2014-02-24 18:50:26', '                        2014-02-24 18:50:26				', '-81','5',' (not associated)' , 'nyu,belkin.48e','232CAFE','Au Bon Pain','nyupda']
-	# node2 = Node("Client",test2)
-	# node2.trimParams()
-	# node2.printParams()
-
-	# test2 = list()

@@ -30,6 +30,7 @@ public:
     string AP;
     string firstTimeString;
     string lastTimeString;
+    int duration;
     int indexAP;
     //    string Cipher;
     //    string Authentication;
@@ -41,7 +42,9 @@ public:
 //    Station MAC,
 //   int  numPackets;
 
-
+    void updateDuration();
+    int getDuration();
+    
     void updateNode(string args);
     DateAndTime convertDateAndTime(string dateTime);
     void setFirstTimeSeen(string dateTime);
