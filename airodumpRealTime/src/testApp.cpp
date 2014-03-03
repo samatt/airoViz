@@ -368,6 +368,24 @@ void testApp::keyPressed(int key){
     if(key =='t'){
         gui->toggleMinified();
     }
+    
+    if(key == OF_KEY_UP){
+        if (currentMode == 0) {
+            routerY-= 10;
+        }
+        else{
+            clientY-= 10;
+        }
+    }
+    
+    if(key == OF_KEY_DOWN){
+        if (currentMode == 0) {
+            routerY+=10;
+        }
+        else{
+            clientY+= 10;
+        }
+    }
 }
 
 void testApp::guiEvent(ofxUIEventArgs& args){
