@@ -17,6 +17,7 @@ void testApp::setup(){
     gui->addIntSlider("RouterY :", -8000, 100, &routerY);
     gui->addIntSlider("Router Width : ", 100, 800, &routerWidth);
     gui->addIntSlider("Router Height : ", 20, 200, &routerHeight);
+    gui->addIntSlider("MAX DURATION : ", 60, 3600, &maxDuration);
     gui->addToggle("Show Duration", &showDuration);
     gui->addSpacer();
     gui->addIntSlider("Client X :", -10, 20, &clientX);
@@ -138,7 +139,7 @@ void testApp::draw(){
                 
                 ofEnableAlphaBlending();
                 //            float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
-                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 5000, 0, 150,true);
+                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, maxDuration, 0, 250,true);
                 ofColor c1;
                 
                 ofSetColor(255,255,255, 255 -alpha );
@@ -371,21 +372,42 @@ void testApp::keyPressed(int key){
     
     if(key == OF_KEY_UP){
         if (currentMode == 0) {
-            routerY-= 10;
+            routerY-= 100;
         }
         else{
-            clientY-= 10;
+            clientY-= 100;
         }
     }
     
     if(key == OF_KEY_DOWN){
         if (currentMode == 0) {
-            routerY+=10;
+            routerY+=100;
         }
         else{
-            clientY+= 10;
+            clientY+= 100;
         }
     }
+    
+    if(key == OF_KEY_LEFT){
+        if (currentMode == 0) {
+            routerHeight-=10;
+        }
+        else{
+            clientHeight-= 10;
+        }
+        
+    }
+    
+    if(key == OF_KEY_RIGHT){
+        if (currentMode == 0) {
+            routerHeight+=10;
+        }
+        else{
+            clientHeight+= 10;
+        }
+        
+    }
+
 }
 
 void testApp::guiEvent(ofxUIEventArgs& args){
