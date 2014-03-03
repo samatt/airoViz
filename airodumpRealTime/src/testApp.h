@@ -57,4 +57,5 @@ public:
     int clientY = 10;
     int clientWidth = 200;
     int clientHeight = 100;
+    bool showDuration = true;
 };

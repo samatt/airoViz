@@ -19,6 +19,7 @@ public:
     string BSSID;
     DateAndTime firstTimeSeen;
     DateAndTime lastTimeSeen;
+    DateAndTime durationSeen;
     int Channel;
     int Speed;
     string Privacy;
@@ -44,6 +45,7 @@ public:
 
     void updateDuration();
     int getDuration();
+    string getDurationString();
     
     void updateNode(string args);
     DateAndTime convertDateAndTime(string dateTime);

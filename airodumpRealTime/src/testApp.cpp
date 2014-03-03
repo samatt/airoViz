@@ -13,12 +13,13 @@ void testApp::setup(){
     gui->addFPS();
     gui->addSpacer();
     gui->addIntSlider("Router X :", -10, 20, &routerX);
-    gui->addIntSlider("RouterY :", -1000, 100, &routerY);
+    gui->addIntSlider("RouterY :", -8000, 100, &routerY);
     gui->addIntSlider("Router Width : ", 100, 800, &routerWidth);
     gui->addIntSlider("Router Height : ", 20, 200, &routerHeight);
+    gui->addToggle("Show Duration", &showDuration);
     gui->addSpacer();
     gui->addIntSlider("Client X :", -10, 20, &clientX);
-    gui->addIntSlider("ClientY :", -1000, 100, &clientY);
+    gui->addIntSlider("ClientY :", -18000, 100, &clientY);
     gui->addIntSlider("client Width : ", 100, 800, &clientWidth);
     gui->addIntSlider("client Height : ", 20, 200, &clientHeight);
     gui->autoSizeToFitWidgets();
@@ -77,30 +78,10 @@ void testApp::update(){
         }
     }
     
-    
-    //    for(int i =0; i<activeNodes.size(); i++){
-    //
-    //        Node& n = nodes[activeNodes[i]];
-    //
-    //        if (n.type == Router) {
-    //            routerPos[n.BSSID] = ofPoint(routerX,routerY);
-    //        }
-    //
-    //        routerX +=  200 ;
-    //
-    //        if(routerX > ofGetWidth() -90){
-    //            routerX  = 20;
-    //            routerY += 100;
-    //
-    //        }
-    //    }
-    //
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    
-    
     
     ofBackground(0);
     x = 20;
@@ -126,9 +107,7 @@ void testApp::draw(){
                 ss<<"\nNo Clients"<<endl;
                 ofDrawBitmapString(ss.str(), routerPos[router.BSSID]);
                 continue;
-                
             }
-            
             
             for (int j = 0 ; j<clientIndex.size(); j++) {
                 string ID;
@@ -141,26 +120,27 @@ void testApp::draw(){
                             ID += "\n\n";
                         }
                         else{
-                            k += "\n";
-                            
+                            ID += "\n";
                         }
-                        
                     }
                 }
-                
 
-                
                 ID += nodes[clientIndex[j]].BSSID ;
-//                cout<<ID<<endl;
-                ID += " : "+ofToString(nodes[clientIndex[j]].getDuration()) + "\n";
+                
+                if(showDuration){
+                    ID += " "+ofToString(nodes[clientIndex[j]].getDurationString()) + "\n";
+                }
+                else{
+                    ID += "\n";
+                }
+                
                 
                 ofEnableAlphaBlending();
                 //            float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
-                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 120, 100, 255);
+                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 5000, 0, 150,true);
                 ofColor c1;
                 
-                ofSetColor(255,255,255,255 );
-                
+                ofSetColor(255,255,255, 255 -alpha );
                 ofDrawBitmapString(ID, routerPos[router.BSSID]);
             }
             
@@ -202,18 +182,13 @@ void testApp::draw(){
 
                 }
                 
-                ID += probedIDs[j];
-                //                ID += " : "+ofToString(nodes[clientIndex[j]].getDuration());
+                ID += trim(probedIDs[j]);
 
                 ofEnableAlphaBlending();
-//                float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
-//                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 120, 0, 255);
                 ofColor c1;
                 
                 ofSetColor(255,255,255,255);
                 ofDrawBitmapString(ID, clientPos[client.BSSID]);
-//                ofDrawBitmapString(ID, clientPos[client.BSSID]);
-                cout<<clientPos[client.BSSID]<<": "<<client.BSSID<<endl;
             }
         }
     }
@@ -386,6 +361,9 @@ void testApp::keyPressed(int key){
     if (key =='2') {
         currentMode = 1;
     }
+    if(key == 'h'){
+        gui->toggleVisible();
+    }
 }
 
 void testApp::guiEvent(ofxUIEventArgs& args){
@@ -432,6 +410,24 @@ void testApp::dragEvent(ofDragInfo dragInfo){
     
 }
 
+
+//    for(int i =0; i<activeNodes.size(); i++){
+//
+//        Node& n = nodes[activeNodes[i]];
+//
+//        if (n.type == Router) {
+//            routerPos[n.BSSID] = ofPoint(routerX,routerY);
+//        }
+//
+//        routerX +=  200 ;
+//
+//        if(routerX > ofGetWidth() -90){
+//            routerX  = 20;
+//            routerY += 100;
+//
+//        }
+//    }
+//
 //    for (int i =0; i<activeNodes.size(); i++) {
 //        Node& n  = nodes[activeNodes[i]];
 //
