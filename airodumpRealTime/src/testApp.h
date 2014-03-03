@@ -26,6 +26,7 @@ public:
     void nodeAdded(AirodumpEventArgs& args);
     void nodeUpdated(AirodumpEventArgs& args);
     void nodeRemoved(AirodumpEventArgs& args);
+    void guiEvent(ofxUIEventArgs& args);
     void updateIndices();
     
 	
@@ -48,4 +49,12 @@ public:
     map<string,vector<int> > routerClientLinks;
     
     ofxUISuperCanvas* gui;
+    int routerX = 20;
+    int routerY = 10;
+    int routerWidth = 200;
+    int routerHeight = 100;
+    int clientX = 20;
+    int clientY = 10;
+    int clientWidth = 200;
+    int clientHeight = 100;
 };

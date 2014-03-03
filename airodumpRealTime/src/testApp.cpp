@@ -8,8 +8,21 @@ void testApp::setup(){
     ofAddListener(receiver.getEvents().nodeAdded, this, &testApp::nodeAdded);
     ofAddListener(receiver.getEvents().nodeUpdated, this, &testApp::nodeUpdated);
     ofAddListener(receiver.getEvents().nodeRemoved, this, &testApp::nodeRemoved);
-    //    ofEnableBlendMode(OF_BLENDMODE_ADD);
     
+    gui = new ofxUISuperCanvas("SUPER COMPACT", OFX_UI_FONT_MEDIUM);
+    gui->addSpacer();
+    gui->addIntSlider("Router X :", -10, 20, &routerX);
+    gui->addIntSlider("RouterY :", -10, 20, &routerY);
+    gui->addIntSlider("Router Width : ", 100, 800, &routerWidth);
+    gui->addIntSlider("Router Height : ", 20, 200, &routerHeight);
+    gui->addSpacer();
+    gui->addIntSlider("Client X :", -10, 20, &clientX);
+    gui->addIntSlider("ClientY :", -10, 20, &clientY);
+    gui->addIntSlider("client Width : ", 100, 800, &clientWidth);
+    gui->addIntSlider("client Height : ", 20, 200, &clientHeight);
+    gui->autoSizeToFitWidgets();
+    gui->loadSettings("GUI/guiSettings.xml");
+    ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
 }
 
 //--------------------------------------------------------------
@@ -17,10 +30,10 @@ void testApp::update(){
     receiver.update();
     //    updateIndices();
     
-    int routerX = 20;
-    int routerY = 10;
-    int clientX = 20;
-    int clientY = 10;
+    int rX = routerX;
+    int rY = routerY;
+    int cX = clientX;
+    int cY = clientY;
     for(int i =0; i<nodes.size(); i++){
         Node& n = nodes[i];
         
@@ -31,18 +44,19 @@ void testApp::update(){
             if (routerPos.find(n.BSSID) == routerPos.end() ) {
                 continue;
             }
-            routerPos[n.BSSID] = ofPoint(routerX,routerY);
-            routerX +=  200 ;
+            routerPos[n.BSSID] = ofPoint(rX,rY);
+            rX +=  routerWidth ;
             
-            if(routerX > ofGetWidth() -90){
-                routerX  = 20;
-                routerY += 100;
+            if(rX > ofGetWidth() -90){
+                rX  = routerX;
+                rY += routerHeight;
                 
             }
             
         }
         else{
             
+
             //check if there is a link bertween the current client and its associated AP
             if( ! ofContains(routerClientLinks[n.AP],i)){
                 
@@ -54,11 +68,11 @@ void testApp::update(){
                 continue;
             }
             
-            clientPos[n.BSSID]=ofPoint(clientX,clientY);
-            clientX  += 200;
-            if(clientX > ofGetWidth() -90){
-                clientX  = 20;
-                clientY += 100;
+            clientPos[n.BSSID]=ofPoint(cX,cY);
+            cX  += clientWidth;
+            if(cX > ofGetWidth() -90){
+                cX  = clientX;
+                cY += clientHeight;
                 
             }
         }
@@ -342,6 +356,8 @@ void testApp::updateIndices(){
 
 //--------------------------------------------------------------
 void testApp::exit(){
+    gui->saveSettings("GUI/guiSettings.xml");
+    delete gui;
     ofRemoveListener(receiver.getEvents().nodeAdded, this, &testApp::nodeAdded);
     ofRemoveListener(receiver.getEvents().nodeUpdated, this, &testApp::nodeUpdated);
     ofRemoveListener(receiver.getEvents().nodeRemoved, this, &testApp::nodeRemoved);
@@ -367,6 +383,9 @@ void testApp::keyPressed(int key){
     }
 }
 
+void testApp::guiEvent(ofxUIEventArgs& args){
+    
+}
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
     
