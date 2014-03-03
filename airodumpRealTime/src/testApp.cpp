@@ -3,6 +3,7 @@
 //--------------------------------------------------------------
 void testApp::setup(){
     
+    ofEnableAlphaBlending();
     receiver.setup();
     currentMode = 0;
     ofAddListener(receiver.getEvents().nodeAdded, this, &testApp::nodeAdded);
@@ -155,7 +156,7 @@ void testApp::draw(){
             }
             
             Node& client = nodes[i];
-            ofSetColor(ofColor::chartreuse);
+            ofSetColor(ofColor::lightCyan);
             ofDrawBitmapString(client.BSSID +"\n", clientPos[client.BSSID]);
             
             vector<string>& probedIDs = client.probedESSID;
@@ -184,7 +185,7 @@ void testApp::draw(){
                 
                 ID += trim(probedIDs[j]);
 
-                ofEnableAlphaBlending();
+
                 ofColor c1;
                 
                 ofSetColor(255,255,255,255);
@@ -363,6 +364,9 @@ void testApp::keyPressed(int key){
     }
     if(key == 'h'){
         gui->toggleVisible();
+    }
+    if(key =='t'){
+        gui->toggleMinified();
     }
 }
 
