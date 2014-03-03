@@ -57,6 +57,7 @@ public:
     int clientY = 10;
     int clientWidth = 200;
     int clientHeight = 100;
-    bool showDuration = true;
     int maxDuration = 2000;
+    bool showDuration = true;
+    bool showSSIDs = true;
 };

@@ -12,6 +12,7 @@ void testApp::setup(){
     
     gui = new ofxUISuperCanvas("SUPER COMPACT", OFX_UI_FONT_MEDIUM);
     gui->addFPS();
+
     gui->addSpacer();
     gui->addIntSlider("Router X :", -10, 20, &routerX);
     gui->addIntSlider("RouterY :", -8000, 100, &routerY);
@@ -20,7 +21,9 @@ void testApp::setup(){
     gui->addIntSlider("MAX DURATION : ", 60, 3600, &maxDuration);
     gui->addToggle("Show Duration", &showDuration);
     gui->addSpacer();
-    gui->addIntSlider("Client X :", -10, 20, &clientX);
+    gui->addToggle("Show Duration", &showSSIDs);
+    gui->addSpacer();
+    gui->addIntSlider("Client X :", -10, 200, &clientX);
     gui->addIntSlider("ClientY :", -18000, 100, &clientY);
     gui->addIntSlider("client Width : ", 100, 800, &clientWidth);
     gui->addIntSlider("client Height : ", 20, 200, &clientHeight);
@@ -102,6 +105,9 @@ void testApp::draw(){
             ofSetColor(ofColor::lightSkyBlue);
             ofDrawBitmapString(router.ESSID +"\n", routerPos[router.BSSID]);
             
+            
+            if(!showSSIDs) continue;
+            
             vector<int> clientIndex = routerClientLinks[router.BSSID];
             
             if (clientIndex.size() == 0) {
@@ -160,6 +166,8 @@ void testApp::draw(){
             ofSetColor(ofColor::lightCyan);
             ofDrawBitmapString(client.BSSID +"\n", clientPos[client.BSSID]);
             
+            if(!showSSIDs) continue;
+            
             vector<string>& probedIDs = client.probedESSID;
             
             if (probedIDs.size() == 1 && probedIDs[0] == " ") {
@@ -181,7 +189,6 @@ void testApp::draw(){
                     else{
                         ID += "\n";
                     }
-
                 }
                 
                 ID += trim(probedIDs[j]);
@@ -406,6 +413,14 @@ void testApp::keyPressed(int key){
             clientHeight+= 10;
         }
         
+    }
+    
+    if(key =='d'){
+        showDuration = !showDuration;
+    }
+    
+    if(key =='m'){
+        showSSIDs = !showSSIDs;
     }
 
 }
