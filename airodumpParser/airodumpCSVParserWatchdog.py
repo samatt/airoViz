@@ -44,8 +44,8 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 		if ID not in clients:
 			return False
 
-		# if not clients[ID].hasTimeChanged(lastTime):
-			# return False
+		if not clients[ID].hasTimeChanged(lastTime):
+			return False
 
 		# if clients[ID].alive:
 			# return False		

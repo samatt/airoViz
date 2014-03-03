@@ -41,8 +41,9 @@ public:
     int x,y;
     
     int numAliveRouters, numAliveClients;
-    
+    int currentMode;
     map<string, ofPoint>routerPos;
+    map<string, ofPoint>clientPos;
     map<string,vector<int> > routerClientLinks;
     
 };

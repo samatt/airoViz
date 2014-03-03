@@ -134,12 +134,12 @@ void Node::updateDuration(){
         s = ofGetSeconds() - lastTimeSeen.second;
     }
     
-    cout<<"Duration : "<<h<<" : "<<m<<" : "<<s<<endl;
+
     h *= 3600;
     m *= 60;
     
     duration = h + m + s;
-    
+//    cout<<"Duration  "<<BSSID<<" : "<<duration<<endl;
 }
 
 int Node::getDuration(){
