@@ -140,7 +140,7 @@ void testApp::draw(){
 //        c.setHsb(hue, 100, 100);
             c = ofColor::chartreuse;
             
-            if (nodes[i].probedESSID == "") {
+            if (nodes[i].probedESSID.size()) {
                 continue;
             }
         }
@@ -157,7 +157,7 @@ void testApp::draw(){
 //            ofSetColor(c);
 //            ofCircle(x, y, r);
             ofSetColor(255);
-            ofDrawBitmapString(nodes[i].probedESSID, ofPoint(x,y));
+            ofDrawBitmapString(ofToString(nodes[i].probedESSID.size()), ofPoint(x,y));
         }
 
         y +=  30 ;

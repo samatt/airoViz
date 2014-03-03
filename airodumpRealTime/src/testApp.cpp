@@ -27,6 +27,10 @@ void testApp::update(){
         n.updateDuration();
         //TODO: Add check for duration
         if (n.type == Router) {
+            
+            if (routerPos.find(n.BSSID) == routerPos.end() ) {
+                continue;
+            }
             routerPos[n.BSSID] = ofPoint(routerX,routerY);
             routerX +=  200 ;
             
@@ -44,13 +48,18 @@ void testApp::update(){
                 
                 routerClientLinks[n.AP].push_back(i);
                 
-                clientPos[n.BSSID]=ofPoint(clientX,clientY);
-                clientX  += 200;
-                if(clientX > ofGetWidth() -90){
-                    clientX  = 20;
-                    clientY += 100;
-                    
-                }
+            }
+            
+            if (clientPos.find(n.BSSID) == clientPos.end() ) {
+                continue;
+            }
+            
+            clientPos[n.BSSID]=ofPoint(clientX,clientY);
+            clientX  += 200;
+            if(clientX > ofGetWidth() -90){
+                clientX  = 20;
+                clientY += 100;
+                
             }
         }
     }
@@ -110,15 +119,27 @@ void testApp::draw(){
             
             for (int j = 0 ; j<clientIndex.size(); j++) {
                 string ID;
-                if(j == 0)ID= "\n\n";
-                
-                for (int k = 0 ; k<j; k++) {
-                    ID += "\n";
+                if(j == 0){
+                 ID= "\n";
+                }
+                else{
+                    for (int k = 0 ; k<j; k++) {
+                        if(k == 0){
+                            ID += "\n\n";
+                        }
+                        else{
+                            k += "\n";
+                            
+                        }
+                        
+                    }
                 }
                 
-                ID += nodes[clientIndex[j]].BSSID;
+
+                
+                ID += nodes[clientIndex[j]].BSSID ;
 //                cout<<ID<<endl;
-                ID += " : "+ofToString(nodes[clientIndex[j]].getDuration());
+                ID += " : "+ofToString(nodes[clientIndex[j]].getDuration()) + "\n";
                 
                 ofEnableAlphaBlending();
                 //            float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
@@ -146,25 +167,34 @@ void testApp::draw(){
             
             vector<string>& probedIDs = client.probedESSID;
             
+            if (probedIDs.size() == 1 && probedIDs[0] == " ") {
+                ofSetColor(ofColor::grey);
+
+                ofDrawBitmapString("\nNo Stations Found yet", clientPos[client.BSSID]);
+                continue;
+                
+            }
+            
             for (int j = 0; j < probedIDs.size() ; j++) {
                 string ID;
                 if(j == 0)ID= "\n";
                 
-                for (int k = 0 ; k<j; k++) {
+                for (int k = 1 ; k<j; k++) {
                     ID += "\n";
                 }
                 
                 ID += probedIDs[j];
                 //                ID += " : "+ofToString(nodes[clientIndex[j]].getDuration());
-                
+
                 ofEnableAlphaBlending();
-                //            float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
-                //                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 120, 0, 255);
+//                float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
+//                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, 120, 0, 255);
                 ofColor c1;
                 
                 ofSetColor(255,255,255,255);
-                
                 ofDrawBitmapString(ID, clientPos[client.BSSID]);
+//                ofDrawBitmapString(ID, clientPos[client.BSSID]);
+                cout<<clientPos[client.BSSID]<<": "<<client.BSSID<<endl;
             }
         }
     }
@@ -176,7 +206,6 @@ void testApp::nodeAdded(AirodumpEventArgs& args){
     if(args.type == "Router"){
         if(routerMapIndex.find(ID) == routerMapIndex.end()){
             routerMapIndex[ID] = nodes.size();
-            
         }
         else{
             ofLogError()<<"Duplicate router ignoring"<<endl;

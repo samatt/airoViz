@@ -5,6 +5,7 @@
 #include "OscReceiver.h"
 //#include "airodumpEvents.h"
 #include "airodumpGlobals.h"
+#include "ofxUI.h"
 
 class testApp : public ofBaseApp{
     
@@ -46,4 +47,5 @@ public:
     map<string, ofPoint>clientPos;
     map<string,vector<int> > routerClientLinks;
     
+    ofxUISuperCanvas* gui;
 };
