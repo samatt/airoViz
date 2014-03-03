@@ -2,46 +2,46 @@
     <Kind>42</Kind>
     <Name>OFX_UI_WIDGET_CANVAS</Name>
     <IsMinified>0</IsMinified>
-    <XPosition>606.000000000</XPosition>
-    <YPosition>84.000000000</YPosition>
+    <XPosition>123.000000000</XPosition>
+    <YPosition>57.000000000</YPosition>
 </Canvas>
 <Widget>
     <Kind>44</Kind>
     <Name>Router X :</Name>
-    <Value>3</Value>
+    <Value>14</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>RouterY :</Name>
-    <Value>20</Value>
+    <Value>40</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>Router Width : </Name>
-    <Value>306</Value>
+    <Value>200</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>Router Height : </Name>
-    <Value>33</Value>
+    <Value>100</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>Client X :</Name>
-    <Value>0</Value>
+    <Value>-3</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>ClientY :</Name>
-    <Value>-4</Value>
+    <Value>-940</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>client Width : </Name>
-    <Value>241</Value>
+    <Value>375</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>client Height : </Name>
-    <Value>79</Value>
+    <Value>26</Value>
 </Widget>

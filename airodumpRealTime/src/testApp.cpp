@@ -10,14 +10,15 @@ void testApp::setup(){
     ofAddListener(receiver.getEvents().nodeRemoved, this, &testApp::nodeRemoved);
     
     gui = new ofxUISuperCanvas("SUPER COMPACT", OFX_UI_FONT_MEDIUM);
+    gui->addFPS();
     gui->addSpacer();
     gui->addIntSlider("Router X :", -10, 20, &routerX);
-    gui->addIntSlider("RouterY :", -10, 20, &routerY);
+    gui->addIntSlider("RouterY :", -1000, 100, &routerY);
     gui->addIntSlider("Router Width : ", 100, 800, &routerWidth);
     gui->addIntSlider("Router Height : ", 20, 200, &routerHeight);
     gui->addSpacer();
     gui->addIntSlider("Client X :", -10, 20, &clientX);
-    gui->addIntSlider("ClientY :", -10, 20, &clientY);
+    gui->addIntSlider("ClientY :", -1000, 100, &clientY);
     gui->addIntSlider("client Width : ", 100, 800, &clientWidth);
     gui->addIntSlider("client Height : ", 20, 200, &clientHeight);
     gui->autoSizeToFitWidgets();
@@ -55,13 +56,11 @@ void testApp::update(){
             
         }
         else{
-            
 
             //check if there is a link bertween the current client and its associated AP
             if( ! ofContains(routerClientLinks[n.AP],i)){
                 
                 routerClientLinks[n.AP].push_back(i);
-                
             }
             
             if (clientPos.find(n.BSSID) == clientPos.end() ) {
@@ -193,8 +192,14 @@ void testApp::draw(){
                 string ID;
                 if(j == 0)ID= "\n";
                 
-                for (int k = 1 ; k<j; k++) {
-                    ID += "\n";
+                for (int k = 0 ; k<j; k++) {
+                    if(k == 0){
+                        ID += "\n\n";
+                    }
+                    else{
+                        ID += "\n";
+                    }
+
                 }
                 
                 ID += probedIDs[j];
