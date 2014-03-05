@@ -8,12 +8,12 @@
 <Widget>
     <Kind>44</Kind>
     <Name>Router X :</Name>
-    <Value>2</Value>
+    <Value>20</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>RouterY :</Name>
-    <Value>0</Value>
+    <Value>100</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
@@ -23,17 +23,22 @@
 <Widget>
     <Kind>44</Kind>
     <Name>Router Height : </Name>
-    <Value>60</Value>
+    <Value>20</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>MAX DURATION : </Name>
-    <Value>1001</Value>
+    <Value>60</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
     <Name>Show Duration</Name>
     <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Show Duration</Name>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
@@ -43,12 +48,12 @@
 <Widget>
     <Kind>44</Kind>
     <Name>Client X :</Name>
-    <Value>53</Value>
+    <Value>57</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
     <Name>ClientY :</Name>
-    <Value>-1002</Value>
+    <Value>100</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
@@ -58,5 +63,5 @@
 <Widget>
     <Kind>44</Kind>
     <Name>client Height : </Name>
-    <Value>170</Value>
+    <Value>20</Value>
 </Widget>

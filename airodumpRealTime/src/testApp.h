@@ -6,6 +6,7 @@
 //#include "airodumpEvents.h"
 #include "airodumpGlobals.h"
 #include "ofxUI.h"
+#include "ofxTween.h";
 
 class testApp : public ofBaseApp{
     
@@ -28,7 +29,7 @@ public:
     void nodeRemoved(AirodumpEventArgs& args);
     void guiEvent(ofxUIEventArgs& args);
     void updateIndices();
-    
+    void resetGrid();
 	
     vector<Node> nodes;
     vector <int> activeNodes;
@@ -38,7 +39,7 @@ public:
     map<string, int> routerMapIndex;
     vector<pair<int, int> > indexPairs;
     //        AirodumpEvents events;
-    int maxPower, minPower;
+    float maxPower, minPower;
     ofVec2f currentPos;
     int x,y;
     
@@ -48,6 +49,7 @@ public:
     map<string, ofPoint>clientPos;
     map<string,vector<int> > routerClientLinks;
     
+
     ofxUISuperCanvas* gui;
     int routerX = 20;
     int routerY = 10;
@@ -57,7 +59,11 @@ public:
     int clientY = 10;
     int clientWidth = 200;
     int clientHeight = 100;
-    int maxDuration = 2000;
+    int maxDuration = 60;
     bool showDuration = true;
     bool showSSIDs = true;
+    bool showESSIDs = true;
+    bool showPower = false;
+
+
 };

@@ -12,16 +12,20 @@ void testApp::setup(){
     
     gui = new ofxUISuperCanvas("SUPER COMPACT", OFX_UI_FONT_MEDIUM);
     gui->addFPS();
+    
+    maxPower = 0;
+    minPower = INT_MAX;
 
     gui->addSpacer();
     gui->addIntSlider("Router X :", -10, 20, &routerX);
     gui->addIntSlider("RouterY :", -8000, 100, &routerY);
     gui->addIntSlider("Router Width : ", 100, 800, &routerWidth);
     gui->addIntSlider("Router Height : ", 20, 200, &routerHeight);
-    gui->addIntSlider("MAX DURATION : ", 60, 3600, &maxDuration);
+    gui->addIntSlider("MAX DURATION : ", 10, 3600, &maxDuration);
     gui->addToggle("Show Duration", &showDuration);
     gui->addSpacer();
     gui->addToggle("Show Duration", &showSSIDs);
+    gui->addToggle("Show Duration", &showPower);
     gui->addSpacer();
     gui->addIntSlider("Client X :", -10, 200, &clientX);
     gui->addIntSlider("ClientY :", -18000, 100, &clientY);
@@ -102,10 +106,18 @@ void testApp::draw(){
             
             stringstream ss;
             
-            ofSetColor(ofColor::lightSkyBlue);
-            ofDrawBitmapString(router.ESSID +"\n", routerPos[router.BSSID]);
+            if (showESSIDs) {
+                ofSetColor(ofColor::lightSkyBlue);
+                ofDrawBitmapString(router.ESSID +"\n", routerPos[router.BSSID]);
+            }
+            else{
+                ofSetColor(ofColor::lightSkyBlue);
+                ofDrawBitmapString(router.BSSID +"\n", routerPos[router.BSSID]);
+                
+            }
+
             
-            
+        
             if(!showSSIDs) continue;
             
             vector<int> clientIndex = routerClientLinks[router.BSSID];
@@ -138,16 +150,18 @@ void testApp::draw(){
                 if(showDuration){
                     ID += " "+ofToString(nodes[clientIndex[j]].getDurationString()) + "\n";
                 }
+                else if(showPower){
+                    ID += " "+ofToString(nodes[clientIndex[j]].Power) + "\n";
+                }
                 else{
                     ID += "\n";
                 }
                 
-                
-                ofEnableAlphaBlending();
+                ofSetColor(255, 255, 255);
                 //            float hue = ofMap(nodes[clientIndex[j]].getDuration(), 0, 500, ofColor::red.getHue(), ofColor::blue.getHue());
-                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, maxDuration, 0, 250,true);
+                int alpha = ofMap(nodes[clientIndex[j]].getDuration(), 0, maxDuration, 0, 200,true);
                 ofColor c1;
-                
+//                cout<<nodes[clientIndex[j]].getDuration()   <<" : "<<alpha<<endl;
                 ofSetColor(255,255,255, 255 -alpha );
                 ofDrawBitmapString(ID, routerPos[router.BSSID]);
             }
@@ -163,8 +177,31 @@ void testApp::draw(){
             }
             
             Node& client = nodes[i];
-            ofSetColor(ofColor::lightCyan);
-            ofDrawBitmapString(client.BSSID +"\n", clientPos[client.BSSID]);
+
+
+
+            if(showPower){
+                ofColor c = ofColor(129,228,252);
+                ofxEasingCubic easing;
+                ofxEasingArgs a;
+                float sat =ofxTween::map((float)client.Power, 20, maxPower, 10 ,240., true, ofxEasingCubic(), ofxTween::easeIn);
+                c.setSaturation(sat);
+                ofSetColor(c);
+                
+                ofDrawBitmapString(client.BSSID , clientPos[client.BSSID]);
+                ofDrawBitmapString( "                "+ofToString(client.Power)+"\n", clientPos[client.BSSID].x + client.BSSID.length() + 1, clientPos[client.BSSID].y);
+            }
+            else{
+
+                ofColor c = ofColor(129,228,252);
+                ofxEasingCubic easing;
+                ofxEasingArgs a;
+                float sat =ofxTween::map((float)client.Power, -maxPower, -20 , 10 ,235, true, ofxEasingCubic(), ofxTween::easeIn);
+                c.setSaturation(sat);
+                ofSetColor(c);
+
+                ofDrawBitmapString(client.BSSID + "\n" , clientPos[client.BSSID]);
+            }
             
             if(!showSSIDs) continue;
             
@@ -239,7 +276,8 @@ void testApp::nodeAdded(AirodumpEventArgs& args){
     
     nodes.push_back(cur);
     
-    
+    maxPower = MAX(cur.Power,maxPower);
+    minPower  = MIN(cur.Power, minPower);
     
     cout<<"added  "<<args.type<<" : "<<ID<<endl;//args.params<<endl;
 }
@@ -252,6 +290,8 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
         if (routerMapIndex.find(ID) != routerMapIndex.end()) {
             int index = routerMapIndex[ID];
             nodes[index].updateNode(args.params);
+            maxPower = MAX(nodes[index].Power,maxPower);
+            minPower  = MIN(nodes[index].Power, minPower);
         }
         else{
             ofLogError()<<" Router : "<<ID<< " not found. It shouldn't be updating"<<endl;
@@ -261,7 +301,8 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
         if (clientMapIndex.find(ID) != clientMapIndex.end()) {
             int index = clientMapIndex[ID];
             nodes[index].updateNode(args.params);
-            
+            maxPower = MAX(nodes[index].Power,maxPower);
+            minPower  = MIN(nodes[index].Power, minPower);
             //Updating linked router for current client
             
             if(routerMapIndex.find(nodes[index].AP) != routerMapIndex .end()){
@@ -277,7 +318,7 @@ void testApp::nodeUpdated(AirodumpEventArgs& args){
             ofLogError()<<" Client : "<<ID<< " not found. It shouldn't be updating"<<endl;
         }
     }
-    
+
     ofLog()<<"[ nodeUpdated ] "<<args.params<<endl;
 }
 
@@ -338,8 +379,7 @@ void testApp::updateIndices(){
             x++;
         }
     }
-    
-    
+        
     //    cout<<"num nodes removed:"<<x<<endl;
 }
 
@@ -359,9 +399,6 @@ void testApp::keyPressed(int key){
         ofToggleFullscreen();
     }
     
-    if(key == ' '){
-        cout<<activeNodes.size()<<endl;
-    }
     
     if (key == '1') {
         currentMode = 0;
@@ -422,7 +459,34 @@ void testApp::keyPressed(int key){
     if(key =='m'){
         showSSIDs = !showSSIDs;
     }
+    
+    if (key == ' ') {
+//        cout<<clientX<<" : "<<clientY<<" : "<<clientWidth<<" : "<<clientHeight<<endl;
 
+    }
+    
+    if(key =='r'){
+        resetGrid();
+    }
+
+    if(key == 'p'){
+        showPower = !showPower;
+    }
+    
+    if(key == 'e'){
+        showESSIDs = !showESSIDs;
+    }
+}
+
+void testApp::resetGrid(){
+    routerX = 57;
+    routerY = 300;
+    routerWidth = 200;
+    routerHeight = 10;
+    clientX = 57;
+    clientY = 300;
+    clientWidth = 200;
+    clientHeight = 10;
 }
 
 void testApp::guiEvent(ofxUIEventArgs& args){
