@@ -47,3 +47,5 @@
 /airodumpParser/classTest-01.csv
 
 /.DS_Store
+
+*.pyc
