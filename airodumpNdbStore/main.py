@@ -20,7 +20,7 @@ class NodeRecord(ndb.Model) :
 	"""Models a node found by airodump-ng. It contains kind, BSSID, first and last time seen, Channel, Speed, Privacy, Power, IP, ESSID, probedESSID"""
 	kind = ndb.KeyProperty()
 	BSSID = ndb.StringProperty()
-	# This is going to be a list of time ranges the devie was seen.
+	# This is going to be a list of time ranges the device was seen.
 	timeRanges = ndb.DateTimeProperty(repeated = True)
 	power= ndb.IntegerProperty()
 	ESSID = ndb.StringProperty(default = "None")
@@ -44,10 +44,10 @@ class NodeRecord(ndb.Model) :
 			return device_readings_list
 
 	@classmethod
-	def queryNodeTimestamps(cls,device_name):
+	def queryNodesByTimestamps(cls,device_name):
 			device_readings_dict = {}
 			device_records_query = cls.query(
-			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
+			ancestor = device_key(device_name)).order(-NodeRecord.timeRanges)
 			
 			device_records = device_records_query.fetch()
 
@@ -55,35 +55,16 @@ class NodeRecord(ndb.Model) :
 			return device_records
 
 	@classmethod
-	def queryNodeProbedESSID(cls,device_name):
-			device_readings_list = []
-			device_records_query = cls.query(
-			ancestor = device_key(device_name)).order(-NodeRecord.probedESSID)
+	def queryNodesProbedESSID(cls,kind, qrySSID):
+			probedESSIDList = []
+			nodeRecordsQuery = cls.query(
+			ndb.AND(cls.kind == "Client",
+					cls.probedESSID.IN[qrySSID]))
 			
 			device_records = device_records_query.fetch()
-			
-			for device_record in device_records:
-				device_readings_list.append(device_record.probedESSID)
-			return device_readings_list
 
-	@classmethod
-		def queryNodeSelfESSID(cls,device_name):
-				device_readings_list = []
-				device_records_query = cls.query(
-				ancestor = device_key(device_name)).order(-NodeRecord.ESSID)
-				
-				device_records = device_records_query.fetch()
+			return device_records
 
-				
-				return device_records
-	@classmethod
-	def query_readings_(cls,device_name):
-		
-		device_records_query = cls.query(
-			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
-			# device_records is a list object only returns sensor reading and time for parsing. 
-		device_record = device_records_query.fetch(1)
-		return device_record[0].sensorreading
 
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
@@ -187,6 +168,11 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/read-time', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
 	webapp2.Route('/read-latest', handler = ReadLatestRecordHandler, name = 'read-latest-value'),
 	webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
+
+	webapp2.Route('/node', handler =  CreateRecordHandler, name = 'create-record'),
+	webapp2.Route('/time', handler = ReadRecordsHandler, name = 'read-values'),
+	webapp2.Route('/essid', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
+	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 ], debug=True)
 
