@@ -75,13 +75,12 @@ class CreateRecordHandler(webapp2.RequestHandler):
     
     def get(self):
 
-    	
     	# populates datastore Model Objects with GET Params and creates Datastore Entity
         self.response.headers['Content-Type'] = 'text/plain'
         #the following request objects are used to collect the arguments from the Query string (everything after the '?')
         device_name = self.request.GET['devicename']
         
-        r = SensorRecord(parent = device_key(device_name),
+        r = NodeRecord(parent = device_key(device_name),
         				sensorreading = json.dumps(self.request.GET.items(), separators=(',', ':')))
         				
         r_key = r.put()
@@ -102,6 +101,22 @@ class ReadRecordsHandler(webapp2.RequestHandler):
 		else:
 			self.response.write(
 			NodeRecord.queryByNode(device_name))
+
+class UpdateRecordHandler(webapp2.RequestHandler):
+
+	def get(self): 
+		pass
+		# this = self
+		# this.response.headers['Content-Type'] = 'text/plain'
+		
+		# try:
+		# 	device_name= self.request.GET['devicename']
+
+		# except KeyError: #bail if there is no argument for 'devicename' submitted
+		# 	self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+		# else:
+		# 	self.response.write(
+		# 	NodeRecord.queryByNode(device_name))			
 
 class ReadRecordsHandlerWithTime(webapp2.RequestHandler):
 
@@ -163,15 +178,16 @@ class PassSensorValueOnly(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
 	webapp2.Route('/', handler = MainHandler, name = 'home'),
-	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-record'),
-	webapp2.Route('/read', handler = ReadRecordsHandler, name = 'read-values'),
-	webapp2.Route('/read-time', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
-	webapp2.Route('/read-latest', handler = ReadLatestRecordHandler, name = 'read-latest-value'),
-	webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
+	# webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-record'),
+	# webapp2.Route('/read', handler = ReadRecordsHandler, name = 'read-values'),
+	# webapp2.Route('/read-time', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
+	# webapp2.Route('/read-latest', handler = ReadLatestRecordHandler, name = 'read-latest-value'),
+	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
-	webapp2.Route('/node', handler =  CreateRecordHandler, name = 'create-record'),
-	webapp2.Route('/time', handler = ReadRecordsHandler, name = 'read-values'),
-	webapp2.Route('/essid', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
+	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
+	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
+	webapp2.Route('/time', handler = ReadRecordsHandler, name = 'nodes-by-time'),
+	webapp2.Route('/essid', handler = ReadRecordsHandlerWithTime, name = 'nodes-ny-essid')
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 ], debug=True)
