@@ -1,14 +1,12 @@
 
 import urllib
 import webapp2
-
 try: import simplejson as json
 except ImportError: import  json
-
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from urlparse import urlparse, parse_qs
-
+import datetime
 
 NO_DEVICE_ID = 'no_device_id'
 
@@ -18,7 +16,7 @@ def device_key(device_name = NO_DEVICE_ID):
 
 class NodeRecord(ndb.Model) :
 	"""Models a node found by airodump-ng. It contains kind, BSSID, first and last time seen, Channel, Speed, Privacy, Power, IP, ESSID, probedESSID"""
-	kind = ndb.KeyProperty()
+	kind = ndb.StringProperty()
 	BSSID = ndb.StringProperty()
 	# This is going to be a list of time ranges the device was seen.
 	timeRanges = ndb.DateTimeProperty(repeated = True)
@@ -26,7 +24,8 @@ class NodeRecord(ndb.Model) :
 	ESSID = ndb.StringProperty(default = "None")
 	probedESSID = ndb.StringProperty(repeated = True) 
 	recordentrytime = ndb.DateTimeProperty(auto_now_add=True)
-	hardware = ndb.JsonProperty()
+	# TODO: Implement hardware API
+	# hardware = ndb.JsonProperty()
 
 
 	#note: all class methods pass the instance of the class as it's first argument 
@@ -73,17 +72,18 @@ class MainHandler(webapp2.RequestHandler):
 
 class CreateRecordHandler(webapp2.RequestHandler):
     
-    def get(self):
-
-    	# populates datastore Model Objects with GET Params and creates Datastore Entity
-        self.response.headers['Content-Type'] = 'text/plain'
-        #the following request objects are used to collect the arguments from the Query string (everything after the '?')
-        device_name = self.request.GET['devicename']
-        
-        r = NodeRecord(parent = device_key(device_name),
-        				sensorreading = json.dumps(self.request.GET.items(), separators=(',', ':')))
-        				
-        r_key = r.put()
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+		kind = self.request.GET['kind']
+		bssid = self.request.GET['bssid']
+		timeRanges = self.request.GET['times']
+		power =  self.request.GET['power']
+		essid =  self.request.GET['essid']
+		probedEssid = self.request.GET['probed']
+		today = datetime.datetime.today()
+		r = NodeRecord(parent = device_key(bssid),
+						kind = kind, BSSID = bssid, timeRanges = today, power = int(power), ESSID  = essid, probedESSID = ['test1','test2'])
+		r_key = r.put()
 
 
 
@@ -94,7 +94,7 @@ class ReadRecordsHandler(webapp2.RequestHandler):
 		this.response.headers['Content-Type'] = 'text/plain'
 		
 		try:
-			device_name= self.request.GET['devicename']
+			device_name= self.request.GET['bssid']
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
@@ -186,7 +186,7 @@ app = webapp2.WSGIApplication([
 
 	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
 	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
-	webapp2.Route('/time', handler = ReadRecordsHandler, name = 'nodes-by-time'),
+	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/essid', handler = ReadRecordsHandlerWithTime, name = 'nodes-ny-essid')
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
