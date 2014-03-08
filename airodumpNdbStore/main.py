@@ -31,7 +31,7 @@ class NodeRecord(ndb.Model) :
 
 	#note: all class methods pass the instance of the class as it's first argument 
 	@classmethod
-	def query_readings_by_device(cls,device_name):
+	def queryByNode(cls,device_name):
 			device_readings_list = []
 			device_records_query = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
@@ -44,7 +44,7 @@ class NodeRecord(ndb.Model) :
 			return device_readings_list
 
 	@classmethod
-	def query_readings_by_device_with_timestamp(cls,device_name):
+	def queryNodeTimestamps(cls,device_name):
 			device_readings_dict = {}
 			device_records_query = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
@@ -55,18 +55,29 @@ class NodeRecord(ndb.Model) :
 			return device_records
 
 	@classmethod
-	def query_readings_by_device_with_probedESSID(cls,device_name):
-			device_readings_dict = {}
+	def queryNodeProbedESSID(cls,device_name):
+			device_readings_list = []
 			device_records_query = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.probedESSID)
 			
 			device_records = device_records_query.fetch()
-
 			
-			return device_records			
+			for device_record in device_records:
+				device_readings_list.append(device_record.probedESSID)
+			return device_readings_list
 
 	@classmethod
-	def query_latest_reading(cls,device_name):
+		def queryNodeSelfESSID(cls,device_name):
+				device_readings_list = []
+				device_records_query = cls.query(
+				ancestor = device_key(device_name)).order(-NodeRecord.ESSID)
+				
+				device_records = device_records_query.fetch()
+
+				
+				return device_records
+	@classmethod
+	def query_readings_(cls,device_name):
 		
 		device_records_query = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
@@ -109,7 +120,7 @@ class ReadRecordsHandler(webapp2.RequestHandler):
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
 			self.response.write(
-			SensorRecord.query_readings_by_device(device_name))
+			NodeRecord.queryByNode(device_name))
 
 class ReadRecordsHandlerWithTime(webapp2.RequestHandler):
 
