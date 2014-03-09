@@ -77,21 +77,16 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'text/plain'
 		kind = self.request.GET['kind']
 		bssid = self.request.GET['bssid']
-		
+		probedEssid = self.request.get_all('probed')
 		power =  self.request.GET['power']
 		essid =  self.request.GET['essid']
 		timeRanges = self.request.get_all('times')
 		curTimes = []
 		for time in timeRanges:
-			
 			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
 			print curTimes
-
-		# datetimeObject[0]  = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p') 
-		probedEssid = self.request.get_all('probed')
-
 		r = NodeRecord(parent = device_key(bssid),
-						kind = kind, BSSID = bssid, timeRanges = [time] , power = int(power), ESSID  = essid, probedESSID =[probedEssid])
+						kind = kind, BSSID = bssid, timeRanges = curTimes , power = int(power), ESSID  = essid, probedESSID =probedEssid)
 		r_key = r.put()
 
 
