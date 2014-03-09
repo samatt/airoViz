@@ -15,7 +15,7 @@ def device_key(device_name = NO_DEVICE_ID):
 	"""constructs Datastore key for NodeRecord entity with device_name """
 	return ndb.Key('NodeGroup', device_name)
 
-class NodeRecord(ndb.Model) :
+class NodeRecord(ndb.Expando) :
 	"""Models a node found by airodump-ng. It contains kind, BSSID, first and last time seen, Channel, Speed, Privacy, Power, IP, ESSID, probedESSID"""
 	kind = ndb.StringProperty()
 	BSSID = ndb.StringProperty()
