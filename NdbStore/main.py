@@ -6,7 +6,8 @@ except ImportError: import  json
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from urlparse import urlparse, parse_qs
-import datetime
+from datetime import datetime, date, time
+# from dateutil import parser
 
 NO_DEVICE_ID = 'no_device_id'
 
@@ -76,13 +77,21 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'text/plain'
 		kind = self.request.GET['kind']
 		bssid = self.request.GET['bssid']
-		timeRanges = self.request.GET['times']
+		
 		power =  self.request.GET['power']
 		essid =  self.request.GET['essid']
-		probedEssid = self.request.GET['probed']
-		today = datetime.datetime.today()
+		timeRanges = self.request.get_all('times')
+		curTimes = []
+		for time in timeRanges:
+			
+			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
+			print curTimes
+
+		# datetimeObject[0]  = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p') 
+		probedEssid = self.request.get_all('probed')
+
 		r = NodeRecord(parent = device_key(bssid),
-						kind = kind, BSSID = bssid, timeRanges = today, power = int(power), ESSID  = essid, probedESSID = ['test1','test2'])
+						kind = kind, BSSID = bssid, timeRanges = [time] , power = int(power), ESSID  = essid, probedESSID =[probedEssid])
 		r_key = r.put()
 
 

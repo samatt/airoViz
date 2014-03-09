@@ -4,7 +4,7 @@ import time, threading
 import urllib2
 import urllib
 import requests
-import datetime
+from datetime import datetime, date, time
 
 routers = dict()
 clients = dict()
@@ -152,18 +152,14 @@ if __name__ == '__main__' :
    	path = sys.argv[1] if len(sys.argv) > 1 else '.'
     
 	url = 'http://localhost:8080'
-	# query_args = { 'devicename':'pyTest', 'sensorreading':'244','sensormin' :1024}
-	# data = urllib.urlencode(query_args)
-	# print data
-	# req = urllib2.Request(url,data)
-	
-	# s
+	startTime = '2014-02-26 14:49:08'
+	endTime =  '2014-02-26 14:49:18'
 
-	payload =  { 'kind':'Client', 'bssid':'00::AA::BB::CC::DD::EE','times' : datetime.datetime.today(), 'power' : 10, 'essid' : "My Wi-Fi",'probed' : 'test1' }
+	payload =  { 'kind':'Client', 'bssid':'00::AA::BB::CC::DD::EE','times' : startTime, 'power' : 10, 'essid' : "My Wi-Fi",'probed' :('test1','test2') }
 	# payload =  { 'devicename':'pyTest2'}
 	r = requests.get("http://localhost:8080/write", params=payload)
-	print (r.url)
-	# print r.json()
+	# print (r.url)
+	print r.json()
 	# res = urllib2.urlopen(req)
 	# html = res.read()
 
