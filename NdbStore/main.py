@@ -84,11 +84,16 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		essid =  self.request.GET['essid']
 		timeRanges = self.request.get_all('times')
 		curTimes = []
-		print power
+		
+		print timeRanges
 		for time in timeRanges:
+			time.encode('ascii','ignore')
+			time = time.strip()
 			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
 			print curTimes
-			power = int(power)
+		
+		power = int(power)
+		print power
 		r = NodeRecord(parent = device_key(bssid),
 						kind = kind, BSSID = bssid, timeRanges = curTimes , power = power, ESSID  = essid, probedESSID =probedEssid)
 		r_key = r.put()

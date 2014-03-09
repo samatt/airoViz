@@ -38,7 +38,8 @@ class Node(object):
             self.AP = "None"
             self.probedESSID = " "
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
-            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("firstTimeSeen",self.firstTimeSeen) , ("lastTimeSeen",self.lastTimeSeen) , ("speed",self.Speed) , ("ESSID",self.ESSID) ])
+            self.forDB =  dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("firstTimeSeen",self.firstTimeSeen) ,("power",self.Power), ("speed",self.Speed) , ("essid",self.ESSID) ])
+            self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
             self.alive = True;
 
         else:
@@ -56,9 +57,10 @@ class Node(object):
             self.Power = int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:],                                                                # [self.firstTimeSeen           # ("AP", (self.AP,self.lastTimeSeen)) 
+            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)                                                    # [self.firstTimeSeen           # ("AP", (self.AP,self.lastTimeSeen)) 
             # self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
-            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("times",self.lastTimeSeen),("power",self.Power),("essid",self.AP)    , ("probed",self.probedESSID) ])
+            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power),("essid",self.AP)    , ("probed",self.probedESSID) ])
+            self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
             self.alive = True;
 
     def printParams(self):
@@ -152,13 +154,27 @@ if __name__ == '__main__' :
     clientLine2.strip()
     clientLine2 = clientLine2.replace("\r\n"," ")
     params = clientLine2.split(',')
-    # print params
     node = Node("Client", params)
-    print node.postToDB(url)
-    print " "
+    try:
+        print node.postToDB(url)
+
+    except ValueError: #bail if there is no argument for 'devicename' submitted
+        print "THERE WAS AN ERROR" 
+    else:
+        print sent  
 
     routerLine.strip()
     routerLine = routerLine.replace("\r\n"," ")
     params = routerLine.split(',')
     node = Node("Router",params)
-    print node.forDB
+    try:
+        print node.postToDB(url)
+
+    except ValueError: #bail if there is no argument for 'devicename' submitted
+        print "THERE WAS AN ERROR" 
+    else:
+        print sent
+    
+
+
+
