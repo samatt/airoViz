@@ -1,4 +1,7 @@
-    
+import urllib2
+import urllib
+import requests
+from datetime import datetime, date, time    
 
 class Node(object):
 
@@ -16,8 +19,9 @@ class Node(object):
             self.Power = ""
             self.ip = " "    
             self.ESSID = " "    
-            self.probedESSID = " "
+            self.probedESSID = " "  
             self.alive = None
+            self.forDB = dict()
 
         elif kind == "Router":
             # print "Router"
@@ -29,11 +33,12 @@ class Node(object):
             self.Channel = int(params[3])
             self.Speed = int(params[4])
             self.Privacy = params[5]
-            self.Power = -int(params[8])
+            self.Power = int(params[8])
             self.ESSID = params[13]
             self.AP = "None"
             self.probedESSID = " "
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
+            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("firstTimeSeen",self.firstTimeSeen) , ("lastTimeSeen",self.lastTimeSeen) , ("speed",self.Speed) , ("ESSID",self.ESSID) ])
             self.alive = True;
 
         else:
@@ -48,11 +53,12 @@ class Node(object):
             self.Privacy = " "
             self.AP = params[5]
             # print params[8]
-            self.Power = -int(params[3])
+            self.Power = int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:]
-            self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
+            self.probedESSID = params[6:],                                                                # [self.firstTimeSeen           # ("AP", (self.AP,self.lastTimeSeen)) 
+            # self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
+            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("times",self.lastTimeSeen),("power",self.Power),("essid",self.AP)    , ("probed",self.probedESSID) ])
             self.alive = True;
 
     def printParams(self):
@@ -130,16 +136,29 @@ class Node(object):
     def wrapForOsc(self):
         return " , ".join(self.forOSC)
 
+    def postToDB(self,url):
 
-# TODO: Add params
-#     //    string Cipher;
-#     //    string Authentication;
-#     //    int numBeacons;
-#     //    int numIV;
-#     //Client only    
-# //    Station MAC,
-# //   int  numPackets;
+        r = requests.get(url+"/write", params=self.forDB)
+        print r.json()
+
 
 if __name__ == '__main__' :
 
-    print 'Im a node'
+    url = 'http://localhost:8080'
+    routerLine = "1C:AF:F7:D6:0E:0F, 2014-03-02 20:22:49, 2014-03-02 20:25:48,  3,  54, WEP , WEP,   , -34,      143,     1411,   0.  0.  0.  0,  16, Flying Spaghetti,"
+    clientLine = "70:DE:E2:8C:47:53, 2014-03-02 20:23:29, 2014-03-02 20:23:29, -44,        6, 1C:AF:F7:D6:0E:0F,"
+    clientLine2 = "00:24:2B:05:D1:A8, 2014-02-27 13:49:05, 2014-02-27 14:03:55, -95,      159, (not associated) , Carolyn Protass's Network,Melissa Protass's Network,DanaWireless,orchardhousecafe"
+
+    clientLine2.strip()
+    clientLine2 = clientLine2.replace("\r\n"," ")
+    params = clientLine2.split(',')
+    # print params
+    node = Node("Client", params)
+    print node.postToDB(url)
+    print " "
+
+    routerLine.strip()
+    routerLine = routerLine.replace("\r\n"," ")
+    params = routerLine.split(',')
+    node = Node("Router",params)
+    print node.forDB

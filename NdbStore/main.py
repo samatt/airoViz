@@ -23,6 +23,8 @@ class NodeRecord(ndb.Expando) :
 	timeRanges = ndb.DateTimeProperty(repeated = True)
 	power= ndb.IntegerProperty()
 	ESSID = ndb.StringProperty(default = "None")
+	# associatedAP  = ndb.JSONProperty(default = "None")
+	Privacy = ndb.StringProperty(default = "None")
 	probedESSID = ndb.StringProperty(repeated = True) 
 	recordentrytime = ndb.DateTimeProperty(auto_now_add=True)
 	# TODO: Implement hardware API
@@ -82,11 +84,13 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		essid =  self.request.GET['essid']
 		timeRanges = self.request.get_all('times')
 		curTimes = []
+		print power
 		for time in timeRanges:
 			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
 			print curTimes
+			power = int(power)
 		r = NodeRecord(parent = device_key(bssid),
-						kind = kind, BSSID = bssid, timeRanges = curTimes , power = int(power), ESSID  = essid, probedESSID =probedEssid)
+						kind = kind, BSSID = bssid, timeRanges = curTimes , power = power, ESSID  = essid, probedESSID =probedEssid)
 		r_key = r.put()
 
 

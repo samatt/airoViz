@@ -125,27 +125,6 @@ def killNodes():
 				routers[k].alive = False
 
 
-# class MyHandler(LoggingEventHandler):
-
-#     def on_modified(self, event):
-#     	if not event.is_directory:
-# 			print event.src_path
-
-# 			if ".kismet.csv" not in event.src_path and "kismet.netxml" not in event.src_path and ".cap" not in event.src_path:
-# 				csv = open(event.src_path, 'r')
-# 				readFile(csv)
-# 				# killNodes()
-# 				csv.close()		
-# 				print "Reading File!"
-# 				print event.src_path
-# 			else:
-# 				print "Ignoring file : "+event.src_path 
-
- #    def on_created(self,event):
- #    	print "Created"
-	# def on_deleted(self,event):
-	# 	print "Deleted"
-
 
 if __name__ == '__main__' :
 
@@ -154,16 +133,9 @@ if __name__ == '__main__' :
 	url = 'http://localhost:8080'
 	startTime = '2014-02-26 14:49:08'
 	endTime =  '2014-02-26 14:49:18'
-
 	payload =  { 'kind':'Client', 'bssid':'00::AA::BB::CC::DD::EE','times' : startTime, 'power' : 10, 'essid' : "My Wi-Fi",'probed' :('test1','test2') }
-	# payload =  { 'devicename':'pyTest2'}
 	r = requests.get("http://localhost:8080/write", params=payload)
-	# print (r.url)
 	print r.json()
-	# res = urllib2.urlopen(req)
-	# html = res.read()
-
-	# print html
 	try :
 	    while True :
 
