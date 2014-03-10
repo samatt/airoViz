@@ -43,9 +43,19 @@ class NodeRecord(ndb.Expando) :
 			device_records = device_records_query.fetch()
 
 		#create methods for pulling different streams of data out for processing. 
-			for device_record in device_records:
-				device_readings_list.append(device_record.sensorreading)
-			return device_readings_list
+			# for device_record in device_records:
+				# device_readings_list.append(device_record.sensorreading)
+			return device_records
+
+	@classmethod
+	def queryNodesByESSID(cls,essid):
+		nodesWIthESSID = []
+		nodeRecordsQuery =  cls.query(cls.ESSID == essid)
+		device_records = nodeRecordsQuery.fetch()
+
+		return device_records
+
+
 
 	@classmethod
 	def queryNodesByTimestamps(cls,device_name):
@@ -54,18 +64,15 @@ class NodeRecord(ndb.Expando) :
 			ancestor = device_key(device_name)).order(-NodeRecord.timeRanges)
 			
 			device_records = device_records_query.fetch()
-
 			
 			return device_records
 
 	@classmethod
-	def queryNodesProbedESSID(cls,kind, qrySSID):
+	def queryNodesProbedESSID(cls, qrySSID):
 			probedESSIDList = []
-			nodeRecordsQuery = cls.query(
-			ndb.AND(cls.kind == "Client",
-					cls.probedESSID.IN[qrySSID]))
+			nodeRecordsQuery = cls.query( cls.probedESSID.IN([qrySSID]))	
 			
-			device_records = device_records_query.fetch()
+			device_records = nodeRecordsQuery.fetch()
 
 			return device_records
 
@@ -79,14 +86,20 @@ class CreateRecordHandler(webapp2.RequestHandler):
     
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/plain'
-		kind = self.request.GET['kind']
-		bssid = self.request.GET['bssid']
+		kind = self.request.GET['kind'].strip()
+		bssid = self.request.GET['bssid'].strip()
 		probedEssid = self.request.get_all('probed')
-		power =  self.request.GET['power']
-		essid =  self.request.GET['essid']
+		power =  self.request.GET['power'].strip()
+		essid =  self.request.GET['essid'].strip()
 		timeRanges = self.request.get_all('times')
 		curTimes = []
 		
+		for probed in probedEssid:
+			probed  = probed.strip()
+			print probed
+			probed.encode('ascii','ignore')
+			print probed
+
 		print timeRanges
 		for time in timeRanges:
 			time.encode('ascii','ignore')
@@ -133,20 +146,35 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 		# 	self.response.write(
 		# 	NodeRecord.queryByNode(device_name))			
 
-class ReadRecordsHandlerWithTime(webapp2.RequestHandler):
+class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
 
 	def get(self): 
 		this = self
 		this.response.headers['Content-Type'] = 'text/plain'
 		
 		try:
-			device_name= self.request.GET['devicename']
+			essid= self.request.GET['essid']
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
 			self.response.write(
-			SensorRecord.query_readings_by_device_with_timestamp(device_name))
+			NodeRecord.queryNodesByESSID(essid))
+
+class ReadRecordsHandlerWithClientESSID(webapp2.RequestHandler):
+
+	def get(self): 
+		this = self
+		this.response.headers['Content-Type'] = 'text/plain'
+		
+		try:
+			essid= self.request.GET['essid']
+
+		except KeyError: #bail if there is no argument for 'devicename' submitted
+			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+		else:
+			self.response.write(
+			NodeRecord.queryNodesProbedESSID(essid))			
 
 class ReadLatestRecordHandler(webapp2.RequestHandler):
 
@@ -170,9 +198,7 @@ class ReadLatestRecordHandler(webapp2.RequestHandler):
 
 		
 			 #outputs key value dictionary of retrieved datastore entity. 
-		
-			
-
+	
 class PassSensorValueOnly(webapp2.RequestHandler):
 
 	def get(self):
@@ -200,7 +226,8 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
 	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
-	webapp2.Route('/essid', handler = ReadRecordsHandlerWithTime, name = 'nodes-ny-essid')
+	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
+	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid')
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 ], debug=True)

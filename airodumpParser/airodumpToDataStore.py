@@ -6,6 +6,7 @@ import urllib
 import requests
 from datetime import datetime, date, time
 import time
+import os
 
 routers = dict()
 clients = dict()
@@ -128,17 +129,38 @@ def killNodes():
 def postToDB(url):
 	for k,v in routers.iteritems():
 		routers[k].postToDB(url)
+	
+	for k,v in clients.iteritems():
+		clients[k].postToDB(url)		
 
 
+# def postToDB(url):
+# 	for k,v in routers.iteritems():
+# 		routers[k].postToDB(url)
 if __name__ == '__main__' :
 
    	path = sys.argv[1] if len(sys.argv) > 1 else '.'
-    
+	rootdir = sys.argv[1] #if len(sys.argv) > 1 else '.'
+	
+	print rootdir
 	url = 'http://localhost:8080'
-	csv = open(path, 'r')
-	readFile(csv)
-	csv.close()
-	postToDB(url)
+	# csv = open(path, 'r')
+	# readFile(csv)
+	# csv.close()
+	# postToDB(url)
 
-	print "Done"
+	# print "Done"
+	for subdir, dirs, files in os.walk(rootdir):
+	    for file in files:
+			# print subdir+'/'+file
+			if ".kismet.csv" not in file and "kismet.netxml" not in file and ".cap" not in file:
+				csv = open(subdir+'/'+file, 'r')
+				readFile(csv)
+			# killNodes()
+				csv.close()		
+				print "Reading File!" + file
+				print 
+			else:
+				print "Ignoring file : "+file 
+	postToDB(url)
 

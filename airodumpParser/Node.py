@@ -53,7 +53,7 @@ class Node(object):
             self.Speed = -1
             self.Privacy = " "
             self.AP = params[5]
-            # print params[8]
+            print params[3]
             self.Power = int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
@@ -114,9 +114,6 @@ class Node(object):
         print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
         self.alive = True
         print params[6:]
-    	# self.kind = "Client"
-        # self.BSSID = params[0]
-        # print params[8]
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
         self.Channel =  -1
@@ -147,7 +144,7 @@ class Node(object):
         try:
             print r.json()
 
-        except ValueError: #bail if there is no argument for 'devicename' submitted
+        except ValueError: 
             print "Val error" 
         else:
             print "sent"  
@@ -165,25 +162,14 @@ if __name__ == '__main__' :
     clientLine2 = clientLine2.replace("\r\n"," ")
     params = clientLine2.split(',')
     node = Node("Client", params)
-    # try:
     print node.postToDB(url)
 
-    # except ValueError: #bail if there is no argument for 'devicename' submitted
-    #     print "THERE WAS AN ERROR" 
-    # else:
-    #     print sent  
+    routerLine.strip()
+    routerLine = routerLine.replace("\r\n"," ")
+    params = routerLine.split(',')
+    node = Node("Router",params)
+    print node.postToDB(url)
 
-    # routerLine.strip()
-    # routerLine = routerLine.replace("\r\n"," ")
-    # params = routerLine.split(',')
-    # node = Node("Router",params)
-    # try:
-    #     print node.postToDB(url)
-
-    # except ValueError: #bail if there is no argument for 'devicename' submitted
-    #     print "THERE WAS AN ERROR" 
-    # else:
-    #     print sent
     
 
 
