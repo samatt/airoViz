@@ -38,7 +38,7 @@ class Node(object):
             self.AP = "None"
             self.probedESSID = " "
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
-            self.forDB =  dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("firstTimeSeen",self.firstTimeSeen) ,("power",self.Power), ("speed",self.Speed) , ("essid",self.ESSID) ])
+            self.forDB =  dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("power",self.Power) , ("speed",self.Speed) , ("essid",self.ESSID) ])  
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
             self.alive = True;
 
@@ -57,9 +57,9 @@ class Node(object):
             self.Power = int(params[3])
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)                                                    # [self.firstTimeSeen           # ("AP", (self.AP,self.lastTimeSeen)) 
-            # self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
-            self.forDB =    dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power),("essid",self.AP)    , ("probed",self.probedESSID) ])
+            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen)) 
+            self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
+            self.forDB = dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power), ("essid",self.AP)  , ("probed",self.probedESSID) ])
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
             self.alive = True;
 
@@ -107,6 +107,8 @@ class Node(object):
         self.ESSID = params[13]    
         self.probedESSID = " "  
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
+        self.forDB["times"].append(self.firstTimeSeen)
+        self.forDB["times"].append(self.lastTimeSeen)
 
     def updateClientNode(self, params):
         print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
@@ -126,7 +128,8 @@ class Node(object):
         self.ESSID = " "
         self.probedESSID = params[6:] 
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
-
+        self.forDB["times"].append(self.firstTimeSeen)
+        self.forDB["times"].append(self.lastTimeSeen)
 
     def hasTimeChanged(self, newTime): 
         if self.lastTimeSeen.strip() == newTime.strip():
@@ -141,7 +144,14 @@ class Node(object):
     def postToDB(self,url):
 
         r = requests.get(url+"/write", params=self.forDB)
-        print r.json()
+        try:
+            print r.json()
+
+        except ValueError: #bail if there is no argument for 'devicename' submitted
+            print "Val error" 
+        else:
+            print "sent"  
+
 
 
 if __name__ == '__main__' :
@@ -155,25 +165,25 @@ if __name__ == '__main__' :
     clientLine2 = clientLine2.replace("\r\n"," ")
     params = clientLine2.split(',')
     node = Node("Client", params)
-    try:
-        print node.postToDB(url)
+    # try:
+    print node.postToDB(url)
 
-    except ValueError: #bail if there is no argument for 'devicename' submitted
-        print "THERE WAS AN ERROR" 
-    else:
-        print sent  
+    # except ValueError: #bail if there is no argument for 'devicename' submitted
+    #     print "THERE WAS AN ERROR" 
+    # else:
+    #     print sent  
 
-    routerLine.strip()
-    routerLine = routerLine.replace("\r\n"," ")
-    params = routerLine.split(',')
-    node = Node("Router",params)
-    try:
-        print node.postToDB(url)
+    # routerLine.strip()
+    # routerLine = routerLine.replace("\r\n"," ")
+    # params = routerLine.split(',')
+    # node = Node("Router",params)
+    # try:
+    #     print node.postToDB(url)
 
-    except ValueError: #bail if there is no argument for 'devicename' submitted
-        print "THERE WAS AN ERROR" 
-    else:
-        print sent
+    # except ValueError: #bail if there is no argument for 'devicename' submitted
+    #     print "THERE WAS AN ERROR" 
+    # else:
+    #     print sent
     
 
 

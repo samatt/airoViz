@@ -5,6 +5,7 @@ import urllib2
 import urllib
 import requests
 from datetime import datetime, date, time
+import time
 
 routers = dict()
 clients = dict()
@@ -52,7 +53,7 @@ def addNewNode(kind,ID, params):
 		n =  parseLine(params,True)
 		routers[n.BSSID] = n
 		routerIdleCount[ID] = 1
-		sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
+		# sender.newNode(n.wrapForOsc(),n.BSSID,"Router")
 	
 	else:
 			
@@ -60,7 +61,7 @@ def addNewNode(kind,ID, params):
 		n =  parseLine(params,False)
 		clients[n.BSSID] = n
 		clientIdleCount[ID] = 1
-		sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
+		# sender.newNode(n.wrapForOsc(),n.BSSID,"Client")
 
 def readFile(fileName):
 	isRouter = None
@@ -124,6 +125,9 @@ def killNodes():
 				routerIdleCount[k] = 1
 				routers[k].alive = False
 
+def postToDB(url):
+	for k,v in routers.iteritems():
+		routers[k].postToDB(url)
 
 
 if __name__ == '__main__' :
@@ -131,20 +135,10 @@ if __name__ == '__main__' :
    	path = sys.argv[1] if len(sys.argv) > 1 else '.'
     
 	url = 'http://localhost:8080'
-	startTime = '2014-02-26 14:49:08'
-	endTime =  '2014-02-26 14:49:18'
-	payload =  { 'kind':'Client', 'bssid':'00::AA::BB::CC::DD::EE','times' : startTime, 'power' : 10, 'essid' : "My Wi-Fi",'probed' :('test1','test2') }
-	r = requests.get("http://localhost:8080/write", params=payload)
-	print r.json()
-	try :
-	    while True :
+	csv = open(path, 'r')
+	readFile(csv)
+	csv.close()
+	postToDB(url)
 
-			time.sleep(1)
-			# csv = open(path, 'r')
-			# readFile(csv)
-			# killNodes()
-			# csv.close()
-
-	except KeyboardInterrupt :
-		print "Done"
+	print "Done"
 

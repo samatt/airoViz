@@ -20,6 +20,8 @@ class NodeRecord(ndb.Expando) :
 	kind = ndb.StringProperty()
 	BSSID = ndb.StringProperty()
 	# This is going to be a list of time ranges the device was seen.
+
+	##EVEN INDICES ARE START TIMES AND ODD ARE LAST SEEN
 	timeRanges = ndb.DateTimeProperty(repeated = True)
 	power= ndb.IntegerProperty()
 	ESSID = ndb.StringProperty(default = "None")
@@ -160,8 +162,6 @@ class ReadLatestRecordHandler(webapp2.RequestHandler):
 		else:
 
 			reading = SensorRecord.query_latest_reading(device_name)
-			
-
 
 			#self.response.write(decoded_dict.get('devicename') + '\n')
 			#self.response.write(decoded_dict.get('a0'))
