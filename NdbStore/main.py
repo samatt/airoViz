@@ -130,21 +130,11 @@ class ReadRecordsHandler(webapp2.RequestHandler):
 			self.response.write(
 			NodeRecord.queryByNode(device_name))
 
-class UpdateRecordHandler(webapp2.RequestHandler):
+class DeleteAllRecordsHandler(webapp2.RequestHandler):
 
 	def get(self): 
-		pass
-		# this = self
-		# this.response.headers['Content-Type'] = 'text/plain'
-		
-		# try:
-		# 	device_name= self.request.GET['devicename']
-
-		# except KeyError: #bail if there is no argument for 'devicename' submitted
-		# 	self.response.write ('NO DEVICE PARAMETER SUBMITTED')
-		# else:
-		# 	self.response.write(
-		# 	NodeRecord.queryByNode(device_name))			
+		node_keys = NodeRecord.query().fetch(keys_only=True)
+		ndb.delete_multi(node_keys)
 
 class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
 
@@ -224,10 +214,13 @@ app = webapp2.WSGIApplication([
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
-	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
+	# webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
-	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid')
+	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
+	webapp2.Route('/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all')
+
+
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 ], debug=True)
