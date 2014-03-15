@@ -34,10 +34,8 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 
 		if not routers[ID].hasTimeChanged(lastTime):
 			return False
-
 		# if routers[ID].alive:
 			# return False		
-
 		return True
 
 	else:
@@ -46,10 +44,8 @@ def isAliveAndTimeChanged(kind,ID,lastTime):
 
 		if not clients[ID].hasTimeChanged(lastTime):
 			return False
-
 		# if clients[ID].alive:
 			# return False		
-
 		return True
 
 def updateCurrentNode(kind,ID,lastTime,params):
@@ -71,16 +67,13 @@ def updateIdleCount(kind,ID):
 		
 			routerIdleCount[ID] += 1
 			# print "Idle count for  Router" + ID + " : "+ str(routerIdleCount[ID])
-		
 		else:
 			print 'wtf?'
 	else:
 		
 		if ID in clientIdleCount:
-		
 			clientIdleCount[ID] += 1
 			# print "Idle count for  Client" + ID + " : "+ str(clientIdleCount[ID])
-		
 		else:
 			print 'wtf?'		
 
@@ -192,17 +185,11 @@ class MyHandler(LoggingEventHandler):
 			if ".kismet.csv" not in event.src_path and "kismet.netxml" not in event.src_path and ".cap" not in event.src_path:
 				csv = open(event.src_path, 'r')
 				readFile(csv)
-				# killNodes()
 				csv.close()		
 				print "Reading File!"
 				print event.src_path
 			else:
 				print "Ignoring file : "+event.src_path 
-
- #    def on_created(self,event):
- #    	print "Created"
-	# def on_deleted(self,event):
-	# 	print "Deleted"
 
 
 if __name__ == '__main__' :
@@ -218,12 +205,7 @@ if __name__ == '__main__' :
 	
 	try :
 	    while True :
-
 			time.sleep(1)
-			# csv = open(path, 'r')
-			# readFile(csv)
-			# killNodes()
-			# csv.close()
 
 	except KeyboardInterrupt :
 		observer.stop()

@@ -40,7 +40,7 @@ Routers (as expected) are the devices that act as access points for logging on t
 * BSSID
 * Probed ESSIDs
 
-##Python Airodump parser
+##Python Airodump Parser
 
 ##NDB Datastore
 	
@@ -48,6 +48,8 @@ Routers (as expected) are the devices that act as access points for logging on t
  - BSSID
  - Power
  - Speed
+ - TimeRanges
+ 	Time Ranges that the Node has been seen
  - ESSID
  	- Router: For Routers this is the Name of the network associated with that Router.
  	- Client: For Clients this is the name of the network the client is currently connected to. If client is not connected to any router this will say 'not associated'

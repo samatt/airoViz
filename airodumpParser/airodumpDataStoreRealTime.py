@@ -92,14 +92,19 @@ def readFile(fileName):
 		if isRouter:
 			if ID in routers:
 				routers[ID].updateRouterNode(params)
+				routers[ID].updateDB()
 			else:
 				addNewNode("Router",ID, params)
+				routers[ID].postToDB()
+
 
 		else:
 			if ID in clients:
 				clients[ID].updateClientNode(params)
+				clients[ID].updateDB()
 			else:
 				addNewNode("Client",ID,params)
+				clients[ID].postToDB()
 
 def killNodes():
 
@@ -156,14 +161,14 @@ class MyHandler(LoggingEventHandler):
 				csv = open(event.src_path, 'r')
 				readFile(csv)
 				csv.close()		
-				print "Reading File!"
+				# print "Reading File!"
 				print event.src_path
 			else:
-				print "Ignoring file : "+event.src_path 
+				pass
+				# print "Ignoring file : "+event.src_path 
 
 if __name__ == '__main__' :
 	
-	print rootdir
 	url = 'http://localhost:8080'
 
    	event_handler = MyHandler()
@@ -173,7 +178,7 @@ if __name__ == '__main__' :
 	observer.schedule(event_handler, path, recursive=True)
 	observer.start()	
 
-	sender = oscSender(8000)
+	# sender = oscSender(8000)
 
 	try :
 	    while True :

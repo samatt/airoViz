@@ -61,6 +61,34 @@ class NodeRecord(ndb.Expando) :
 		return device_records
 
 
+	@classmethod
+	def updateNode(cls,updateData):
+		returnString = "" 
+
+		nodeRecordsQuery = cls.query(
+			ancestor = device_key(updateData['bssid']))
+
+		##using get as we only want the first query (only one entity should exist)
+		nodeToUpdate  = nodeRecordsQuery.get()
+
+		if nodeToUpdate.kind == "Router":
+			returnString += "Router "+ nodeToUpdate.BSSID + "\n "
+			returnString += str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
+			returnString += "Last Time updated seen : " + str(updateData['time']) + "  \n"
+
+			nodeToUpdate.power = int(updateData['power'])
+			nodeToUpdate.timeRanges = updateData['time']
+
+		else:
+			returnString += "Client "+ nodeToUpdate.BSSID + "\n "
+			returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
+			returnString += "Last Time : updated to " + str(updateData['time']) + "  \n"
+			returnString += "AP : "+ nodeToUpdate.AP + " updated to " + updateData['essid'] + "\n"
+
+			nodeToUpdate.power = int(updateData['power'])
+			nodeToUpdate.timeRanges = updateData['time']
+			nodeToUpdate.AP = updateData['essid']
+		return returnString
 
 	@classmethod
 	def queryNodesByTimestamps(cls,device_name):
@@ -76,15 +104,14 @@ class NodeRecord(ndb.Expando) :
 	def queryNodesByLastSeen(cls,queryTime):
 
 			queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
-			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj)
+			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj).order(NodeRecord.lastSeen)
 			
 			device_records = nodeRecordsQuery.fetch()
 
 			logDict  = dict()
 			for device in device_records:
 				logDict[device.BSSID] = device.lastSeen
-			
-			
+
 			pprint(sorted(logDict.items(), key=lambda p: p[1], reverse=True))
 			
 			return device_records			
@@ -139,8 +166,6 @@ class CreateRecordHandler(webapp2.RequestHandler):
 						kind = kind, BSSID = bssid, timeRanges = curTimes , lastSeen = curTimes[-1], power = power, AP = essid, probedESSID =probedEssid)
 
 		r_key = r.put()
-
-
 
 class ReadRecordsHandler(webapp2.RequestHandler):
 
@@ -230,21 +255,47 @@ class LastSeenRecordsHandler(webapp2.RequestHandler):
 			# decoded_dict = dict(json.loads(reading))
 			self.response.write(byLastSeen)
 
-
-class PassSensorValueOnly(webapp2.RequestHandler):
-
+class UpdateRecordHandler(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/plain'
 
 		try:
-			device_name= self.request.GET['devicename']
+			self.response.headers['Content-Type'] = 'text/plain'
+			update = dict()
+			update['kind'] = self.request.GET['kind'].strip()
+			update['bssid'] = self.request.GET['bssid'].strip()
+			update['power'] =  self.request.GET['power'].strip()
+			update['essid'] =  self.request.GET['essid'].strip()
+
+
+			probe = self.request.get_all('probed')
+			timeRanges = self.request.get_all('times')
+			curTimes = []
+			probedEssid = []
+			
+			for probed in probe:
+				probed.encode('ascii','ignore')
+				probed  = probed.strip()
+				probedEssid.append(probed)
+
+			update['probed'] = probedEssid
+
+			for time in timeRanges:
+				time.encode('ascii','ignore')
+				time = time.strip()
+				curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
+				print curTimes
+
+			update['time'] = curTimes
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
-			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+			self.response.write ('Error with update parameters')
+		
 		else:
-			reading = SensorRecord.query_latest_reading(device_name)
-			decoded_dict = dict(json.loads(reading))
-			self.response.write(decoded_dict.get('a0'))
+			updated = NodeRecord.updateNode(update)
+			# decoded_dict = dict(json.loads(reading))
+
+			self.response.write(updated)
 
 
 app = webapp2.WSGIApplication([
@@ -256,7 +307,7 @@ app = webapp2.WSGIApplication([
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
-	# webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
+	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
