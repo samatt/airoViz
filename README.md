@@ -1,6 +1,12 @@
 #Overview
 This repository contains code for a platform for Wi-Fi based location tracking. It has three main components
 
+* Aircrack-ng on Linux
+* Python airodump Parser
+	* Sends OSC messages of parsed data
+	* Writes data to Google App Engine DB
+* Google app NDB Data Store
+
 ##Aircrack-ng 
 Aircrack-ng and a compatible router are used to monitor the Wi-Fi spectrum for activity. The activity is can be split into two categories
 
@@ -34,7 +40,9 @@ Routers (as expected) are the devices that act as access points for logging on t
 * BSSID
 * Probed ESSIDs
 
-##DataStore Parameters
+##Python Airodump parser
+
+##NDB Datastore
 	
  - Kind
  - BSSID
