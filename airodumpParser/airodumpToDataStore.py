@@ -131,17 +131,19 @@ def killNodes():
 				routers[k].alive = False
 
 def postToDB(url):
+	i =0
 	for k,v in routers.iteritems():
 
 		routers[k].postToDB(url)
+		print "Router :" + str(i) + " of "+ str(len(routers))
+		i+=1
 	
+	i =0
 	for k,v in clients.iteritems():
-		clients[k].postToDB(url)		
+		clients[k].postToDB(url)	
+		print "Client :" + str(i) + " of "+ str(len(clients))
+		i+=1
 
-
-# def postToDB(url):
-# 	for k,v in routers.iteritems():
-# 		routers[k].postToDB(url)
 if __name__ == '__main__' :
 
    	path = sys.argv[1] if len(sys.argv) > 1 else '.'
@@ -149,33 +151,38 @@ if __name__ == '__main__' :
 	
 	print rootdir
 	url = 'http://localhost:8080'
-	# csv = open(path, 'r')
-	# readFile(csv)
-	# csv.close()
-	# postToDB(url)
+	csv = open(path, 'r')
+	readFile(csv)
+	csv.close()	
+	postToDB(url)
 
 	print "Done"
-	i =0
-	for subdir, dirs, files in os.walk(rootdir):
-	    for file in files:
+	# i =0
+	# for subdir, dirs, files in os.walk(rootdir):
+	# 	size = len(routers)
+	# 	sizeC = len(clients)
+	# 	for file in files:
 
-			# print subdir+'/'+file
-			if ".kismet.csv" not in file and "kismet.netxml" not in file and ".cap" not in file:
-				print "Reading File :" + file
-				csv = open(subdir+'/'+file, 'r')
-				readFile(csv)
-			# killNodes()
-				csv.close()		
+	# 		# print subdir+'/'+file
+	# 		if ".kismet.csv" not in file and "kismet.netxml" not in file and ".cap" not in file and ".csv" in file:
+
+	# 			print "Reading File :" + file
+	# 			csv = open(subdir+'/'+file, 'r')
+	# 			readFile(csv)
+	# 		# killNodes()
+	# 			csv.close()		
 				
-				print 
-			else:
-				print "Ignoring file : "+file 
+	# 			print 
+	# 		else:
+	# 			print "Ignoring file : "+file 
+				 
 
-			print "### " + str(i) + " of "+ str(len(files))
+	# 		print "### " + str(i) + " of "+ str(len(files))
+	# 		print " No of routers added : "+ str(len(routers) - size) 
+	# 		print " No of clients added : "  + str(len(clients) - sizeC)
+	# 		print " No of routers total  : "	+ len(routers) 
+	# 		print " No of clients total  : "	+ len(clients)
+	# 		i += 1
 
-			# print clients
-			# print routers
-			i += 1
-
-	postToDB(url)
+	# postToDB(url)
 
