@@ -59,8 +59,13 @@ class Node(object):
             self.ESSID = " "
             self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen)) 
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
-            self.forDB = dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power), ("essid",self.AP)  , ("probed",self.probedESSID) ])
+            self.forDB = dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power) , ("probed",self.probedESSID) ])
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
+            
+            #using the pipe to be keep track of when the client was associated to a router and update if it changes
+            newAP = [self.AP + "|" + self.lastTimeSeen]
+            self.forDB["essid"]= newAP
+            
             self.alive = True;
 
     def printParams(self):
@@ -89,12 +94,15 @@ class Node(object):
             # print self.ip
         self.ESSID = self.ESSID.strip()
         self.probedESSID = self.probedESSID
+        trimProbe = []
+        for probe in self.probedESSID:
+            probe = probe.strip()
+            trimProbe.append(probe)
+
+        self.probedESSID = trimProbe 
 	
     def updateRouterNode(self, params):
-        # print "Updating Router : " + self.BSSID 
-        # print "Updating Router : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
-        # self.kind = "Router"
-        # self.BSSID = params[0]
+
         self.alive = True
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2].strip()
@@ -113,13 +121,20 @@ class Node(object):
     def updateClientNode(self, params):
         # print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
         self.alive = True
-        print params[6:]
+        # print params[6:]
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
         self.Channel =  -1
         self.Speed = -1
         self.Privacy = " "
-        
+        if self.AP == params[5]:
+            pass
+        else:
+            print "AP updated from : " +  self.AP + " to "+params[5] +"|"+self.lastTimeSeen
+            #using the pipe to be keep track of when the client was associated to a router and update if it changes
+            newAP = self.AP + "|" + self.lastTimeSeen
+            self.forDB["essid"].append(newAP)
+        # self.AP = params[5]
         self.Power = -int(params[3])
         self.AP = params[5]
         self.ESSID = " "
@@ -130,17 +145,16 @@ class Node(object):
 
         newProbe = []
         for probe in self.probedESSID:
-            print probe
             if probe == " ":
-                print "its blank"
+                pass
+            elif probe in self.probedESSID:
+                pass
             else:
                 probe = probe.strip()
                 newProbe.append(probe)
 
-        print len(newProbe)
         if len(newProbe) > 0:
             print "Updating probes for Client : " + self.BSSID
-            print newProbe
             self.forDB["probed"].append(newProbe)
 
     def hasTimeChanged(self, newTime): 
@@ -157,10 +171,11 @@ class Node(object):
 
         r = requests.get(url+"/write", params=self.forDB)
         try:
-            print r.json()
+            r.json()
 
         except ValueError: 
-            print "Val error" 
+            pass
+            # print "Val error" 
         else:
             print "sent"  
 
