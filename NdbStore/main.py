@@ -7,6 +7,7 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from urlparse import urlparse, parse_qs
 from datetime import datetime, date, time
+from pprint import pprint
 # from dateutil import parser
 
 NO_DEVICE_ID = 'no_device_id'
@@ -22,13 +23,17 @@ class NodeRecord(ndb.Expando) :
 	# This is going to be a list of time ranges the device was seen.
 
 	##EVEN INDICES ARE START TIMES AND ODD ARE LAST SEEN
-	timeRanges = ndb.DateTimeProperty(repeated = True)
 	power= ndb.IntegerProperty()
 	ESSID = ndb.StringProperty(default = "None")
 	# associatedAP  = ndb.JSONProperty(default = "None")
 	Privacy = ndb.StringProperty(default = "None")
 	probedESSID = ndb.StringProperty(repeated = True) 
+
+	AP = ndb.StringProperty(default = "None")
+	timeRanges = ndb.DateTimeProperty(repeated = True)
 	recordentrytime = ndb.DateTimeProperty(auto_now_add=True)
+	lastSeen = ndb.DateTimeProperty()
+	
 	# TODO: Implement hardware API
 	# hardware = ndb.JsonProperty()
 
@@ -37,10 +42,10 @@ class NodeRecord(ndb.Expando) :
 	@classmethod
 	def queryByNode(cls,device_name):
 			device_readings_list = []
-			device_records_query = cls.query(
+			nodeRecordsQuery = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
 			# device_records is a list object only returns sensor reading and time for parsing. 
-			device_records = device_records_query.fetch()
+			device_records = nodeRecordsQuery.fetch()
 
 		#create methods for pulling different streams of data out for processing. 
 			# for device_record in device_records:
@@ -60,12 +65,29 @@ class NodeRecord(ndb.Expando) :
 	@classmethod
 	def queryNodesByTimestamps(cls,device_name):
 			device_readings_dict = {}
-			device_records_query = cls.query(
+			nodeRecordsQuery = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.timeRanges)
 			
-			device_records = device_records_query.fetch()
+			device_records = nodeRecordsQuery.fetch()
 			
 			return device_records
+
+	@classmethod
+	def queryNodesByLastSeen(cls,queryTime):
+
+			queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
+			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj)
+			
+			device_records = nodeRecordsQuery.fetch()
+
+			logDict  = dict()
+			for device in device_records:
+				logDict[device.BSSID] = device.lastSeen
+			
+			
+			pprint(sorted(logDict.items(), key=lambda p: p[1], reverse=True))
+			
+			return device_records			
 
 	@classmethod
 	def queryNodesProbedESSID(cls, qrySSID):
@@ -88,19 +110,18 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		self.response.headers['Content-Type'] = 'text/plain'
 		kind = self.request.GET['kind'].strip()
 		bssid = self.request.GET['bssid'].strip()
-		probedEssid = self.request.get_all('probed')
+		probe = self.request.get_all('probed')
 		power =  self.request.GET['power'].strip()
 		essid =  self.request.GET['essid'].strip()
 		timeRanges = self.request.get_all('times')
 		curTimes = []
+		probedEssid = []
 		
-		for probed in probedEssid:
-			probed  = probed.strip()
-			print probed
+		for probed in probe:
 			probed.encode('ascii','ignore')
-			print probed
+			probed  = probed.strip()
+			probedEssid.append(probed)
 
-		print timeRanges
 		for time in timeRanges:
 			time.encode('ascii','ignore')
 			time = time.strip()
@@ -109,8 +130,14 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		
 		power = int(power)
 		print power
-		r = NodeRecord(parent = device_key(bssid),
-						kind = kind, BSSID = bssid, timeRanges = curTimes , power = power, ESSID  = essid, probedESSID =probedEssid)
+
+		if kind == "Router":
+			r = NodeRecord(parent = device_key(bssid),
+						kind = kind, BSSID = bssid, timeRanges = curTimes , lastSeen = curTimes[-1], power = power, ESSID  = essid, probedESSID =probedEssid)
+		else:
+			r = NodeRecord(parent = device_key(bssid),
+						kind = kind, BSSID = bssid, timeRanges = curTimes , lastSeen = curTimes[-1], power = power, AP = essid, probedESSID =probedEssid)
+
 		r_key = r.put()
 
 
@@ -179,7 +206,7 @@ class ReadLatestRecordHandler(webapp2.RequestHandler):
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
 
-			reading = SensorRecord.query_latest_reading(device_name)
+			reading = NodeRecord.query_latest_reading(device_name)
 
 			#self.response.write(decoded_dict.get('devicename') + '\n')
 			#self.response.write(decoded_dict.get('a0'))
@@ -189,6 +216,21 @@ class ReadLatestRecordHandler(webapp2.RequestHandler):
 		
 			 #outputs key value dictionary of retrieved datastore entity. 
 	
+class LastSeenRecordsHandler(webapp2.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+
+		try:
+			device_name= self.request.GET['lastseen']
+
+		except KeyError: #bail if there is no argument for 'devicename' submitted
+			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+		else:
+			byLastSeen = NodeRecord.queryNodesByLastSeen(device_name)
+			# decoded_dict = dict(json.loads(reading))
+			self.response.write(byLastSeen)
+
+
 class PassSensorValueOnly(webapp2.RequestHandler):
 
 	def get(self):
@@ -218,7 +260,8 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
-	webapp2.Route('/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all')
+	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
+	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
 
 
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')

@@ -49,7 +49,6 @@ def updateIdleCount(kind,ID):
 
 def addNewNode(kind,ID, params):
 	if kind == "Router":
-
 		# print "add routers" 
 		n =  parseLine(params,True)
 		routers[n.BSSID] = n
@@ -89,11 +88,16 @@ def readFile(fileName):
 			continue 
 		
 		if isRouter:
-			addNewNode("Router",ID, params)
+			if ID in routers:
+				routers[ID].updateRouterNode(params)
+			else:
+				addNewNode("Router",ID, params)
 
 		else:
-			# print isAliveAndTimeChanged("Client",ID,lastTime)
-			addNewNode("Client",ID,params)
+			if ID in clients:
+				clients[ID].updateClientNode(params)
+			else:
+				addNewNode("Client",ID,params)
 
 def killNodes():
 
@@ -128,6 +132,7 @@ def killNodes():
 
 def postToDB(url):
 	for k,v in routers.iteritems():
+
 		routers[k].postToDB(url)
 	
 	for k,v in clients.iteritems():
@@ -149,18 +154,28 @@ if __name__ == '__main__' :
 	# csv.close()
 	# postToDB(url)
 
-	# print "Done"
+	print "Done"
+	i =0
 	for subdir, dirs, files in os.walk(rootdir):
 	    for file in files:
+
 			# print subdir+'/'+file
 			if ".kismet.csv" not in file and "kismet.netxml" not in file and ".cap" not in file:
+				print "Reading File :" + file
 				csv = open(subdir+'/'+file, 'r')
 				readFile(csv)
 			# killNodes()
 				csv.close()		
-				print "Reading File!" + file
+				
 				print 
 			else:
 				print "Ignoring file : "+file 
+
+			print "### " + str(i) + " of "+ str(len(files))
+
+			# print clients
+			# print routers
+			i += 1
+
 	postToDB(url)
 

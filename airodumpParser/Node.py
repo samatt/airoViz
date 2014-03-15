@@ -91,7 +91,7 @@ class Node(object):
         self.probedESSID = self.probedESSID
 	
     def updateRouterNode(self, params):
-        print "Updating Router : " + self.BSSID 
+        # print "Updating Router : " + self.BSSID 
         # print "Updating Router : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
         # self.kind = "Router"
         # self.BSSID = params[0]
@@ -111,7 +111,7 @@ class Node(object):
         self.forDB["times"].append(self.lastTimeSeen)
 
     def updateClientNode(self, params):
-        print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
+        # print "Updating Client : " + self.BSSID + " from time : " + self.lastTimeSeen + " to time : "+ params[2]
         self.alive = True
         print params[6:]
         self.firstTimeSeen = params[1]
@@ -127,6 +127,21 @@ class Node(object):
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
         self.forDB["times"].append(self.firstTimeSeen)
         self.forDB["times"].append(self.lastTimeSeen)
+
+        newProbe = []
+        for probe in self.probedESSID:
+            print probe
+            if probe == " ":
+                print "its blank"
+            else:
+                probe = probe.strip()
+                newProbe.append(probe)
+
+        print len(newProbe)
+        if len(newProbe) > 0:
+            print "Updating probes for Client : " + self.BSSID
+            print newProbe
+            self.forDB["probed"].append(newProbe)
 
     def hasTimeChanged(self, newTime): 
         if self.lastTimeSeen.strip() == newTime.strip():
