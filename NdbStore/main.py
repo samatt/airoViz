@@ -301,7 +301,11 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				returnString += "Last Time updated seen : " + str(update['time']) + "  \n"
 
 				nodeToUpdate.power = int(update['power'])
-				nodeToUpdate.timeRanges = update['time']
+				nodeToUpdate.lastSeen = update['time'][-1]
+				for t in update['time']:
+					nodeToUpdate.timeRanges.append(t)	
+
+				
 
 			else:
 				returnString += "Client "+ nodeToUpdate.BSSID + "\n "
@@ -310,8 +314,10 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				returnString += "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
 
 				nodeToUpdate.power = int(update['power'])
+				#Doing this because it seems redundant to strore ranges for the real time app. Can always put it back for data analyis
 
-				print type(update['time'])
+				nodeToUpdate.lastSeen = update['time'][-1]
+				nodeToUpdate.timeRanges = []
 				for t in update['time']:
 					nodeToUpdate.timeRanges.append(t)	
 				# nodeToUpdate.timeRanges.append(update['time'])

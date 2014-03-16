@@ -110,13 +110,14 @@ class Node(object):
         self.Speed = int(params[4])
         self.Privacy = params[5]
         self.AP = "None"
-        self.Power = -int(params[8])
+        self.Power = int(params[8])
         self.ESSID = params[13]    
         self.probedESSID = " "  
         
         #Updates for DB
         self.forDB["power"] = self.Power
-        self.forDB["times"].append(self.firstTimeSeen)
+        #Removing these because they seem redundent for the real time app.
+        # self.forDB["times"].append(self.firstTimeSeen)
         self.forDB["times"].append(self.lastTimeSeen)
 
         #Updates for OSC
@@ -130,7 +131,7 @@ class Node(object):
         self.Channel =  -1
         self.Speed = -1
         self.Privacy = " "
-        self.Power = -int(params[3])
+        self.Power = int(params[3])
         self.ESSID = " "
         self.probedESSID = params[6:] 
         
@@ -146,7 +147,7 @@ class Node(object):
         
         #Updates for DB        
         self.forDB["power"] = self.Power
-        self.forDB["times"].append(self.firstTimeSeen)
+        # self.forDB["times"].append(self.firstTimeSeen)
         self.forDB["times"].append(self.lastTimeSeen)
 
         #Updates for OSC
@@ -199,6 +200,7 @@ class Node(object):
         print "Updating : "+ self.BSSID
         try:
             print r.json()
+
 
         except ValueError: 
             pass
