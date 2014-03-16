@@ -33,7 +33,7 @@ class Node(object):
             self.Channel = int(params[3])
             self.Speed = int(params[4])
             self.Privacy = params[5]
-            self.Power = int(params[8])
+            self.Power = self.updatePower(params[8])
             self.ESSID = params[13]
             self.AP = "None"
             self.probedESSID = " "
@@ -53,8 +53,9 @@ class Node(object):
             self.Speed = -1
             self.Privacy = " "
             self.AP = params[5]
-            print params[3]
-            self.Power = int(params[3])
+            self.Power = self.updatePower(params[3])
+            print self.Power
+
             #TODO: make list of all networks
             self.ESSID = " "
             self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen)) 
@@ -67,6 +68,13 @@ class Node(object):
             self.forDB["essid"]= newAP
             
             self.alive = True;
+
+    def updatePower(self, newValue):
+        newValue = int(newValue)
+        if newValue >= -1 and newValue <=    0:
+            return -128
+        else:
+            return newValue
 
     def printParams(self):
         print self.kind
@@ -110,7 +118,7 @@ class Node(object):
         self.Speed = int(params[4])
         self.Privacy = params[5]
         self.AP = "None"
-        self.Power = int(params[8])
+        self.Power = self.updatePower(params[8])
         self.ESSID = params[13]    
         self.probedESSID = " "  
         
@@ -131,7 +139,7 @@ class Node(object):
         self.Channel =  -1
         self.Speed = -1
         self.Privacy = " "
-        self.Power = int(params[3])
+        self.Power = self.updatePower(params[3])
         self.ESSID = " "
         self.probedESSID = params[6:] 
         
