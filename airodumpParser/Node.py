@@ -1,7 +1,7 @@
 import urllib2
 import urllib
 import requests
-from datetime import datetime, date, time    
+from datetime import datetime, date, time, timedelta
 
 class Node(object):
 
@@ -167,11 +167,16 @@ class Node(object):
             self.forDB["probed"].append(newProbe)
 
     def hasTimeChanged(self, newTime): 
-        if self.lastTimeSeen.strip() == newTime.strip():
-            return False
-        else:
-            # print "Time changed "+ self.lastTimeSeen + " to " + newTime
+
+        lastTimeSeen = datetime.strptime(self.lastTimeSeen.strip(), "%Y-%m-%d %H:%M:%S")
+        curTime = datetime.strptime(newTime.strip(), "%Y-%m-%d %H:%M:%S")
+
+        if (curTime - lastTimeSeen) > timedelta(seconds = 1):
+            print  "Time since previous ping for "+self.BSSID +" with "+ self.AP +" : "
+            print (curTime - lastTimeSeen)
             return True
+        else:
+            return False
 
     def wrapForOsc(self):
         return " , ".join(self.forOSC)

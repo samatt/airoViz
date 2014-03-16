@@ -153,7 +153,6 @@ class CreateRecordHandler(webapp2.RequestHandler):
 			time.encode('ascii','ignore')
 			time = time.strip()
 			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
-			print curTimes
 		
 		power = int(power)
 		print power
@@ -284,7 +283,6 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				time.encode('ascii','ignore')
 				time = time.strip()
 				curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
-				print curTimes
 
 			update['time'] = curTimes
 

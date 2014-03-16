@@ -91,8 +91,10 @@ def readFile(fileName):
 		
 		if isRouter:
 			if ID in routers:
-				routers[ID].updateRouterNode(params)
-				routers[ID].updateDB()
+				pass
+				# if routers[ID].hasTimeChanged(params[2]):
+					# routers[ID].updateRouterNode(params)
+					# routers[ID].updateDB()
 			else:
 				addNewNode("Router",ID, params)
 				routers[ID].postToDB()
@@ -100,8 +102,10 @@ def readFile(fileName):
 
 		else:
 			if ID in clients:
-				clients[ID].updateClientNode(params)
-				clients[ID].updateDB()
+				if clients[ID].hasTimeChanged(params[2].strip()):
+					clients[ID].updateClientNode(params)
+					clients[ID].updateDB()				
+
 			else:
 				addNewNode("Client",ID,params)
 				clients[ID].postToDB()
@@ -162,7 +166,7 @@ class MyHandler(LoggingEventHandler):
 				readFile(csv)
 				csv.close()		
 				# print "Reading File!"
-				print event.src_path
+				# print event.src_path
 			else:
 				pass
 				# print "Ignoring file : "+event.src_path 
