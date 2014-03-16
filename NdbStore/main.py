@@ -70,25 +70,28 @@ class NodeRecord(ndb.Expando) :
 
 		##using get as we only want the first query (only one entity should exist)
 		nodeToUpdate  = nodeRecordsQuery.get()
+		print "\n##################################\n"
+		print nodeToUpdate
+		print "\n##################################\n"
+		return nodeToUpdate
+		# if nodeToUpdate.kind == "Router":
+		# 	returnString += "Router "+ nodeToUpdate.BSSID + "\n "
+		# 	returnString += str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
+		# 	returnString += "Last Time updated seen : " + str(updateData['time']) + "  \n"
 
-		if nodeToUpdate.kind == "Router":
-			returnString += "Router "+ nodeToUpdate.BSSID + "\n "
-			returnString += str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
-			returnString += "Last Time updated seen : " + str(updateData['time']) + "  \n"
+		# 	nodeToUpdate.power = int(updateData['power'])
+		# 	nodeToUpdate.timeRanges = updateData['time']
 
-			nodeToUpdate.power = int(updateData['power'])
-			nodeToUpdate.timeRanges = updateData['time']
+		# else:
+		# 	returnString += "Client "+ nodeToUpdate.BSSID + "\n "
+		# 	returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
+		# 	returnString += "Last Time : updated to " + str(updateData['time']) + "  \n"
+		# 	returnString += "AP : "+ nodeToUpdate.AP + " updated to " + updateData['essid'] + "\n"
 
-		else:
-			returnString += "Client "+ nodeToUpdate.BSSID + "\n "
-			returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
-			returnString += "Last Time : updated to " + str(updateData['time']) + "  \n"
-			returnString += "AP : "+ nodeToUpdate.AP + " updated to " + updateData['essid'] + "\n"
-
-			nodeToUpdate.power = int(updateData['power'])
-			nodeToUpdate.timeRanges = updateData['time']
-			nodeToUpdate.AP = updateData['essid']
-		return returnString
+		# 	nodeToUpdate.power = int(updateData['power'])
+		# 	nodeToUpdate.timeRanges = updateData['time']
+		# 	nodeToUpdate.AP = updateData['essid']
+		
 
 	@classmethod
 	def queryNodesByTimestamps(cls,device_name):
@@ -257,10 +260,10 @@ class LastSeenRecordsHandler(webapp2.RequestHandler):
 class UpdateRecordHandler(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/plain'
-
+		update = dict()
 		try:
 			self.response.headers['Content-Type'] = 'text/plain'
-			update = dict()
+			
 			update['kind'] = self.request.GET['kind'].strip()
 			update['bssid'] = self.request.GET['bssid'].strip()
 			update['power'] =  self.request.GET['power'].strip()
@@ -290,10 +293,33 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 			self.response.write ('Error with update parameters')
 		
 		else:
-			updated = NodeRecord.updateNode(update)
-			# decoded_dict = dict(json.loads(reading))
+			nodeToUpdate = NodeRecord.updateNode(update)
+			returnString = ""
+			if nodeToUpdate.kind == "Router":
+				returnString += "Router "+ nodeToUpdate.BSSID + "\n "
+				returnString += str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				returnString += "Last Time updated seen : " + str(update['time']) + "  \n"
 
-			self.response.write(updated)
+				nodeToUpdate.power = int(update['power'])
+				nodeToUpdate.timeRanges = update['time']
+
+			else:
+				returnString += "Client "+ nodeToUpdate.BSSID + "\n "
+				returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				returnString += "Last Time : updated to " + str(update['time']) + "  \n"
+				returnString += "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
+
+				nodeToUpdate.power = int(update['power'])
+
+				print type(update['time'])
+				for t in update['time']:
+					nodeToUpdate.timeRanges.append(t)	
+				# nodeToUpdate.timeRanges.append(update['time'])
+				
+				nodeToUpdate.AP = update['essid']			
+			# decoded_dict = dict(json.loads(reading))
+			r_key = nodeToUpdate.put()
+			self.response.write(returnString)
 
 
 app = webapp2.WSGIApplication([
