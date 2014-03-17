@@ -51,3 +51,5 @@
 *.pyc
 
 /airodumpParser/googleAPITest.json
+
+/airodumpParser/parseTest/
