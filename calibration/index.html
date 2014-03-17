@@ -2,10 +2,10 @@
 	<head>
 		<meta charset="utf-8">
 		<title>D3: SVG bar chart with value labels (centered)</title>
-		<script type="text/javascript" src="lib/d3/d3.js"></script>
-		<script type="text/javascript" src="lib/jquery/jquery-2.1.0.min.js"></script>
-		// <!-- <script type="text/javascript" src="../lib/d3/d3.js"></script>
-		// <script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script> -->
+
+		<script type="text/javascript" src="../lib/d3/d3.js"></script>
+		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
+		<script type="text/javascript" src="../utils.js"></script>
 		<style type="text/css">
 			/* No style rules here yet */		
 		</style>
@@ -18,26 +18,14 @@
     			var time = setDuration(5);
     			url = 'http://localhost:8080/lastseen?lastseen='+time;
     			console.log(url)
-    			
-				// d3.json(url, function(err, json) {
-			
-				// if (err) {
-				// 	return console.warn(err);
-				// }
-
-				// console.log(json);
-				// });
 				
-				// calibration.data = json				
 				$.ajax({
 					dataType: 'jsonp',
 					url: url,
 					type: 'GET',
 						success: function(postData) {
-						  //console.log("POST succeeded for new player " + postData.id);
-						  console.dir(postData);
-						  // cd.playerId = Number(postData.id);
-					  // console.log('set playerId to ' + cd.playerId);
+							calibration.data = postData
+						  
 						},
 						error: function(err) {
 						  console.log("GET failed ");
@@ -45,68 +33,13 @@
 						}
 				});
 
-				// var xhr = createCORSRequest('GET', url);
-				// if (!xhr) {
-				//   throw new Error('CORS not supported');
-				// }
-				// else{
-				// 	xhr.onload = function(){
-				// 		console.log(xhr.responseText)
-				// 	}
-				// 	console.log(xhr);
-				// }
+			    d3.xhr(url, function( json) {
+					console.log(json);
 
-				// console.log(json);
-				// calibration.data = json				
-				// $.ajax({
-				// 	dataType: 'json',
-				// 	url: url,
-				// 	type: 'POST',
-				// 	success: function(postData) {
-				// 	  //console.log("POST succeeded for new player " + postData.id);
-				// 	  console.dir(postData);
-				// 	  // cd.playerId = Number(postData.id);
-				//   // console.log('set playerId to ' + cd.playerId);
-				// },
-				// error: function() {
-				//   console.log("POST failed for new player");
-				// }
-				// });
-
-				// drawing.initScreen();
-				// setInterval(function() { $('input#controller').focus(); }, 1000/cd.data.screen.frameRate);
+			    });				
+				
 			});
 
-			function createCORSRequest(method, url) {
-			  var xhr = new XMLHttpRequest();
-			  if ("withCredentials" in xhr) {
-
-			    // Check if the XMLHttpRequest object has a "withCredentials" property.
-			    // "withCredentials" only exists on XMLHTTPRequest2 objects.
-			    xhr.open(method, url, true);
-
-			  } else if (typeof XDomainRequest != "undefined") {
-
-			    // Otherwise, check if XDomainRequest.
-			    // XDomainRequest only exists in IE, and is IE's way of making CORS requests.
-			    xhr = new XDomainRequest();
-			    xhr.open(method, url);
-
-			  } else {
-
-			    // Otherwise, CORS is not supported by the browser.
-			    xhr = null;
-
-			  }
-			  return xhr;
-			}
-
-			 function setDuration (numMinutes){
-    			var ts = new Date();
-    			timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+ts.getDate()+" "+ts.getHours()+":"+(ts.getMinutes()-numMinutes)	+":"+ts.getSeconds();
-
-    			return timestamp
-			}
 
 		</script>
 	</body>

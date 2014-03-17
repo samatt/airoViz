@@ -81,30 +81,8 @@ class NodeRecord(ndb.Expando) :
 
 		nodeRecordsQuery = cls.query(
 			ancestor = device_key(updateData['bssid']))
-
-		##using get as we only want the first query (only one entity should exist)
 		nodeToUpdate  = nodeRecordsQuery.get()
-		# print "\n##################################\n"
-		# print nodeToUpdate
-		# print "\n##################################\n"
 		return nodeToUpdate
-		# if nodeToUpdate.kind == "Router":
-		# 	returnString += "Router "+ nodeToUpdate.BSSID + "\n "
-		# 	returnString += str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
-		# 	returnString += "Last Time updated seen : " + str(updateData['time']) + "  \n"
-
-		# 	nodeToUpdate.power = int(updateData['power'])
-		# 	nodeToUpdate.timeRanges = updateData['time']
-
-		# else:
-		# 	returnString += "Client "+ nodeToUpdate.BSSID + "\n "
-		# 	returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(updateData['power'])+ "\n"
-		# 	returnString += "Last Time : updated to " + str(updateData['time']) + "  \n"
-		# 	returnString += "AP : "+ nodeToUpdate.AP + " updated to " + updateData['essid'] + "\n"
-
-		# 	nodeToUpdate.power = int(updateData['power'])
-		# 	nodeToUpdate.timeRanges = updateData['time']
-		# 	nodeToUpdate.AP = updateData['essid']
 		
 
 	@classmethod
@@ -118,30 +96,21 @@ class NodeRecord(ndb.Expando) :
 			return device_records
 
 	@classmethod
-	def queryNodesByLastSeen(cls,queryTime,fromJS):
+	def queryNodesByLastSeen(cls,queryTime):
 			queryDTObj = 0
-			if fromJS:
-				queryTime = float(queryTime)
-				queryDTObj = datetime.fromtimestamp(queryTime/1000)
 
-				print "##################"
-				print queryDTObj
-				print queryDTObj.second
-				print queryDTObj.microsecond
-				print "##################"				
-			else:
-				queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
+			queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
 			
 			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj).order(NodeRecord.lastSeen)
-			
 			device_records = nodeRecordsQuery.fetch()
-			# JSONEncoder().encode( nodeRecordsQuery.fetch())
-			logDict  = dict()
+
+			#for debug
+			# logDict  = dict()
+			# logDict[device.BSSID] = device.lastSeen
+			# pprint(sorted(logDict.items(), key=lambda p: p[1], reverse=True))
 			nodeJSONArray = []
 			for device in device_records:
-				logDict[device.BSSID] = device.lastSeen
 				nodeJSONArray.append(serialize(device))
-			pprint(sorted(logDict.items(), key=lambda p: p[1], reverse=True))
 
 			return nodeJSONArray			
 
@@ -244,61 +213,23 @@ class ReadRecordsHandlerWithClientESSID(webapp2.RequestHandler):
 		else:
 			self.response.write(
 			NodeRecord.queryNodesProbedESSID(essid))			
-
-class ReadLatestRecordHandler(webapp2.RequestHandler):
-
-	def get(self): 
-		this = self
-		this.response.headers['Content-Type'] = 'text/plain'
-		
-		try:
-			device_name= self.request.GET['devicename']
-
-		except KeyError: #bail if there is no argument for 'devicename' submitted
-			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
-		else:
-
-			reading = NodeRecord.query_latest_reading(device_name)
-
-			#self.response.write(decoded_dict.get('devicename') + '\n')
-			#self.response.write(decoded_dict.get('a0'))
-
-			self.response.write(reading)
-
-		
-			 #outputs key value dictionary of retrieved datastore entity. 
 	
 class LastSeenRecordsHandler(webapp2.RequestHandler):
 	def get(self):
-		# self.response.headers['Content-Type'] = 'text/plain'
 		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
 		self.response.headers['Content-Type'] = 'application/javascript'
 		try:
 			lastSeen= self.request.GET['lastseen']
-
+			print lastSeen
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
-			byLastSeen = NodeRecord.queryNodesByLastSeen(lastSeen,False)
+			byLastSeen = NodeRecord.queryNodesByLastSeen(lastSeen)
 			self.response.out.write("%s(%s)" %
                               (urllib2.unquote(self.request.get('callback')),
                                byLastSeen))			
-			# self.response.write(byLastSeen)
 
-class LastSeenJSRecordsHandler(webapp2.RequestHandler):
-	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-
-		try:
-			jsTimeStamp= self.request.GET['lastseen']
-
-		except KeyError: #bail if there is no argument for 'devicename' submitted
-			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
-		else:
-			byLastSeen = NodeRecord.queryNodesByLastSeen(jsTimeStamp,False)
-			# decoded_dict = dict(json.loads(reading))
-			self.response.write(byLastSeen)
 
 class UpdateRecordHandler(webapp2.RequestHandler):
 	def get(self):
@@ -371,20 +302,9 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 			r_key = nodeToUpdate.put()
 			self.response.write("Updated")
 
-class CORSEnabledHandler(webapp2.RequestHandler):
-  def get(self):
-    self.response.headers.add_header("Access-Control-Allow-Origin", "*")
-    self.response.headers['Content-Type'] = 'text/csv'
-    self.response.out.write(self.dump_csv())
-
 
 app = webapp2.WSGIApplication([
 	webapp2.Route('/', handler = MainHandler, name = 'home'),
-	# webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-record'),
-	# webapp2.Route('/read', handler = ReadRecordsHandler, name = 'read-values'),
-	# webapp2.Route('/read-time', handler = ReadRecordsHandlerWithTime, name = 'read-values-with-time'),
-	# webapp2.Route('/read-latest', handler = ReadLatestRecordHandler, name = 'read-latest-value'),
-	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 	webapp2.Route('/write', handler =  CreateRecordHandler, name = 'create-node'),
 	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
@@ -392,8 +312,8 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
 	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
-	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen'),
-	webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),
+	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
+	# webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),
 
 
 
