@@ -49,3 +49,5 @@
 /.DS_Store
 
 *.pyc
+
+/airodumpParser/googleAPITest.json
