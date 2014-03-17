@@ -91,10 +91,10 @@ def readFile(fileName):
 		
 		if isRouter:
 			if ID in routers:
-				pass
-				# if routers[ID].hasTimeChanged(params[2]):
-					# routers[ID].updateRouterNode(params)
-					# routers[ID].updateDB()
+				print routers[ID].BSSID
+				if routers[ID].hasTimeChanged(params[2].strip()):
+					routers[ID].updateRouterNode(params)
+					routers[ID].updateDB()
 			else:
 				addNewNode("Router",ID, params)
 				routers[ID].postToDB()

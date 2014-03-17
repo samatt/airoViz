@@ -1,17 +1,31 @@
 
 import urllib
 import webapp2
-try: import simplejson as json
-except ImportError: import  json
+# try: import simplejson as json
+# except ImportError: import  json
+import json
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from urlparse import urlparse, parse_qs
 from datetime import datetime, date, time
 from pprint import pprint
+import urllib2
 # from dateutil import parser
 
-NO_DEVICE_ID = 'no_device_id'
 
+class GaeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return str(obj.strftime('%Y-%m-%d %H:%M:%S'))
+        elif isinstance(obj, ndb.Model):
+            return obj.to_dict()
+        else:
+            return json.JSONEncoder.default(self, obj)
+
+def serialize(object_to_serialize):
+    return json.dumps(object_to_serialize, cls=GaeEncoder)
+
+NO_DEVICE_ID = 'no_device_id'        
 def device_key(device_name = NO_DEVICE_ID):
 	"""constructs Datastore key for NodeRecord entity with device_name """
 	return ndb.Key('NodeGroup', device_name)
@@ -70,9 +84,9 @@ class NodeRecord(ndb.Expando) :
 
 		##using get as we only want the first query (only one entity should exist)
 		nodeToUpdate  = nodeRecordsQuery.get()
-		print "\n##################################\n"
-		print nodeToUpdate
-		print "\n##################################\n"
+		# print "\n##################################\n"
+		# print nodeToUpdate
+		# print "\n##################################\n"
 		return nodeToUpdate
 		# if nodeToUpdate.kind == "Router":
 		# 	returnString += "Router "+ nodeToUpdate.BSSID + "\n "
@@ -104,20 +118,32 @@ class NodeRecord(ndb.Expando) :
 			return device_records
 
 	@classmethod
-	def queryNodesByLastSeen(cls,queryTime):
+	def queryNodesByLastSeen(cls,queryTime,fromJS):
+			queryDTObj = 0
+			if fromJS:
+				queryTime = float(queryTime)
+				queryDTObj = datetime.fromtimestamp(queryTime/1000)
 
-			queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
+				print "##################"
+				print queryDTObj
+				print queryDTObj.second
+				print queryDTObj.microsecond
+				print "##################"				
+			else:
+				queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
+			
 			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj).order(NodeRecord.lastSeen)
 			
 			device_records = nodeRecordsQuery.fetch()
-
+			# JSONEncoder().encode( nodeRecordsQuery.fetch())
 			logDict  = dict()
+			nodeJSONArray = []
 			for device in device_records:
 				logDict[device.BSSID] = device.lastSeen
-
+				nodeJSONArray.append(serialize(device))
 			pprint(sorted(logDict.items(), key=lambda p: p[1], reverse=True))
-			
-			return device_records			
+
+			return nodeJSONArray			
 
 	@classmethod
 	def queryNodesProbedESSID(cls, qrySSID):
@@ -127,7 +153,6 @@ class NodeRecord(ndb.Expando) :
 			device_records = nodeRecordsQuery.fetch()
 
 			return device_records
-
 
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
@@ -245,15 +270,33 @@ class ReadLatestRecordHandler(webapp2.RequestHandler):
 	
 class LastSeenRecordsHandler(webapp2.RequestHandler):
 	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-
+		# self.response.headers['Content-Type'] = 'text/plain'
+		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+		self.response.headers['Content-Type'] = 'application/javascript'
 		try:
-			device_name= self.request.GET['lastseen']
+			lastSeen= self.request.GET['lastseen']
+
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
-			byLastSeen = NodeRecord.queryNodesByLastSeen(device_name)
+			byLastSeen = NodeRecord.queryNodesByLastSeen(lastSeen,False)
+			self.response.out.write("%s(%s)" %
+                              (urllib2.unquote(self.request.get('callback')),
+                               byLastSeen))			
+			# self.response.write(byLastSeen)
+
+class LastSeenJSRecordsHandler(webapp2.RequestHandler):
+	def get(self):
+		self.response.headers['Content-Type'] = 'text/plain'
+
+		try:
+			jsTimeStamp= self.request.GET['lastseen']
+
+		except KeyError: #bail if there is no argument for 'devicename' submitted
+			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+		else:
+			byLastSeen = NodeRecord.queryNodesByLastSeen(jsTimeStamp,False)
 			# decoded_dict = dict(json.loads(reading))
 			self.response.write(byLastSeen)
 
@@ -294,11 +337,11 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 		
 		else:
 			nodeToUpdate = NodeRecord.updateNode(update)
-			returnString = ""
+			# returnString = ""
 			if nodeToUpdate.kind == "Router":
-				returnString += "Router "+ nodeToUpdate.BSSID + "\n "
-				returnString += str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				returnString += "Last Time updated seen : " + str(update['time']) + "  \n"
+				print "Router "+ nodeToUpdate.BSSID + "\n "
+				print str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				print "Last Time updated seen : " + str(update['time']) + "  \n"
 
 				nodeToUpdate.power = int(update['power'])
 				nodeToUpdate.lastSeen = update['time'][-1]
@@ -308,10 +351,10 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				
 
 			else:
-				returnString += "Client "+ nodeToUpdate.BSSID + "\n "
-				returnString += "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				returnString += "Last Time : updated to " + str(update['time']) + "  \n"
-				returnString += "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
+				print "Client "+ nodeToUpdate.BSSID + "\n "
+				print "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				print "Last Time : updated to " + str(update['time']) + "  \n"
+				print "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
 
 				nodeToUpdate.power = int(update['power'])
 				#Doing this because it seems redundant to strore ranges for the real time app. Can always put it back for data analyis
@@ -324,8 +367,15 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				
 				nodeToUpdate.AP = update['essid']			
 			# decoded_dict = dict(json.loads(reading))
+			print
 			r_key = nodeToUpdate.put()
-			self.response.write(returnString)
+			self.response.write("Updated")
+
+class CORSEnabledHandler(webapp2.RequestHandler):
+  def get(self):
+    self.response.headers.add_header("Access-Control-Allow-Origin", "*")
+    self.response.headers['Content-Type'] = 'text/csv'
+    self.response.out.write(self.dump_csv())
 
 
 app = webapp2.WSGIApplication([
@@ -342,7 +392,9 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
 	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
-	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
+	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen'),
+	webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),
+
 
 
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
