@@ -6,6 +6,7 @@
 		<script type="text/javascript" src="../lib/d3/d3.js"></script>
 		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="../utils.js"></script>
+		<script type="text/javascript" src="../graph.js"></script>
 		<style type="text/css">
 			/* No style rules here yet */
 		</style>
@@ -14,8 +15,7 @@
 		<script type="text/javascript">
 			calibration = new Object();
 			calibration.server = 'localhost:8080';
-			// calibration.w = window.innerWidth;
-			// calibration.h = window.innerHeight;
+
 		  $(document).ready(function() {
 
 					calibration.width = $(window).width();
@@ -30,33 +30,12 @@
 						url: url,
 						type: 'GET',
 							success: function(postData) {
-								// console.log(postData)
 
-								// var json = JSON.parse(postData);
-								// console.log(postData.length);
-								var nodes = new Array();
-								var links = new Array();
-								nodes.push({'name' : "Listener", 'power': 1, 'kind': "Listener"});
-								for (var i = 0; i < 20; i++) {
-
-									var node = JSON.parse(postData[i])
-
-									var n = {'name' : node.BSSID, 'power': node.power, 'kind': node.kind};
-									nodes.push(n);
-
-									// link = new  Object();
-									link = {'source' : 0, 'target': i, 'weight':node.power};
-									// link.source = 0
-									// link.target = i+1;
-									// link.value = -node.power;
-									links.push(link);
-
-								};
-
-								calibration.data = {'nodes' : nodes, 'links': links}
-								initScreen();
+								parseData(postData);
+								initGraph();
 
 							},
+
 							error: function(err) {
 							  console.log("GET failed ");
 							  console.log(err);
@@ -64,103 +43,7 @@
 					});
 
 				});
-				var scale = d3.scale.linear()
-					.domain([0,128])
-					.range([10,100]);
 
-				var colors = d3.scale.category20();
-
-				// var force = d3.layout.force()
-			  //   .gravity([.05])
-			  //   .distance([100])
-				// 	.linkDistance([50])
-				// 	.charge([-100])
-			  //   .size([calibration.width, calibration.height]);
-
-				var initScreen = function() {
-
-					//Height of the client window - the header height
-
-			    svg = d3.select('body')
-				    .append('svg:svg')
-				    .attr('width', calibration.width)
-				    .attr('height', calibration.height);
-
-					var force = d3.layout.force()
-				      .nodes(calibration.data.nodes)
-							.links(calibration.data.links)
-							.linkDistance([50])
-							.charge([-100])
-							.size([calibration.width, calibration.height])
-				      .start();
-
-					console.log(calibration.data);
-					var edges = svg.selectAll("line")
-			        .data(calibration.data.links)
-			        .enter()
-			        .append("line")
-			        .style("stroke", "#ccc")
-			        .style("stroke-width", function(d){
-									return scale(-d.power);
-							});
-
-						var nodes = svg.selectAll("circle")
-			        .data(calibration.data.nodes)
-			        .enter()
-			        .append("circle")
-			        .attr("r", 10)
-			        .style("fill", function(d, i) {
-			                return colors(i);
-			        })
-			        .call(force.drag);
-
-						force.on("tick", function() {
-
-								edges.attr("x1", function(d) { return d.source.x; })
-								     .attr("y1", function(d) { return d.source.y; })
-								     .attr("x2", function(d) { return d.target.x; })
-								     .attr("y2", function(d) { return d.target.y; });
-
-								nodes.attr("cx", function(d) { return d.x; })
-								     .attr("cy", function(d) { return d.y; });
-
-						});
-				}
-
-				// var node = svg.selectAll("circle.node")
-				// 	.data(calibration.data.nodes)
-				// 	.enter().append("circle")
-				// 	.attr("class", "node")
-				// 	.attr("cx", 100)
-				// 	.attr("cy", 100)
-				// 	.attr("r", function(d) { return scale(d.power); })
-				// 	.style("fill", function(d,i) { return color(color(i)); })
-				// 	.call(force.drag);
-				// var initPack = function(){
-				// 	var color = d3.scale.category10()
-				//     .domain(d3.range(m));
-				//
-				// 	d3.layout.pack()
-				// 		.sort(null)
-				// 		.size([calibration.width, calibration.height])
-				// 		.children(function(d) { return d.values; })
-				// 		.value(function(d) { return d.radius * d.radius; })
-				// 		.nodes({values: d3.nest()
-				// 		.key(function(d) { return d.cluster; })
-				// 		.entries(nodes)});
-				// }
-
-				// calibration.node = calibration.svg.selectAll('circle.node')
-				//   .data(calibration.data.nodes)
-				//   .enter()
-				//   .append('circle')
-				//   .attr('class', 'node')
-				//   .attr('r', function(d) {
-				//     return scale(d.power);
-				//   })
-				//   .attr('fill', function(d,i) {
-				//     return color(i);
-				//   });
 		</script>
 	</body>
 </html>
