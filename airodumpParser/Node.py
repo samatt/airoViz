@@ -1,6 +1,7 @@
 import urllib2
 import urllib
 import requests
+import logging
 from datetime import datetime, date, time, timedelta
 
 class Node(object):
@@ -9,7 +10,7 @@ class Node(object):
 
         if not params:
             print "No params"
-            self.kind = kind    
+            self.kind = kind
             self.BSSID = " "
             self.firstTimeSeen = " "
             self.lastTimeSeen = " "
@@ -17,9 +18,9 @@ class Node(object):
             self.Speed = " "
             self.Privacy = " "
             self.Power = ""
-            self.ip = " "    
-            self.ESSID = " "    
-            self.probedESSID = " "  
+            self.ip = " "
+            self.ESSID = " "
+            self.probedESSID = " "
             self.alive = None
             self.forDB = dict()
 
@@ -38,7 +39,7 @@ class Node(object):
             self.AP = "None"
             self.probedESSID = " "
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
-            self.forDB =  dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("power",self.Power) , ("speed",self.Speed) , ("essid",self.ESSID) ])  
+            self.forDB =  dict([ ("kind",self.kind) , ("bssid",self.BSSID) , ("power",self.Power) , ("speed",self.Speed) , ("essid",self.ESSID) ])
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
             self.alive = True;
 
@@ -54,19 +55,18 @@ class Node(object):
             self.Privacy = " "
             self.AP = params[5]
             self.Power = self.updatePower(params[3])
-            print self.Power
 
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen)) 
+            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen))
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
             self.forDB = dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power) , ("probed",self.probedESSID) ])
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
-            
+
             #using the pipe to be keep track of when the client was associated to a router and update if it changes
             newAP = [self.AP + "|" + self.lastTimeSeen]
             self.forDB["essid"]= newAP
-            
+
             self.alive = True;
 
     def updatePower(self, newValue):
@@ -85,7 +85,6 @@ class Node(object):
         print self.Speed
         print self.Privacy
         print self.Power
-        # print self.ip
         print self.ESSID
         print self.probedESSID
         print self.alive
@@ -99,7 +98,6 @@ class Node(object):
         self.Speed
         self.Privacy = self.Privacy.strip()
         self.Power
-            # print self.ip
         self.ESSID = self.ESSID.strip()
         self.probedESSID = self.probedESSID
         trimProbe = []
@@ -107,8 +105,8 @@ class Node(object):
             probe = probe.strip()
             trimProbe.append(probe)
 
-        self.probedESSID = trimProbe 
-	
+        self.probedESSID = trimProbe
+
     def updateRouterNode(self, params):
 
         self.alive = True
@@ -119,9 +117,9 @@ class Node(object):
         self.Privacy = params[5]
         self.AP = "None"
         self.Power = self.updatePower(params[8])
-        self.ESSID = params[13]    
-        self.probedESSID = " "  
-        
+        self.ESSID = params[13]
+        self.probedESSID = " "
+
         #Updates for DB
         self.forDB["power"] = self.Power
         #Removing these because they seem redundent for the real time app.
@@ -141,19 +139,17 @@ class Node(object):
         self.Privacy = " "
         self.Power = self.updatePower(params[3])
         self.ESSID = " "
-        self.probedESSID = params[6:] 
-        
-
+        self.probedESSID = params[6:]
         if self.AP == params[5]:
             pass
         else:
-            print "AP updated from : " +  self.AP + " to "+params[5] +"|"+self.lastTimeSeen
-            self.AP = params[5] 
+            logging.debug("AP updated from : " +  self.AP + " to "+params[5] +"|"+self.lastTimeSeen)
+            self.AP = params[5]
             #using the pipe to be keep track of when the client was associated to a router and update if it changes
             newAP = self.AP + "|" + self.lastTimeSeen
             self.forDB["essid"].append(newAP)
-        
-        #Updates for DB        
+
+        #Updates for DB
         self.forDB["power"] = self.Power
         # self.forDB["times"].append(self.firstTimeSeen)
         self.forDB["times"].append(self.lastTimeSeen)
@@ -172,49 +168,48 @@ class Node(object):
                 newProbe.append(probe)
 
         if len(newProbe) > 0:
-            print "Updating probes for Client : " + self.BSSID
+            logging.debug("Updating probes for Client : " + self.BSSID)
             self.forDB["probed"].append(newProbe)
 
-    def hasTimeChanged(self, newTime): 
+    def hasTimeChanged(self, newTime):
 
-        lastTimeSeen = datetime.strptime(self.lastTimeSeen.strip(), "%Y-%m-%d %H:%M:%S")
-        curTime = datetime.strptime(newTime.strip(), "%Y-%m-%d %H:%M:%S")
+        try:
+          lastTimeSeen = datetime.strptime(self.lastTimeSeen.strip(), "%Y-%m-%d %H:%M:%S")
+          curTime = datetime.strptime(newTime.strip(), "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+          logging.error("invalid time: " +newTime);
 
-        if (curTime - lastTimeSeen) > timedelta(seconds = 1):
-            print  "Time since previous ping for "+self.BSSID +" with "+ self.AP +" : "
-            print (curTime - lastTimeSeen)
-            return True
         else:
-            return False
+
+          if (curTime - lastTimeSeen) > timedelta(seconds = 1):
+              logging.debug("Time since previous ping for "+self.BSSID +" with "+ self.AP +" : ")
+              logging.debug(curTime - lastTimeSeen)
+              return True
+          else:
+              return False
 
     def wrapForOsc(self):
         return " , ".join(self.forOSC)
 
     def postToDB(self,url = 'http://localhost:8080'):
 
-        r = requests.get(url+"/write", params=self.forDB)
-        try:
-            r.json()
 
-        except ValueError: 
-            pass
-            # print "Val error" 
-        else:
-            print "sent"
-    
+        try:
+          r = requests.get(url+"/write", params=self.forDB)
+        except requests.exceptions.RequestException as e:    # This is the correct syntax
+            logging.error("Not Connected")
+
+
     def updateDB(self, url = "http://localhost:8080"):
 
-        r = requests.get(url+"/update", params=self.forDB)
-        print "Updating : "+ self.BSSID
+
         try:
-            print r.json()
+            r = requests.get(url+"/update", params=self.forDB)
+            logging.debug("Updating : "+ self.BSSID)
+        except requests.exceptions.RequestException as e:    # This is the correct syntax
+            logging.error("Not Connected")
 
 
-        except ValueError: 
-            pass
-            # print "Val error" 
-        else:
-            print "sent"        
 
 if __name__ == '__main__' :
 
@@ -234,8 +229,3 @@ if __name__ == '__main__' :
     params = routerLine.split(',')
     node = Node("Router",params)
     print node.postToDB(url)
-
-    
-
-
-

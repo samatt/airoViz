@@ -10,6 +10,7 @@ from urlparse import urlparse, parse_qs
 from datetime import datetime, date, time
 from pprint import pprint
 import urllib2
+import logging
 # from dateutil import parser
 
 
@@ -25,7 +26,7 @@ class GaeEncoder(json.JSONEncoder):
 def serialize(object_to_serialize):
     return json.dumps(object_to_serialize, cls=GaeEncoder)
 
-NO_DEVICE_ID = 'no_device_id'        
+NO_DEVICE_ID = 'no_device_id'
 def device_key(device_name = NO_DEVICE_ID):
 	"""constructs Datastore key for NodeRecord entity with device_name """
 	return ndb.Key('NodeGroup', device_name)
@@ -41,27 +42,27 @@ class NodeRecord(ndb.Expando) :
 	ESSID = ndb.StringProperty(default = "None")
 	# associatedAP  = ndb.JSONProperty(default = "None")
 	Privacy = ndb.StringProperty(default = "None")
-	probedESSID = ndb.StringProperty(repeated = True) 
+	probedESSID = ndb.StringProperty(repeated = True)
 
 	AP = ndb.StringProperty(default = "None")
 	timeRanges = ndb.DateTimeProperty(repeated = True)
 	recordentrytime = ndb.DateTimeProperty(auto_now_add=True)
 	lastSeen = ndb.DateTimeProperty()
-	
+
 	# TODO: Implement hardware API
 	# hardware = ndb.JsonProperty()
 
 
-	#note: all class methods pass the instance of the class as it's first argument 
+	#note: all class methods pass the instance of the class as it's first argument
 	@classmethod
 	def queryByNode(cls,device_name):
 			device_readings_list = []
 			nodeRecordsQuery = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.recordentrytime)
-			# device_records is a list object only returns sensor reading and time for parsing. 
+			# device_records is a list object only returns sensor reading and time for parsing.
 			device_records = nodeRecordsQuery.fetch()
 
-		#create methods for pulling different streams of data out for processing. 
+		#create methods for pulling different streams of data out for processing.
 			# for device_record in device_records:
 				# device_readings_list.append(device_record.sensorreading)
 			return device_records
@@ -77,22 +78,22 @@ class NodeRecord(ndb.Expando) :
 
 	@classmethod
 	def updateNode(cls,updateData):
-		returnString = "" 
+		returnString = ""
 
 		nodeRecordsQuery = cls.query(
 			ancestor = device_key(updateData['bssid']))
 		nodeToUpdate  = nodeRecordsQuery.get()
 		return nodeToUpdate
-		
+
 
 	@classmethod
 	def queryNodesByTimestamps(cls,device_name):
 			device_readings_dict = {}
 			nodeRecordsQuery = cls.query(
 			ancestor = device_key(device_name)).order(-NodeRecord.timeRanges)
-			
+
 			device_records = nodeRecordsQuery.fetch()
-			
+
 			return device_records
 
 	@classmethod
@@ -100,7 +101,7 @@ class NodeRecord(ndb.Expando) :
 			queryDTObj = 0
 
 			queryDTObj = datetime.strptime(queryTime, "%Y-%m-%d %H:%M:%S")
-			
+
 			nodeRecordsQuery = cls.query(cls.lastSeen > queryDTObj).order(NodeRecord.lastSeen)
 			device_records = nodeRecordsQuery.fetch()
 
@@ -112,13 +113,13 @@ class NodeRecord(ndb.Expando) :
 			for device in device_records:
 				nodeJSONArray.append(serialize(device))
 
-			return nodeJSONArray			
+			return nodeJSONArray
 
 	@classmethod
 	def queryNodesProbedESSID(cls, qrySSID):
 			probedESSIDList = []
-			nodeRecordsQuery = cls.query( cls.probedESSID.IN([qrySSID]))	
-			
+			nodeRecordsQuery = cls.query( cls.probedESSID.IN([qrySSID]))
+
 			device_records = nodeRecordsQuery.fetch()
 
 			return device_records
@@ -129,7 +130,7 @@ class MainHandler(webapp2.RequestHandler):
 		self.response.write('hello world')
 
 class CreateRecordHandler(webapp2.RequestHandler):
-    
+
 	def get(self):
 		self.response.headers['Content-Type'] = 'text/plain'
 		kind = self.request.GET['kind'].strip()
@@ -140,7 +141,7 @@ class CreateRecordHandler(webapp2.RequestHandler):
 		timeRanges = self.request.get_all('times')
 		curTimes = []
 		probedEssid = []
-		
+
 		for probed in probe:
 			probed.encode('ascii','ignore')
 			probed  = probed.strip()
@@ -150,9 +151,8 @@ class CreateRecordHandler(webapp2.RequestHandler):
 			time.encode('ascii','ignore')
 			time = time.strip()
 			curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
-		
+
 		power = int(power)
-		print power
 
 		if kind == "Router":
 			r = NodeRecord(parent = device_key(bssid),
@@ -165,10 +165,10 @@ class CreateRecordHandler(webapp2.RequestHandler):
 
 class ReadRecordsHandler(webapp2.RequestHandler):
 
-	def get(self): 
+	def get(self):
 		this = self
 		this.response.headers['Content-Type'] = 'text/plain'
-		
+
 		try:
 			device_name= self.request.GET['bssid']
 
@@ -180,16 +180,16 @@ class ReadRecordsHandler(webapp2.RequestHandler):
 
 class DeleteAllRecordsHandler(webapp2.RequestHandler):
 
-	def get(self): 
+	def get(self):
 		node_keys = NodeRecord.query().fetch(keys_only=True)
 		ndb.delete_multi(node_keys)
 
 class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
 
-	def get(self): 
+	def get(self):
 		this = self
 		this.response.headers['Content-Type'] = 'text/plain'
-		
+
 		try:
 			essid= self.request.GET['essid']
 
@@ -201,10 +201,10 @@ class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
 
 class ReadRecordsHandlerWithClientESSID(webapp2.RequestHandler):
 
-	def get(self): 
+	def get(self):
 		this = self
 		this.response.headers['Content-Type'] = 'text/plain'
-		
+
 		try:
 			essid= self.request.GET['essid']
 
@@ -212,15 +212,15 @@ class ReadRecordsHandlerWithClientESSID(webapp2.RequestHandler):
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
 			self.response.write(
-			NodeRecord.queryNodesProbedESSID(essid))			
-	
+			NodeRecord.queryNodesProbedESSID(essid))
+
 class LastSeenRecordsHandler(webapp2.RequestHandler):
 	def get(self):
 		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
 		self.response.headers['Content-Type'] = 'application/javascript'
 		try:
 			lastSeen= self.request.GET['lastseen']
-			print lastSeen
+			# print lastSeen
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
@@ -228,7 +228,7 @@ class LastSeenRecordsHandler(webapp2.RequestHandler):
 			byLastSeen = NodeRecord.queryNodesByLastSeen(lastSeen)
 			self.response.out.write("%s(%s)" %
                               (urllib2.unquote(self.request.get('callback')),
-                               byLastSeen))			
+                               byLastSeen))
 
 
 class UpdateRecordHandler(webapp2.RequestHandler):
@@ -237,18 +237,16 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 		update = dict()
 		try:
 			self.response.headers['Content-Type'] = 'text/plain'
-			
+
 			update['kind'] = self.request.GET['kind'].strip()
 			update['bssid'] = self.request.GET['bssid'].strip()
 			update['power'] =  self.request.GET['power'].strip()
 			update['essid'] =  self.request.GET['essid'].strip()
-
-
 			probe = self.request.get_all('probed')
 			timeRanges = self.request.get_all('times')
 			curTimes = []
 			probedEssid = []
-			
+
 			for probed in probe:
 				probed.encode('ascii','ignore')
 				probed  = probed.strip()
@@ -265,27 +263,27 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('Error with update parameters')
-		
+
 		else:
 			nodeToUpdate = NodeRecord.updateNode(update)
 			# returnString = ""
 			if nodeToUpdate.kind == "Router":
-				print "Router "+ nodeToUpdate.BSSID + "\n "
-				print str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				print "Last Time updated seen : " + str(update['time']) + "  \n"
+				# print "Router "+ nodeToUpdate.BSSID + "\n "
+				# print str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				# print "Last Time updated seen : " + str(update['time']) + "  \n"
 
 				nodeToUpdate.power = int(update['power'])
 				nodeToUpdate.lastSeen = update['time'][-1]
 				for t in update['time']:
-					nodeToUpdate.timeRanges.append(t)	
+					nodeToUpdate.timeRanges.append(t)
 
-				
+
 
 			else:
-				print "Client "+ nodeToUpdate.BSSID + "\n "
-				print "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				print "Last Time : updated to " + str(update['time']) + "  \n"
-				print "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
+				# print "Client "+ nodeToUpdate.BSSID + "\n "
+				# print "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
+				# print "Last Time : updated to " + str(update['time']) + "  \n"
+				# print "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
 
 				nodeToUpdate.power = int(update['power'])
 				#Doing this because it seems redundant to strore ranges for the real time app. Can always put it back for data analyis
@@ -293,12 +291,12 @@ class UpdateRecordHandler(webapp2.RequestHandler):
 				nodeToUpdate.lastSeen = update['time'][-1]
 				nodeToUpdate.timeRanges = []
 				for t in update['time']:
-					nodeToUpdate.timeRanges.append(t)	
+					nodeToUpdate.timeRanges.append(t)
 				# nodeToUpdate.timeRanges.append(update['time'])
-				
-				nodeToUpdate.AP = update['essid']			
+
+				nodeToUpdate.AP = update['essid']
 			# decoded_dict = dict(json.loads(reading))
-			print
+			# print
 			r_key = nodeToUpdate.put()
 			self.response.write("Updated")
 
@@ -321,5 +319,12 @@ app = webapp2.WSGIApplication([
 
 ], debug=True)
 
+def main():
+    # Set the logging level in the main function
+    # See the section on Requests and App Caching for information on how
+    # App Engine reuses your request handlers when you specify a main function
+    logging.getLogger().setLevel(logging.WARNING)
+    webapp.util.run_wsgi_app(application)
 
- 
+if __name__ == '__main__':
+    main()
