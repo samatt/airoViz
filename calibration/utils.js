@@ -9,7 +9,7 @@ function setDuration (numHours, numMinutes, numSeconds){
 	var hours 	= (ts.getHours()-numHours) >0 ? (ts.getHours()-numHours) : 0
 
 	//FIXME: Get rid off the -1 from getDate and -2 from hours
-	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-1)+" "+(hours-2)+":"+ minutes	+":"+seconds;
+	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(15)+":"+ minutes	+":"+seconds;
 	return timestamp
 }
 
@@ -20,7 +20,7 @@ function parseData(data){
 	//TODO: Implement the 'Listeners' in DB. These will be the RPi routers running Airckrack-ng
 	nodes.push({'name' : "Listener", 'power': 1, 'kind': "Listener"});
 
-	for (var i = 0; i < 10; i++) {
+	for (var i = 0; i < data.length; i++) {
 
 		var node = JSON.parse(data[i])
 
@@ -38,14 +38,16 @@ function parseData(data){
 
 function parseDataWithChildren(data){
 	var nodes = new Array();
-	var links = new Array();
+	// var links = new Array();
 
 	var associated = new Array();
 
 	//TODO: Implement the 'Listeners' in DB. These will be the RPi routers running Airckrack-ng
-	nodes.push({'name' : "Listener", 'power': 1, 'kind': "Listener"});
 
-	for (var i = 0; i < 10; i++) {
+	nodes.push({'name' : "Listener", 'power': 1, 'kind': "Listener", 'weight': 0});
+	nodes[0].children = new Array();
+
+	for (var i = 0; i < data.length-20; i++) {
 
 		var node = JSON.parse(data[i])
 
@@ -53,24 +55,18 @@ function parseDataWithChildren(data){
 			var AP = node.AP.split("|");
 			ap = $.trim(AP[0]);
 
-			if(ap === "(not associated)"){
-				console.log("Adding unassociated client to nodes array");
-
-				// var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
-				// continue;
-			}
-			else{
+			if(!  (ap === "(not associated)") ){
 				associated.push(node);
 				continue;
 			}
+
 
 		}
 
 		//Renaming BSSID to name as thats what D3 force stuff expects
 		var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
-		nodes.push(n);
-		link = {'source' : 0, 'target': i, 'power':node.power};
-		links.push(link);
+		nodes[0].children.push(n);
+
 
 	};
 
@@ -84,7 +80,7 @@ function parseDataWithChildren(data){
 
 			var AP = associated[i].AP.split("|");
 			var ap = $.trim(AP[0]);
-			console.log(nodes[j].name + " : "+ ap);
+			// console.log(nodes[j].name + " : "+ ap);
 			if(nodes[j].name === ap){
 
 					var node = associated[i];
@@ -98,14 +94,14 @@ function parseDataWithChildren(data){
 						nodes[j].children.push(n);
 					}
 
-					console.log( "Adding node : " + n.name +" to " + nodes[j].name  );
-					console.log(nodes[j]);
+					// console.log( "Adding node : " + n.name +" to " + nodes[j].name  );
+					// console.log(nodes[j]);
 			}
 
 		}
 	}
 
-	calibration.data = {'nodes' : nodes, 'links': links}
+	calibration.data = {'nodes' : nodes}
 }
 
 // Returns a list of all nodes under the root.
@@ -120,11 +116,16 @@ function flatten(root) {
   }
 
   root.size = recurse(root);
+	console.log(nodes);
   return nodes;
 }
 
-var scale = d3.scale.pow()
+var scale = d3.scale.log()
 	.domain([-20,-128])
-	.range([10,500]);
+	.range([10,250]);
 
-var colors = d3.scale.category20c();
+var colors = d3.scale.category10();
+
+function childrenColor(d) {
+  return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
+}
