@@ -53,7 +53,7 @@ class NodeRecord(ndb.Expando) :
 	# hardware = ndb.JsonProperty()
 
 
-	#note: all class methods pass the instance of the class as it's first argument
+	# NOTE: all class methods pass the instance of the class as it's first argument
 	@classmethod
 	def queryByNode(cls,device_name):
 			device_readings_list = []
@@ -163,20 +163,71 @@ class CreateRecordHandler(webapp2.RequestHandler):
 
 		r_key = r.put()
 
+class UpdateRecordHandler(webapp2.RequestHandler):
+  def get(self):
+    self.response.headers['Content-Type'] = 'text/plain'
+    update = dict()
+    curTimes = []
+    probedEssid = []
+    try:
+      self.response.headers['Content-Type'] = 'text/plain'
+
+      update['kind'] = self.request.GET['kind'].strip()
+      update['bssid'] = self.request.GET['bssid'].strip()
+      update['power'] =  self.request.GET['power'].strip()
+      update['essid'] =  self.request.GET['essid'].strip()
+      probe = self.request.get_all('probed')
+      timeRanges = self.request.get_all('times')
+
+
+      for probed in probe:
+        probed.encode('ascii','ignore')
+        probed  = probed.strip()
+        probedEssid.append(probed)
+
+      update['probed'] = probedEssid
+
+      for time in timeRanges:
+        time.encode('ascii','ignore')
+        time = time.strip()
+        curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
+
+    except KeyError: #bail if there is no argument for 'devicename' submitted
+      self.response.write ('Error with update parameters')
+
+    else:
+
+      nodeToUpdate = NodeRecord.updateNode(update)
+      nodeToUpdate.power = int(update['power'])
+      nodeToUpdate.lastSeen = curTimes[-1]
+
+      # NOTE: Commenting out this because it seems redundant to strore ranges for the real time app.
+      #       Can always put it back for data analyis
+      # nodeToUpdate.timeRanges = []
+      # for t in update['time']:
+      # nodeToUpdate.timeRanges.append(t)
+
+      if nodeToUpdate.kind == "Client":
+        nodeToUpdate.AP = update['essid']
+
+      r_key = nodeToUpdate.put()
+      self.response.write("Updated")
+
 class ReadRecordsHandler(webapp2.RequestHandler):
 
-	def get(self):
-		this = self
-		this.response.headers['Content-Type'] = 'text/plain'
+  def get(self):
+    this = self
+    this.response.headers['Content-Type'] = 'text/plain'
 
-		try:
-			device_name= self.request.GET['bssid']
+    try:
+      device_name= self.request.GET['bssid']
 
-		except KeyError: #bail if there is no argument for 'devicename' submitted
-			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
-		else:
-			self.response.write(
-			NodeRecord.queryByNode(device_name))
+    except KeyError: #bail if there is no argument for 'devicename' submitted
+      self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+    else:
+      self.response.write(
+      NodeRecord.queryByNode(device_name))
+
 
 class DeleteAllRecordsHandler(webapp2.RequestHandler):
 
@@ -231,74 +282,6 @@ class LastSeenRecordsHandler(webapp2.RequestHandler):
                                byLastSeen))
 
 
-class UpdateRecordHandler(webapp2.RequestHandler):
-	def get(self):
-		self.response.headers['Content-Type'] = 'text/plain'
-		update = dict()
-		try:
-			self.response.headers['Content-Type'] = 'text/plain'
-
-			update['kind'] = self.request.GET['kind'].strip()
-			update['bssid'] = self.request.GET['bssid'].strip()
-			update['power'] =  self.request.GET['power'].strip()
-			update['essid'] =  self.request.GET['essid'].strip()
-			probe = self.request.get_all('probed')
-			timeRanges = self.request.get_all('times')
-			curTimes = []
-			probedEssid = []
-
-			for probed in probe:
-				probed.encode('ascii','ignore')
-				probed  = probed.strip()
-				probedEssid.append(probed)
-
-			update['probed'] = probedEssid
-
-			for time in timeRanges:
-				time.encode('ascii','ignore')
-				time = time.strip()
-				curTimes.append(datetime.strptime(time, "%Y-%m-%d %H:%M:%S") )
-
-			update['time'] = curTimes
-
-		except KeyError: #bail if there is no argument for 'devicename' submitted
-			self.response.write ('Error with update parameters')
-
-		else:
-			nodeToUpdate = NodeRecord.updateNode(update)
-			# returnString = ""
-			if nodeToUpdate.kind == "Router":
-				# print "Router "+ nodeToUpdate.BSSID + "\n "
-				# print str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				# print "Last Time updated seen : " + str(update['time']) + "  \n"
-
-				nodeToUpdate.power = int(update['power'])
-				nodeToUpdate.lastSeen = update['time'][-1]
-				for t in update['time']:
-					nodeToUpdate.timeRanges.append(t)
-
-
-
-			else:
-				# print "Client "+ nodeToUpdate.BSSID + "\n "
-				# print "Power : "+ str(nodeToUpdate.power) + " updated to " + str(update['power'])+ "\n"
-				# print "Last Time : updated to " + str(update['time']) + "  \n"
-				# print "AP : "+ nodeToUpdate.AP + " updated to " + update['essid'] + "\n"
-
-				nodeToUpdate.power = int(update['power'])
-				#Doing this because it seems redundant to strore ranges for the real time app. Can always put it back for data analyis
-
-				nodeToUpdate.lastSeen = update['time'][-1]
-				nodeToUpdate.timeRanges = []
-				for t in update['time']:
-					nodeToUpdate.timeRanges.append(t)
-				# nodeToUpdate.timeRanges.append(update['time'])
-
-				nodeToUpdate.AP = update['essid']
-			# decoded_dict = dict(json.loads(reading))
-			# print
-			r_key = nodeToUpdate.put()
-			self.response.write("Updated")
 
 
 app = webapp2.WSGIApplication([
@@ -318,13 +301,3 @@ app = webapp2.WSGIApplication([
 	# webapp2.Route('/a0', handler = PassSensorValueOnly, name = 'pass-sensor-value-a0')
 
 ], debug=True)
-
-def main():
-    # Set the logging level in the main function
-    # See the section on Requests and App Caching for information on how
-    # App Engine reuses your request handlers when you specify a main function
-    logging.getLogger().setLevel(logging.WARNING)
-    webapp.util.run_wsgi_app(application)
-
-if __name__ == '__main__':
-    main()

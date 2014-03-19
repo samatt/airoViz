@@ -25,8 +25,6 @@ class Node(object):
             self.forDB = dict()
 
         elif kind == "Router":
-            # print "Router"
-            # params = line.split(",")
             self.kind = "Router"
             self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
@@ -44,8 +42,6 @@ class Node(object):
             self.alive = True;
 
         else:
-            # print "Client"
-            # params = line.split(",")
             self.kind = "Client"
             self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
@@ -58,12 +54,13 @@ class Node(object):
 
             #TODO: make list of all networks
             self.ESSID = " "
-            self.probedESSID = params[6:]            #, ("times",self.lastTimeSeen)       # ("AP", (self.AP,self.lastTimeSeen))
+            self.probedESSID = params[6:]
             self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
             self.forDB = dict([ ("kind",self.kind) , ("bssid",self.BSSID) ,("power",self.Power) , ("probed",self.probedESSID) ])
             self.forDB["times"]  = [ self.firstTimeSeen , self.lastTimeSeen ]
 
-            #using the pipe to be keep track of when the client was associated to a router and update if it changes
+            #using the pipe to be keep track of when
+            #the client was associated to a router and update if it changes
             newAP = [self.AP + "|" + self.lastTimeSeen]
             self.forDB["essid"]= newAP
 
@@ -124,7 +121,8 @@ class Node(object):
         self.forDB["power"] = self.Power
         #Removing these because they seem redundent for the real time app.
         # self.forDB["times"].append(self.firstTimeSeen)
-        self.forDB["times"].append(self.lastTimeSeen)
+        # self.forDB["times"].append(self.lastTimeSeen)
+        self.forDB["times"] =self.lastTimeSeen
 
         #Updates for OSC
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
@@ -152,7 +150,8 @@ class Node(object):
         #Updates for DB
         self.forDB["power"] = self.Power
         # self.forDB["times"].append(self.firstTimeSeen)
-        self.forDB["times"].append(self.lastTimeSeen)
+        # self.forDB["times"].append(self.lastTimeSeen)
+        self.forDB["times"] = self.lastTimeSeen
 
         #Updates for OSC
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]

@@ -143,7 +143,7 @@ class MyHandler(LoggingEventHandler):
 
 if __name__ == '__main__' :
 
-	logging.basicConfig(level=logging.INFO)
+	logging.basicConfig(level=logging.DEBUG)
 	requests_log = logging.getLogger("requests")
 	requests_log.setLevel(logging.WARNING)
 
