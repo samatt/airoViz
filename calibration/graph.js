@@ -2,6 +2,7 @@
 
 function initGraph () {
 
+
   svg = d3.select('body')
     .append('svg:svg')
     .attr('width', calibration.width)
@@ -10,6 +11,7 @@ function initGraph () {
   var force = d3.layout.force()
       .nodes(calibration.data.nodes)
       .links(calibration.data.links)
+      .friction(0.7)
       .linkDistance(function(d){
         return scale(d.power);
       })
@@ -17,6 +19,8 @@ function initGraph () {
       .size([calibration.width, calibration.height])
       .start();
 
+
+  
   var edges = svg.selectAll("line")
       .data(calibration.data.links)
       .enter()
@@ -26,14 +30,18 @@ function initGraph () {
       .data(calibration.data.nodes)
       .enter()
       .append("circle")
-      .attr("r",4)
+      .attr("r",function(d){
+            if(d.kind == "Listener"){
+              return 10;
+            }
+            return (d.kind === "Client") ? 4:6;
+        }
+      )
       .style("fill", function(d, i) {
-              colors(3);
-              colors(2);
               if(d.kind == "Listener"){
-                return colors(0);
+                return colors(1);
               }
-              return (d.kind === "Client")?colors(1):colors(2);
+              return (d.kind === "Client")?colors(2):colors(3);
       })
       .call(force.drag);
 
