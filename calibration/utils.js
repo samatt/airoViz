@@ -9,7 +9,8 @@ function setDuration (numHours, numMinutes, numSeconds){
 	var hours 	= (ts.getHours()-numHours) >0 ? (ts.getHours()-numHours) : 0
 
 	//FIXME: Get rid off the -1 from getDate and -2 from hours
-	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(15)+":"+ minutes	+":"+seconds;
+	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate())+" "+hours+":"+ minutes	+":"+seconds;
+	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(15)+":"+ minutes	+":"+seconds;
 	return timestamp
 }
 
