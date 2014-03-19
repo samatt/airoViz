@@ -43,9 +43,17 @@
 					calibration.width = $(window).width();
 					calibration.height=$(window).height();
 
-    			var time = setDuration(1,5,0);
-    			url = 'http://'+calibration.server+'/lastseen?lastseen='+time;
-    			console.log(url)
+					setInterval(myInterval,1000);
+
+
+				}
+			);
+
+				var myInterval = function(){
+					console.log("here")
+					var time = setDuration(0,3,0);
+					url = 'http://'+calibration.server+'/lastseen?lastseen='+time;
+					console.log(url);
 
 					$.ajax({
 						dataType: 'jsonp',
@@ -59,13 +67,11 @@
 							},
 
 							error: function(err) {
-							  console.log("GET failed ");
-							  console.log(err);
+								console.log("GET failed ");
+								console.log(err);
 							}
 					});
-
-				});
-
+				}
 		</script>
 	</body>
 </html>

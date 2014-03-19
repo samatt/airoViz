@@ -10,7 +10,7 @@ function setDuration (numHours, numMinutes, numSeconds){
 
 	//FIXME: Get rid off the -1 from getDate and -2 from hours
 	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate())+" "+hours+":"+ minutes	+":"+seconds;
-	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(15)+":"+ minutes	+":"+seconds;
+	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(13)+":"+ minutes	+":"+seconds;
 	return timestamp
 }
 
@@ -121,11 +121,11 @@ function flatten(root) {
   return nodes;
 }
 
-var scale = d3.scale.log()
-	.domain([-20,-128])
-	.range([10,250]);
+var scale = d3.scale.pow()
+	.domain([0,-128])
+	.range([100,250]);
 
-var colors = d3.scale.category10();
+var colors = d3.scale.category20c();
 
 function childrenColor(d) {
   return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
