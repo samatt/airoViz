@@ -44,7 +44,7 @@
 					app.width = $(window).width();
 					app.height=$(window).height();
 					myNetwork = Network();
-					var time = setDuration(0,8,0);
+					var time = setDuration(0,2,0);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
 					console.log(url);
 					$.ajax({
@@ -74,7 +74,7 @@
 
 				var myInterval = function(){
 					// console.log("here")
-					var time = setDuration(0,8,0);
+					var time = setDuration(0,5,00);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
 					console.log(url);
 

@@ -18,6 +18,8 @@ Network = function(){
   var  link = null;
 
   var nodesMap = d3.map();
+  var ramp = d3.map();
+
   // variables to refect the current settings
   // of the visualization
   var  layout = "force";
@@ -102,7 +104,7 @@ Network = function(){
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
       .attr("r", function(d){ return d.radius})
-      .style("fill", function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
+      .style("fill",function(d){console.log(d.color); return d.color;})// function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
       .call(force.drag);
       // .style("stroke", function(d){ return strokeFor(d); })
       // .style("stroke-width", 1.0)
@@ -183,10 +185,11 @@ Network = function(){
       data.links.push(l);
 
     }
+
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.pow().range([3, 9]).domain(countExtent);
     linkRadius = d3.scale.pow().range([500, 30]).domain(countExtent);
-
+      ramp=d3.scale.linear().domain(countExtent).range(["blue","green"]);
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
@@ -206,7 +209,8 @@ Network = function(){
       // add radius to the node so we can use it later
       n.radius = circleRadius(n.power);
       console.log(n.radius);
-      n.linkPower = linkRadius(n.power)
+      n.linkPower = linkRadius(n.power);
+      n.color = ramp(n.power);
     });
 
     // id's -> node objects
