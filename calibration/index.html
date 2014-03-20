@@ -5,6 +5,7 @@
 
 		<script type="text/javascript" src="../lib/d3/d3.js"></script>
 		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
+<!-- 		// <script src="http://marvl.infotech.monash.edu/webcola/cola.v1.min.js"></script> -->
 		<script type="text/javascript" src="../utils.js"></script>
 		<script type="text/javascript" src="../graph.js"></script>
 		<script type="text/javascript" src="../graphNew.js"></script>
@@ -43,9 +44,9 @@
 					app.width = $(window).width();
 					app.height=$(window).height();
 					myNetwork = Network();
-					var time = setDuration(4,10,0);
+					var time = setDuration(0,8,0);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
-					// console.log(url);
+					console.log(url);
 					$.ajax({
 						dataType: 'jsonp',
 						url: url,
@@ -65,7 +66,7 @@
 
 
 
-					// setInterval(myInterval,2000);
+					setInterval(myInterval,7000);
 
 				}
 			);
@@ -73,9 +74,9 @@
 
 				var myInterval = function(){
 					// console.log("here")
-					var time = setDuration(4,10,0);
+					var time = setDuration(0,8,0);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
-					// console.log(url);
+					console.log(url);
 
 					$.ajax({
 						dataType: 'jsonp',

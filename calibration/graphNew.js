@@ -1,14 +1,14 @@
 Network = function(){
   // variables we want to access
   // in multiple places of Network
-  var  width = 960
-  var  height = 800
+  var  width = app.width;
+  var  height = app.height;
   //  allData will store the unfiltered data
   var allData = []
   var  curLinksData = [];
   var  curNodesData = [];
   var  linkedByIndex = {};
-  // these will hold the svg groups for
+  // these will hold the svg groups fora
   // accessing the nodes and links display
   var  nodesG = null;
   var  linksG = null;
@@ -16,13 +16,19 @@ Network = function(){
   // of the nodes and links
   var  node = null;
   var  link = null;
+
+  var nodesMap = d3.map();
   // variables to refect the current settings
   // of the visualization
   var  layout = "force";
 
 
+
   // our force directed layout
-  var  force = d3.layout.force();
+  var  force = d3.layout.force()
+      .friction(0.9)
+      .charge([-500])
+      .size([width, height]);
   // color function used to color nodes
   var nodeColors = d3.scale.category20();
 
@@ -48,6 +54,7 @@ Network = function(){
   }
 
   force.on("tick", forceTick)
+  force.on("end",function(){console.log("Over");})
   .charge(-200)
 
 
@@ -60,27 +67,41 @@ Network = function(){
     // reset nodes and links in force layout
     force.nodes(curNodesData)
     .links(curLinksData)
-    .linkDistance(function(d){return -d.power});
+    .linkDistance(function(d){
+      return scale(d.power);
+    });
     // enter / exit for nodes
     updateNodes();
     updateLinks();
 
-
+    console.log(force.nodes().length);
     // start me up!
-    force.start()
+    force.start();
   }
+
 
   // enter/exit display for nodes
   function updateNodes(){
     node = nodesG.selectAll("circle.node")
       .data(curNodesData, function(d) { return d.name ;});
 
+
+    node
+      .attr("attr","update")
+      .attr("cx", function(d){ return d.x; })
+      .attr("cy", function(d){ return d.y; })
+      .transition()
+        .duration(750)
+        .attr("r",function(d){
+          return scale(d.power);
+        });
+
     node.enter().append("circle")
       .attr("class", "node")
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
       .attr("r", function(d){ return scale(d.power); })
-      .style("fill", function(d,i){ return colors(i) })
+      .style("fill", function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
       .call(force.drag);
       // .style("stroke", function(d){ return strokeFor(d); })
       // .style("stroke-width", 1.0)
@@ -94,12 +115,19 @@ Network = function(){
   // enter/exit display for links
   function updateLinks(){
     link = linksG.selectAll("line.link")
-      .data(curLinksData, function(d){ return "#{d.source.id}_#{d.target.id}"});
+      .data(curLinksData, function(d){ return (d.source.name + " : "+d.target.name) });
+
+    link
+      .attr("attr","update")
+      .attr("x1", function(d){ return d.source.x;})
+      .attr("y1", function(d){ return d.source.y;})
+      .attr("x2", function(d){ return d.target.x;})
+      .attr("y2", function(d){ return d.target.y;});
 
     link.enter().append("line")
       .attr("class", "link")
       .attr("stroke", "#ddd")
-      .attr("stroke-opacity", 0.8)
+      .attr("stroke-width", function(d){return scale2(-d.power);})
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
@@ -110,6 +138,14 @@ Network = function(){
   network.toggleLayout = function(newLayout){
     // # public function
 
+  }
+
+  network.updateData = function(newData){
+      force.stop();
+      allData = setupData(newData)
+      link.remove()
+      node.remove()
+      update()
   }
 
   // tick function for force directed layout
@@ -125,21 +161,14 @@ Network = function(){
       .attr("y2", function(d){ return d.target.y;});
   }
 
-  network.updateData = function(newData){
-      allData = setupData(newData)
-      // link.remove()
-      // node.remove()
-      update()
-  }
   // called once to clean up raw data and switch links to
   // point to node instances
   // Returns modified data
   setupData = function(data){
     // initialize circle radius scale
-
     data.links = new Array();
     data.nodes = new Array();
-    data.nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener", 'weight': 0});
+    data.nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener"});
     for (var i = 0; i < data.length; i++) {
 
       var node = JSON.parse(data[i])
@@ -152,27 +181,38 @@ Network = function(){
     }
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.sqrt().range([3, 10]).domain(countExtent);
-    data.links.forEach( function(n){
+
+
+    data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
-      // n.x = randomnumber=Math.floor(Math.random()*width);
-      // n.y = randomnumber=Math.floor(Math.random()*height);
+      if(nodesMap.has(n.name)){
+          _n = nodesMap.get(n.name);
+          console.log(_n);
+          n.x = _n.x;
+          n.y = _n.y;
+          n.px = _n.px;
+          n.py = _n.py;
+      }
+      else{
+        n.x = randomnumber=Math.floor(Math.random()*width);
+        n.y = randomnumber=Math.floor(Math.random()*height);
+      }
+
 
       // add radius to the node so we can use it later
       n.radius = circleRadius(n.power);
     });
 
     // id's -> node objects
-    var nodesMap  = mapNodes(data.nodes);
-    console.log(nodesMap);
+    nodesMap  = mapNodes(data.nodes);
+
     data.links.forEach( function(l){
       l.source = nodesMap.get(l.source);
       l.target = nodesMap.get(l.target);
       // linkedByIndex is used for link sorting
-      linkedByIndex[l.source + " : "+l.target] = 1;
+      linkedByIndex[l.source.name + " : "+l.target.name] = 1;
     });
-
-
 
     return data;
   }
