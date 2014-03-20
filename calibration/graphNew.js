@@ -29,7 +29,7 @@ Network = function(){
   // our force directed layout
   var  force = d3.layout.force()
       .friction(0.9)
-      .charge([-50])
+      .charge([-100])
       .size([width, height]);
   // color function used to color nodes
   var nodeColors = d3.scale.category20();
@@ -41,7 +41,12 @@ Network = function(){
     // create our svg and groups
     vis = d3.select(selection).append("svg")
       .attr("width", width)
-      .attr("height", height)
+      .attr("height", height);
+    vis.append("rect")
+      .attr("width", "100%")
+      .attr("height", "100%")
+      .attr("fill", "black");
+
     linksG = vis.append("g").attr("id", "links")
     nodesG = vis.append("g").attr("id", "nodes")
 
@@ -91,20 +96,18 @@ Network = function(){
 
     node
       .attr("attr","update")
-      .attr("cx", function(d){ return d.x; })
-      .attr("cy", function(d){ return d.y; })
       .transition()
-        .duration(10000)
-        .attr("r",function(d){
-          return d.radius;
-        });
+        .attr("cx", function(d){ return (d.kind==="Listener"?app.width/2:d.x); })
+        .attr("cy", function(d){ return (d.kind==="Listener"?app.height/2:d.y); });
 
     node.enter().append("circle")
       .attr("class", "node")
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
+      .attr("stroke-width","0.4")
+      .attr("stroke","white")
       .attr("r", function(d){ return d.radius})
-      .style("fill",function(d){console.log(d.color); return d.color;})// function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
+      .style("fill",function(d){return d.color;})// function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
       .call(force.drag);
       // .style("stroke", function(d){ return strokeFor(d); })
       // .style("stroke-width", 1.0)
@@ -125,16 +128,18 @@ Network = function(){
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
-      .attr("y2", function(d){ return d.target.y;});
+      .attr("y2", function(d){ return d.target.y;})
+      // .attr("stroke-width", 2)
+      // .attr("stroke", "black");
 
     link.enter().append("line")
       .attr("class", "link")
-      .attr("stroke", "#ddd")
-      .attr("stroke-width", function(d){return scale2(-d.power);})
+      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"6":"8"})
+      .attr("stroke","black")
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
-      .attr("y2", function(d){ return d.target.y;})
+      .attr("y2", function(d){ return d.target.y;});
 
     link.exit().remove()
   }
@@ -189,7 +194,7 @@ Network = function(){
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.pow().range([3, 9]).domain(countExtent);
     linkRadius = d3.scale.pow().range([500, 30]).domain(countExtent);
-      ramp=d3.scale.linear().domain(countExtent).range(["blue","green"]);
+    ramp=d3.scale.linear().domain(countExtent).range(["#8dbbd8","#acbc43"]);
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
@@ -201,14 +206,13 @@ Network = function(){
           n.py = _n.py;
       }
       else{
-        n.x = randomnumber=Math.floor(Math.random()*width);
-        n.y = randomnumber=Math.floor(Math.random()*height);
+        n.x = 0;//randomnumber=Math.floor(Math.random()*width);
+        n.y = 0;//randomnumber=Math.floor(Math.random()*height);
       }
 
 
       // add radius to the node so we can use it later
       n.radius = circleRadius(n.power);
-      console.log(n.radius);
       n.linkPower = linkRadius(n.power);
       n.color = ramp(n.power);
     });
