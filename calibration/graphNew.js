@@ -27,7 +27,7 @@ Network = function(){
   // our force directed layout
   var  force = d3.layout.force()
       .friction(0.9)
-      .charge([-500])
+      .charge([-50])
       .size([width, height]);
   // color function used to color nodes
   var nodeColors = d3.scale.category20();
@@ -54,8 +54,8 @@ Network = function(){
   }
 
   force.on("tick", forceTick)
-  force.on("end",function(){console.log("Over");})
-  .charge(-200)
+  force.on("end",function(){console.log("Over");});
+
 
 
   function update(){
@@ -68,7 +68,8 @@ Network = function(){
     force.nodes(curNodesData)
     .links(curLinksData)
     .linkDistance(function(d){
-      return scale(d.power);
+
+      return d.target.linkPower;
     });
     // enter / exit for nodes
     updateNodes();
@@ -100,7 +101,7 @@ Network = function(){
       .attr("class", "node")
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
-      .attr("r", function(d){ return scale(d.power); })
+      .attr("r", function(d){ return d.radius})
       .style("fill", function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
       .call(force.drag);
       // .style("stroke", function(d){ return strokeFor(d); })
@@ -174,21 +175,23 @@ Network = function(){
       var node = JSON.parse(data[i])
 
       var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
+      if(n.kind == "Client"){
+        n.probedESSID = node.probedESSID;
+      }
       var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
       data.nodes.push(n);
       data.links.push(l);
 
     }
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
-    circleRadius = d3.scale.sqrt().range([3, 10]).domain(countExtent);
-
+    circleRadius = d3.scale.pow().range([5, 1]).domain(countExtent);
+    linkRadius = d3.scale.linear().range([50, 20]).domain(countExtent);
 
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
       if(nodesMap.has(n.name)){
           _n = nodesMap.get(n.name);
-          console.log(_n);
           n.x = _n.x;
           n.y = _n.y;
           n.px = _n.px;
@@ -202,6 +205,8 @@ Network = function(){
 
       // add radius to the node so we can use it later
       n.radius = circleRadius(n.power);
+      console.log(n.radius);
+      n.linkPower = linkRadius(n.power)
     });
 
     // id's -> node objects
