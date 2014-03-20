@@ -29,7 +29,7 @@ Network = function(){
   // our force directed layout
   var  force = d3.layout.force()
       .friction(0.9)
-      .charge([-100])
+      .charge([-200])
       .size([width, height]);
   // color function used to color nodes
   var nodeColors = d3.scale.category20();
@@ -134,8 +134,9 @@ Network = function(){
 
     link.enter().append("line")
       .attr("class", "link")
-      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"6":"8"})
-      .attr("stroke","black")
+      .style("stroke-width","0.3")
+      .style("stroke","white")
+      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"20":"30"})
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
@@ -193,7 +194,7 @@ Network = function(){
 
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.pow().range([3, 9]).domain(countExtent);
-    linkRadius = d3.scale.pow().range([500, 30]).domain(countExtent);
+    linkRadius = d3.scale.pow().range([300, 30]).domain(countExtent);
     ramp=d3.scale.linear().domain(countExtent).range(["#8dbbd8","#acbc43"]);
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
