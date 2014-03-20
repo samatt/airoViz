@@ -92,9 +92,9 @@ Network = function(){
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
       .transition()
-        .duration(750)
+        .duration(10000)
         .attr("r",function(d){
-          return scale(d.power);
+          return d.radius;
         });
 
     node.enter().append("circle")
@@ -184,8 +184,8 @@ Network = function(){
 
     }
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
-    circleRadius = d3.scale.pow().range([5, 1]).domain(countExtent);
-    linkRadius = d3.scale.linear().range([50, 20]).domain(countExtent);
+    circleRadius = d3.scale.pow().range([3, 9]).domain(countExtent);
+    linkRadius = d3.scale.pow().range([500, 30]).domain(countExtent);
 
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
