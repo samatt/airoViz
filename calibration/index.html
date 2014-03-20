@@ -7,6 +7,8 @@
 		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
 		<script type="text/javascript" src="../utils.js"></script>
 		<script type="text/javascript" src="../graph.js"></script>
+		<script type="text/javascript" src="../graphNew.js"></script>
+<!-- 		// <script type="text/javascript" src="../graphOld.js"></script> -->
 		<style type="text/css">
 
 
@@ -35,25 +37,45 @@
 	</head>
 	<body>
 		<script type="text/javascript">
-			calibration = new Object();
-			calibration.server = 'localhost:8080';
 
 		  $(document).ready(function() {
 
-					calibration.width = $(window).width();
-					calibration.height=$(window).height();
+					app.width = $(window).width();
+					app.height=$(window).height();
+					myNetwork = Network();
+					var time = setDuration(4,10,0);
+					url = 'http://'+app.server+'/lastseen?lastseen='+time;
+					// console.log(url);
+					$.ajax({
+						dataType: 'jsonp',
+						url: url,
+						type: 'GET',
+							success: function(postData) {
 
-					setInterval(myInterval,1000);
+								// parseData(postData);
+								myNetwork('body',postData);
 
+							},
+
+							error: function(err) {
+								console.log("GET failed ");
+								console.log(err);
+							}
+					});
+
+
+
+					// setInterval(myInterval,2000);
 
 				}
 			);
 
+
 				var myInterval = function(){
-					console.log("here")
-					var time = setDuration(0,3,0);
-					url = 'http://'+calibration.server+'/lastseen?lastseen='+time;
-					console.log(url);
+					// console.log("here")
+					var time = setDuration(4,10,0);
+					url = 'http://'+app.server+'/lastseen?lastseen='+time;
+					// console.log(url);
 
 					$.ajax({
 						dataType: 'jsonp',
@@ -61,8 +83,10 @@
 						type: 'GET',
 							success: function(postData) {
 
-								parseData(postData);
-								initGraph();
+								// parseData(postData);
+								// update();
+								myNetwork.updateData(postData);
+
 
 							},
 

@@ -9,8 +9,8 @@ function setDuration (numHours, numMinutes, numSeconds){
 	var hours 	= (ts.getHours()-numHours) >0 ? (ts.getHours()-numHours) : 0
 
 	//FIXME: Get rid off the -1 from getDate and -2 from hours
-	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate())+" "+hours+":"+ minutes	+":"+seconds;
-	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(13)+":"+ minutes	+":"+seconds;
+	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate())+" "+hours+":"+ minutes	+":"+seconds;
+	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(13)+":"+ minutes	+":"+seconds;
 	return timestamp
 }
 
@@ -27,13 +27,17 @@ function parseData(data){
 
 		//Renaming BSSID to name as thats what D3 force stuff expects
 		var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
-		nodes.push(n);
 		link = {'source' : 0, 'target': i, 'power':node.power};
+		nodes.push(n);
+		app.nodes.push(n);
+
 		links.push(link);
+		app.links.push(link);
 
 	};
 
-	calibration.data = {'nodes' : nodes, 'links': links}
+	// app.nodes = nodes;
+	// app.links = links;
 }
 
 
@@ -45,7 +49,7 @@ function parseDataWithChildren(data){
 
 	//TODO: Implement the 'Listeners' in DB. These will be the RPi routers running Airckrack-ng
 
-	nodes.push({'name' : "Listener", 'power': 1, 'kind': "Listener", 'weight': 0});
+	nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener", 'weight': 0});
 	nodes[0].children = new Array();
 
 	for (var i = 0; i < data.length-20; i++) {
@@ -102,7 +106,8 @@ function parseDataWithChildren(data){
 		}
 	}
 
-	calibration.data = {'nodes' : nodes}
+	app.nodes = nodes;
+
 }
 
 // Returns a list of all nodes under the root.
@@ -123,10 +128,12 @@ function flatten(root) {
 
 var scale = d3.scale.pow()
 	.domain([0,-128])
-	.range([100,250]);
+	.range([3,8]);
 
 var colors = d3.scale.category20c();
 
 function childrenColor(d) {
   return d._children ? "#3182bd" : d.children ? "#c6dbef" : "#fd8d3c";
 }
+
+var color = d3.scale.category10();

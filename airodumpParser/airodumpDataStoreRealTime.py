@@ -74,11 +74,11 @@ def readFile(fileName):
 		line = line.replace("\r\n"," ")
 		params = line.split(',')
 
-		if len(params) <6 :
+		if len(params) <7 :
+			logging.error("Invalid Packet. Too small")
 			continue
 
 		ID = params[0].strip()
-		lastTime = params[2].strip()
 
 		if ID == "BSSID":
 
@@ -143,9 +143,11 @@ class MyHandler(LoggingEventHandler):
 
 if __name__ == '__main__' :
 
-	logging.basicConfig(level=logging.DEBUG)
 	requests_log = logging.getLogger("requests")
 	requests_log.setLevel(logging.WARNING)
+
+	logging.basicConfig(level=logging.DEBUG)
+
 
 	url = 'http://localhost:8080'
 
@@ -155,8 +157,6 @@ if __name__ == '__main__' :
 	observer = Observer()
 	observer.schedule(event_handler, path, recursive=True)
 	observer.start()
-
-	# sender = oscSender(8000)
 
 	try :
 	    while True :
