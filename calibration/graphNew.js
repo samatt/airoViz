@@ -23,22 +23,24 @@ Network = function(){
   // variables to refect the current settings
   // of the visualization
   var  layout = "force";
+  var tooltip = Tooltip("vis-tooltip", 230)
 
-
-
-  // our force directed layout
   var  force = d3.layout.force()
       .friction(0.9)
       .charge([-200])
       .size([width, height]);
-  // color function used to color nodes
+
+      force.on("tick", forceTick);
+      force.on("end",function(){console.log("Over");});
+
+// color function used to color nodes
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
-    // format our data
+    // format data
     allData = setupData(data)
 
-    // create our svg and groups
+    // create svg and groups
     vis = d3.select(selection).append("svg")
       .attr("width", width)
       .attr("height", height);
@@ -47,23 +49,17 @@ Network = function(){
       .attr("height", "100%")
       .attr("fill", "black");
 
-    linksG = vis.append("g").attr("id", "links")
-    nodesG = vis.append("g").attr("id", "nodes")
+    linksG = vis.append("g").attr("id", "links");
+    nodesG = vis.append("g").attr("id", "nodes");
 
-    // setup the size of the force environment
-    force.size([width, height])
+    force.size([width, height]);
 
     // setLayout("force")
     // setFilter("all")
 
     // perform rendering and start force layout
-    update()
+    update();
   }
-
-  force.on("tick", forceTick)
-  force.on("end",function(){console.log("Over");});
-
-
 
   function update(){
     //  filter data to show based on current filter settings.
@@ -74,10 +70,9 @@ Network = function(){
     // reset nodes and links in force layout
     force.nodes(curNodesData)
     .links(curLinksData)
-    .linkDistance(function(d){
+    .linkDistance(function(d){ return d.target.linkPower; });
 
-      return d.target.linkPower;
-    });
+
     // enter / exit for nodes
     updateNodes();
     updateLinks();
@@ -93,12 +88,11 @@ Network = function(){
     node = nodesG.selectAll("circle.node")
       .data(curNodesData, function(d) { return d.name ;});
 
-
-    node
-      .attr("attr","update")
-      .transition()
-        .attr("cx", function(d){ return (d.kind==="Listener"?app.width/2:d.x); })
-        .attr("cy", function(d){ return (d.kind==="Listener"?app.height/2:d.y); });
+    // node
+    //   .attr("attr","update")
+    //   .transition()
+    //     .attr("cx", function(d){ return (d.kind==="Listener"?app.width/2:d.x); })
+    //     .attr("cy", function(d){ return (d.kind==="Listener"?app.height/2:d.y); });
 
     node.enter().append("circle")
       .attr("class", "node")
@@ -112,10 +106,10 @@ Network = function(){
       // .style("stroke", function(d){ return strokeFor(d); })
       // .style("stroke-width", 1.0)
 
-    // node.on("mouseover", showDetails)
-    //   .on("mouseout", hideDetails)
+    node.on("mouseover", showDetails)
+      .on("mouseout", hideDetails)
 
-    node.exit().remove()
+    node.exit().remove();
   }
 
   // enter/exit display for links
@@ -123,12 +117,12 @@ Network = function(){
     link = linksG.selectAll("line.link")
       .data(curLinksData, function(d){ return (d.source.name + " : "+d.target.name) });
 
-    link
-      .attr("attr","update")
-      .attr("x1", function(d){ return d.source.x;})
-      .attr("y1", function(d){ return d.source.y;})
-      .attr("x2", function(d){ return d.target.x;})
-      .attr("y2", function(d){ return d.target.y;})
+    // link
+    //   .attr("attr","update")
+    //   .attr("x1", function(d){ return d.source.x;})
+    //   .attr("y1", function(d){ return d.source.y;})
+    //   .attr("x2", function(d){ return d.target.x;})
+    //   .attr("y2", function(d){ return d.target.y;})
       // .attr("stroke-width", 2)
       // .attr("stroke", "black");
 
@@ -136,13 +130,13 @@ Network = function(){
       .attr("class", "link")
       .style("stroke-width","0.3")
       .style("stroke",function(d){return (d.target.kind ==="Router"?"White":"Grey")})
-      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"10":"15"})
+      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?" 20":"35"})
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
       .attr("y2", function(d){ return d.target.y;});
 
-    link.exit().remove()
+    link.exit().remove();
   }
   network.toggleLayout = function(newLayout){
     // # public function
@@ -150,8 +144,8 @@ Network = function(){
   }
 
   network.updateData = function(newData){
-      force.stop();
-      allData = setupData(newData)
+      // force.stop();
+      allData = setupData(newData);
       link.remove()
       node.remove()
       update()
@@ -243,7 +237,22 @@ Network = function(){
     return nodesMap;
   }
 
+  showDetails = function (d,i){
+    content = '<p class="main">' + d.name + '</span></p>';
+    content += '<hr class="tooltip-hr">';
+    content += '<p class="main">' + d.power + '</span></p>';
+    tooltip.showTooltip(content,d3.event);
+  }
 
+    hideDetails = function(d,i){
+      tooltip.hideTooltip();
+      // # watch out - don't mess with node if search is currently matching
+      // node.style("stroke", (n) -> if !n.searched then strokeFor(n) else "#555")
+        // .style("stroke-width", (n) -> if !n.searched then 1.0 else 2.0)
+      // if link
+        // link.attr("stroke", "#ddd")
+          // .attr("stroke-opacity", 0.8)
+    }
   return network
 
 }

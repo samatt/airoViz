@@ -15,9 +15,7 @@ function setDuration (numHours, numMinutes, numSeconds){
 }
 
 
-var scaleLinkDistance = d3.scale.pow()
-	.domain([10,128])
-	.range([20,20]);
+
 var scale = d3.scale.pow()
 	.domain([0,128])
 	.range([10,3]);
