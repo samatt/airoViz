@@ -5,6 +5,23 @@ This repository contains code for a platform for Wi-Fi based location tracking. 
 * Python airodump Parser
 	* Sends OSC messages of parsed data
 	* Writes data to Google App Engine DB
+	* Files
+		* airodumpCSVParser.py:
+				* Reads file on timer
+				* Kills old nodes
+				* Sends osc messages
+		* airodumpCSVParserWatchdog.py
+			* Uses watchdog to monitor when file has changed. Only reads file on change.
+			* Checks the last time seen, only send OSC update if time has changed.
+		* airodumpToDataStore.py
+			* Use this to send a lot of old data to the data store in one shot.
+			* Works for both individual files and directories
+
+		* airodumpDataStoreRealTime.py
+			* Use this to send data to the data store in real time. 
+
+		* Node.py
+
 * Google app NDB Data Store
 
 ##Aircrack-ng
