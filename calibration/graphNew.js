@@ -135,8 +135,8 @@ Network = function(){
     link.enter().append("line")
       .attr("class", "link")
       .style("stroke-width","0.3")
-      .style("stroke","white")
-      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"20":"30"})
+      .style("stroke",function(d){return (d.target.kind ==="Router"?"White":"Grey")})
+      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"10":"15"})
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
@@ -207,8 +207,8 @@ Network = function(){
           n.py = _n.py;
       }
       else{
-        n.x = 0;//randomnumber=Math.floor(Math.random()*width);
-        n.y = 0;//randomnumber=Math.floor(Math.random()*height);
+        n.x = randomnumber=Math.floor(Math.random()*width);
+        n.y = randomnumber=Math.floor(Math.random()*height);
       }
 
 
