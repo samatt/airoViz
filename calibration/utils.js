@@ -1,4 +1,10 @@
 
+app = new Object();
+app.server = 'localhost:8080';
+app.nodes = [];
+app.links = [];
+var node = null;
+var link = null;
 
 function setDuration (numHours, numMinutes, numSeconds){
 

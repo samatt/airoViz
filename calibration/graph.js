@@ -7,56 +7,56 @@ app.links = [];
 var node = null;
 var link = null;
 
-var force = d3.layout.force()
-  .nodes(app.nodes)
-  .links(app.links)
-  .friction(0.7)
-  .charge([-100])
-  .size([app.width, app.height]);
-
-
-var svg = d3.select('body')
-    .append('svg:svg')
-    .attr('width', app.width)
-    .attr('height', app.height);
-
-
-
-function update () {
-  force.nodes(app.nodes);
-  force.links(app.links);
-  force.linkDistance(function(d){
-    return scale(d.power);
-  }); //.on("tick", tick);
-  if(node !==null)node.remove();
-
-  // link.remove();
-
-  force.start();
-  updateNodes();
-  // updateLinks();
-
-}
-
-function tick(){
-  node.attr("cx", function(d) { return d.x; })
-  .attr("cy", function(d) { return d.y; });
-
-  // console.log(node);
-  link.attr("x1", function(d) { return d.source.x; })
-  .attr("y1", function(d) { return d.source.y; })
-  .attr("x2", function(d) { return d.target.x; })
-  .attr("y2", function(d) { return d.target.y; });
-}
-
-function updateLinks(){
-  link = svg.selectAll("line")
-  .data(app.links, function(d) { return d.source + "-" + d.target; })
-  .enter()
-  .append("line");
-}
-
-function updateNodes(){
+// var force = d3.layout.force()
+//   .nodes(app.nodes)
+//   .links(app.links)
+//   .friction(0.7)
+//   .charge([-100])
+//   .size([app.width, app.height]);
+//
+//
+// var svg = d3.select('body')
+//     .append('svg:svg')
+//     .attr('width', app.width)
+//     .attr('height', app.height);
+//
+//
+//
+// function update () {
+//   force.nodes(app.nodes);
+//   force.links(app.links);
+//   force.linkDistance(function(d){
+//     return scale(d.power);
+//   }); //.on("tick", tick);
+//   if(node !==null)node.remove();
+//
+//   // link.remove();
+//
+//   force.start();
+//   updateNodes();
+//   // updateLinks();
+//
+// }
+//
+// function tick(){
+//   node.attr("cx", function(d) { return d.x; })
+//   .attr("cy", function(d) { return d.y; });
+//
+//   // console.log(node);
+//   link.attr("x1", function(d) { return d.source.x; })
+//   .attr("y1", function(d) { return d.source.y; })
+//   .attr("x2", function(d) { return d.target.x; })
+//   .attr("y2", function(d) { return d.target.y; });
+// }
+//
+// function updateLinks(){
+//   link = svg.selectAll("line")
+//   .data(app.links, function(d) { return d.source + "-" + d.target; })
+//   .enter()
+//   .append("line");
+// }
+//
+// function updateNodes(){
   //Data Join method, update already exisitng objects data
   //Using the key method. Name is the unique BSSID for each node.
 
@@ -73,31 +73,31 @@ function updateNodes(){
   // node.call(force.drag);
 
   //Enter
-    var  nodes = svg.selectAll("circle")
-      .data(app.nodes)
-      .enter()
-      .append("circle")
-      .attr("r",4)
-      .style("fill", function(d, i) {
-              return colors(i);
-      })
-      .call(force.drag);
-
-      var edges = svg.selectAll("line")
-          .data(app.links)
-          .enter()
-          .append("line");
-      force.on("tick", function() {
-
-          edges.attr("x1", function(d) { return d.source.x; })
-               .attr("y1", function(d) { return d.source.y; })
-               .attr("x2", function(d) { return d.target.x; })
-               .attr("y2", function(d) { return d.target.y; });
-
-          nodes.attr("cx", function(d) { return d.x; })
-               .attr("cy", function(d) { return d.y; });
-
-      });
+    // var  nodes = svg.selectAll("circle")
+    //   .data(app.nodes)
+    //   .enter()
+    //   .append("circle")
+    //   .attr("r",4)
+    //   .style("fill", function(d, i) {
+    //           return colors(i);
+    //   })
+    //   .call(force.drag);
+    //
+    //   var edges = svg.selectAll("line")
+    //       .data(app.links)
+    //       .enter()
+    //       .append("line");
+    //   force.on("tick", function() {
+    //
+    //       edges.attr("x1", function(d) { return d.source.x; })
+    //            .attr("y1", function(d) { return d.source.y; })
+    //            .attr("x2", function(d) { return d.target.x; })
+    //            .attr("y2", function(d) { return d.target.y; });
+    //
+    //       nodes.attr("cx", function(d) { return d.x; })
+    //            .attr("cy", function(d) { return d.y; });
+    //
+    //   });
   // .attr("r",function(d){
   //   return scale(d.power)
   // })
@@ -112,7 +112,7 @@ function updateNodes(){
   //Exit
   // node.exit().remove()
 
-}
+//}
 
 //
 // function tick() {

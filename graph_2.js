@@ -26,7 +26,7 @@ Network = function(){
   var tooltip = Tooltip("vis-tooltip", 230)
 
   var  force = d3.layout.force()
-      .friction(0.9)
+      .friction(.65)
       .charge([-200])
       .size([width, height]);
 
@@ -117,12 +117,12 @@ Network = function(){
     link = linksG.selectAll("line.link")
       .data(curLinksData, function(d){ return (d.source.name + " : "+d.target.name) });
 
-    // link
-    //   .attr("attr","update")
-    //   .attr("x1", function(d){ return d.source.x;})
-    //   .attr("y1", function(d){ return d.source.y;})
-    //   .attr("x2", function(d){ return d.target.x;})
-    //   .attr("y2", function(d){ return d.target.y;})
+    link
+      .attr("attr","update")
+      .attr("x1", function(d){ return d.source.x;})
+      .attr("y1", function(d){ return d.source.y;})
+      .attr("x2", function(d){ return d.target.x;})
+      .attr("y2", function(d){ return d.target.y;});
       // .attr("stroke-width", 2)
       // .attr("stroke", "black");
 
@@ -130,7 +130,7 @@ Network = function(){
       .attr("class", "link")
       .style("stroke-width","0.3")
       .style("stroke",function(d){return (d.target.kind ==="Router"?"White":"Grey")})
-      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?" 20":"35"})
+      .attr("stroke-dasharray",function(d){return d.target.kind ==="Router"?"10":"35"})
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
@@ -176,9 +176,16 @@ Network = function(){
 
       var node = JSON.parse(data[i])
 
+
       var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
+
       if(n.kind == "Client"){
+        n.essid = node.AP;
         n.probedESSID = node.probedESSID;
+        // console.log(node.probedESSID);
+      }
+      else{
+        n.essid =  node.ESSID;
       }
       var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
       data.nodes.push(n);
@@ -187,9 +194,9 @@ Network = function(){
     }
 
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
-    circleRadius = d3.scale.pow().range([3, 9]).domain(countExtent);
+    circleRadius = d3.scale.pow().range([3, 13]).domain(countExtent);
     linkRadius = d3.scale.pow().range([300, 30]).domain(countExtent);
-    ramp=d3.scale.linear().domain(countExtent).range(["#8dbbd8","#acbc43"]);
+    ramp=d3.scale.pow().domain(countExtent).range(["#8dbbd8","#acbc43"]);
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
@@ -238,9 +245,43 @@ Network = function(){
   }
 
   showDetails = function (d,i){
-    content = '<p class="main">' + d.name + '</span></p>';
+    content = '<p class="main">' + d.kind.toUpperCase() + " : "+ d.name + '</span></p>';
     content += '<hr class="tooltip-hr">';
-    content += '<p class="main">' + d.power + '</span></p>';
+    if(d.kind == "Client"){
+
+      var AP = d.essid.split("|");
+      //contains
+      var networkName = $.trim(AP[0]);
+      if(networkName === "(not associated)"){
+        networkName =  "AP: "+"unassociated";
+      }
+      else{
+        networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+      }
+      content += '<p class="main">' + networkName    + '</span></p>';
+      content += '<hr class="tooltip-hr">';
+      content += '<p class="main">' +"RSSI: " + d.power  + '</span></p>';
+
+      if(d.probedESSID.length > 0){
+        content += '<hr class="tooltip-hr">';
+        content += '<p class="main">' + "PROBED NETWORKS:"  + '</span></p>';
+        d.probedESSID.forEach(function(n){
+
+          content += '<p class="main">' + n  + '</span></p>';
+        });
+      }
+
+
+    }
+    else{
+
+      content += '<p class="main">' + "NAME:" + d.essid  + '</span></p>';
+      content += '<hr class="tooltip-hr">';
+      content += '<p class="main">' +"RSSI: " + d.power  + '</span></p>';
+
+    }
+
+
     tooltip.showTooltip(content,d3.event);
   }
 

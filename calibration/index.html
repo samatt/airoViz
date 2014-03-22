@@ -7,39 +7,12 @@
 		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
 <!-- 		// <script src="http://marvl.infotech.monash.edu/webcola/cola.v1.min.js"></script> -->
 		<script type="text/javascript" src="../utils.js"></script>
-		<script type="text/javascript" src="../graph.js"></script>
-		<script type="text/javascript" src="../graphNew.js"></script>
+<!-- 		// <script type="text/javascript" src="../graph.js"></script> -->
+		<script type="text/javascript" src="../graph_1.js"></script>
 		<script type="text/javascript" src="../Tooltip.js"></script>
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/bootstrap.min.css">
 		<link rel="stylesheet" href="css/style.css">
-<!-- 		// <script type="text/javascript" src="../graphOld.js"></script> -->
-<!-- /*		<style type="text/css">
-
-
-
-			.node {
-			  cursor: pointer;
-			}
-
-			.node circle {
-			  fill: #fff;
-			  stroke: steelblue;
-			  stroke-width: 1.5px;
-			}
-
-			.node text {
-			  font: 10px sans-serif;
-			}
-
-			.link {
-			  fill: none;
-			  stroke: #ccc;
-			  stroke-width: 1.5px;
-			}
-
-
-		</style>*/ -->
 	</head>
 	<body>
 		<script type="text/javascript">
@@ -58,7 +31,7 @@
 						type: 'GET',
 							success: function(postData) {
 
-								// parseData(postData);
+								// Setup Network
 								myNetwork('body',postData);
 
 							},
@@ -71,7 +44,7 @@
 
 
 
-					setInterval(myInterval,5000);
+					setInterval(myInterval,2000);
 
 				}
 			);
@@ -79,7 +52,7 @@
 
 				var myInterval = function(){
 					// console.log("here")
-					var time = setDuration(0,1,00);
+					var time = setDuration(0,1,0);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
 					console.log(url);
 
