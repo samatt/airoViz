@@ -49,7 +49,7 @@ a, a:visited {
 
 p.search_title {
   display: inline;
-  text-align: left;  
+  text-align: left;
   font-weight: normal;
   color: #777;
 }
@@ -73,35 +73,40 @@ footer p {
   left: 100px;
   -moz-border-radius:3px;
   border-radius: 3px;
-  border: 2px solid #DDD;
-  background: #fff;
-  opacity: 1;
-  color: #000;
-  padding: 10px;
-  width: 300px;
-  font-size: 15px;
+  border: 1px solid #DDD;
+  background-color:rgba(0,0,0,0.3);
+  opacity: 1.0;
+  color: #0000.5;
+  padding: 7px;
+  width: 250px;
+  font-size: 5px;
   z-index: 120;
 }
 
 .tooltip p.main {
-  font-size: 15px;
-  text-align: center;
+/*  font-size: 15px;*/
+opacity:1.0;
+  text-align: left;
+  color: White  ;
   padding:0;
   margin:0;
+  font-family: "Courier New", Courier, monospace;
+
 }
 
 hr.tooltip-hr {
-  padding:3px 0 0 0;
+  padding:0px 0 0 0;
   margin:3px 0 3px 0;
+  border-bottom: 0px;
 }
 
 .tooltip .title {
   font-size: 20px;
   line-height: 24px;
 }
- 
+
 .tooltip .name {
-  font-weight:bold;
+  font-weight:normal;
 }
 
 
@@ -109,4 +114,3 @@ line.link {
   fill: none;
   stroke-width: 1.5px;
 }
-
