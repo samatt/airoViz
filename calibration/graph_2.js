@@ -229,9 +229,9 @@ console.log(vis);
       }
       else {
         ramp = function(d){
-          if(d.kind == "Router"){ return "#7241a7";}
+          if(d.kind == "Router"){ return "#4c92c1";}
           else if(d.kind == "Listener"){ return "White";}
-          else{return "#b34244";}
+          else{return "#bb7646";}
         }
 
         n.color = ramp(n);

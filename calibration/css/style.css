@@ -1,5 +1,5 @@
 body {
-  font-family: Arial, sans-serif;
+font-family: "Courier New", Courier, monospace;
 }
 
 a, a:visited {
@@ -36,6 +36,7 @@ a, a:visited {
   cursor: pointer;
   margin-right: 3px;
   text-decoration: none;
+
 }
 
 .control a:hover {
@@ -85,7 +86,7 @@ footer p {
 
 .tooltip p.main {
 /*  font-size: 15px;*/
-opacity:1.0;
+opacity:0.9;
   text-align: left;
   color: White  ;
   padding:0;
