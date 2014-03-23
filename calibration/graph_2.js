@@ -37,6 +37,8 @@ Network = function(){
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
+    setLayout("Power");
+
     // format data
     allData = setupData(data)
 
@@ -48,13 +50,13 @@ Network = function(){
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("fill", "black");
-
+console.log(vis);
     linksG = vis.append("g").attr("id", "links");
     nodesG = vis.append("g").attr("id", "nodes");
 
     force.size([width, height]);
 
-    // setLayout("force")
+
     // setFilter("all")
 
     // perform rendering and start force layout
@@ -98,8 +100,8 @@ Network = function(){
       .attr("class", "node")
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
-      .attr("stroke-width","0.4")
-      .attr("stroke","white")
+      // .attr("stroke-width","0.4")
+      // .attr("stroke","white")
       .attr("r", function(d){ return d.radius})
       .style("fill",function(d){return d.color;})// function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
       .call(force.drag);
@@ -140,8 +142,16 @@ Network = function(){
   }
   network.toggleLayout = function(newLayout){
     // # public function
-
+    force.stop()
+    setLayout(newLayout)
+    setupData(allData);
+    update()
   }
+
+  setLayout = function(newLayout){
+    layout = newLayout;
+  }
+
 
   network.updateData = function(newData){
       // force.stop();
@@ -196,7 +206,7 @@ Network = function(){
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.pow().range([3, 13]).domain(countExtent);
     linkRadius = d3.scale.pow().range([300, 30]).domain(countExtent);
-    ramp=d3.scale.pow().domain(countExtent).range(["#8dbbd8","#acbc43"]);
+
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
@@ -213,10 +223,23 @@ Network = function(){
       }
 
 
+      if(layout =="Power"){
+        ramp = d3.scale.pow().domain(countExtent).range(["#8dbbd8","#acbc43"]);
+        n.color = ramp(n.power);
+      }
+      else {
+        ramp = function(d){
+          if(d.kind == "Router"){ return "#7241a7";}
+          else if(d.kind == "Listener"){ return "White";}
+          else{return "#b34244";}
+        }
+
+        n.color = ramp(n);
+      }
       // add radius to the node so we can use it later
       n.radius = circleRadius(n.power);
-      n.linkPower = linkRadius(n.power);
-      n.color = ramp(n.power);
+      n.linkPower = linkRadius(n.power);;
+
     });
 
     // id's -> node objects
@@ -236,11 +259,7 @@ Network = function(){
   // Returns d3.map of ids -> nodes
   mapNodes = function(nodes){
     nodesMap = d3.map();
-
-    nodes.forEach (function(n){
-      nodesMap.set(n.name, n);
-    });
-
+    nodes.forEach (function(n){ nodesMap.set(n.name, n);});
     return nodesMap;
   }
 
@@ -270,30 +289,26 @@ Network = function(){
           content += '<p class="main">' + n  + '</span></p>';
         });
       }
-
-
     }
     else{
-
       content += '<p class="main">' + "NAME:" + d.essid  + '</span></p>';
       content += '<hr class="tooltip-hr">';
       content += '<p class="main">' +"RSSI: " + d.power  + '</span></p>';
-
     }
-
 
     tooltip.showTooltip(content,d3.event);
   }
 
-    hideDetails = function(d,i){
-      tooltip.hideTooltip();
-      // # watch out - don't mess with node if search is currently matching
-      // node.style("stroke", (n) -> if !n.searched then strokeFor(n) else "#555")
-        // .style("stroke-width", (n) -> if !n.searched then 1.0 else 2.0)
-      // if link
-        // link.attr("stroke", "#ddd")
-          // .attr("stroke-opacity", 0.8)
-    }
-  return network
 
-}
+  hideDetails = function(d,i){
+    tooltip.hideTooltip();
+    // # watch out - don't mess with node if search is currently matching
+    // node.style("stroke", (n) -> if !n.searched then strokeFor(n) else "#555")
+      // .style("stroke-width", (n) -> if !n.searched then 1.0 else 2.0)
+    // if link
+      // link.attr("stroke", "#ddd")
+        // .attr("stroke-opacity", 0.8)
+  }
+
+    return network
+  }

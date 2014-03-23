@@ -8,7 +8,7 @@
 <!-- 		// <script src="http://marvl.infotech.monash.edu/webcola/cola.v1.min.js"></script> -->
 		<script type="text/javascript" src="../utils.js"></script>
 <!-- 		// <script type="text/javascript" src="../graph.js"></script> -->
-		<script type="text/javascript" src="../graph_1.js"></script>
+		<script type="text/javascript" src="../graph_2.js"></script>
 		<script type="text/javascript" src="../Tooltip.js"></script>
 		<link rel="stylesheet" href="css/reset.css">
 		<link rel="stylesheet" href="css/bootstrap.min.css">
@@ -17,6 +17,8 @@
 	<body>
 		<script type="text/javascript">
 
+
+
 		  $(document).ready(function() {
 
 					app.width = $(window).width();
@@ -24,7 +26,7 @@
 					myNetwork = Network();
 					var time = setDuration(0,2,0);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
-					console.log(url);
+					// console.log(url);
 					$.ajax({
 						dataType: 'jsonp',
 						url: url,
@@ -32,7 +34,7 @@
 							success: function(postData) {
 
 								// Setup Network
-								myNetwork('body',postData);
+								myNetwork('#vis',postData);
 
 							},
 
@@ -41,15 +43,29 @@
 								console.log(err);
 							}
 					});
-
-
-
 					setInterval(myInterval,3500);
 
-				}
+					function activate(group, link){
+						d3.selectAll("#layouts a").classed({'active': false});
+						// d3.select("#layouts a").classed({'active': true});
+						d3.select("#"+group+" #"+link).attr("id",link).classed('active', true)
+						console.log(link);
+
+					}
+
+
+					var test = d3.selectAll("#layouts a").on("click",function (d){
+						newLayout = d3.select(this).attr("id");
+						console.log(newLayout);
+						activate("layouts", newLayout);
+						myNetwork.toggleLayout(newLayout);
+						console.log("Current Mode : " +newLayout);
+
+					});
+
+
+		}
 			);
-
-
 				var myInterval = function(){
 					// console.log("here")
 					var time = setDuration(0,1,0);
@@ -61,12 +77,9 @@
 						url: url,
 						type: 'GET',
 							success: function(postData) {
-
 								// parseData(postData);
 								// update();
 								myNetwork.updateData(postData);
-
-
 							},
 
 							error: function(err) {
@@ -75,6 +88,25 @@
 							}
 					});
 				}
+
+
+
+
+
 		</script>
+		<div id="controls">
+      <div id="layouts" class="control">
+        <h3>Layout</h3>
+        <a id="Kind" >Node Type</a>
+				<a id="Power" class="active">Power</a>
+
+      </div>
+
+		<div id="main" role="main">
+			<div id='vis'></div>
+		</div>
+
+		</div>
+
 	</body>
 </html>
