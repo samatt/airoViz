@@ -5,6 +5,7 @@ Network = function(){
   var  height = app.height;
   //  allData will store the unfiltered data
   var allData = []
+  var allRawData = [];
   var  curLinksData = [];
   var  curNodesData = [];
   var  linkedByIndex = {};
@@ -18,11 +19,14 @@ Network = function(){
   var  link = null;
 
   var nodesMap = d3.map();
+  var routersMap = d3.map();
+  var clientsMap = d3.map();
   var ramp = d3.map();
 
   // variables to refect the current settings
   // of the visualization
   var  layout = "force";
+  var sort = "other";
   var tooltip = Tooltip("vis-tooltip", 230)
 
   var  force = d3.layout.force()
@@ -68,12 +72,10 @@ Network = function(){
     curNodesData = allData.nodes;
     curLinksData = allData.links;
 
-
     // reset nodes and links in force layout
     force.nodes(curNodesData)
     .links(curLinksData)
     .linkDistance(function(d){ return d.target.linkPower; });
-
 
     // enter / exit for nodes
     updateNodes();
@@ -90,11 +92,10 @@ Network = function(){
     node = nodesG.selectAll("circle.node")
       .data(curNodesData, function(d) { return d.name ;});
 
-    // node
-    //   .attr("attr","update")
-    //   .transition()
-    //     .attr("cx", function(d){ return (d.kind==="Listener"?app.width/2:d.x); })
-    //     .attr("cy", function(d){ return (d.kind==="Listener"?app.height/2:d.y); });
+    node
+      .attr("attr","update")
+      .transition(750)
+      .style("fill",function(d){return d.color;});
 
     node.enter().append("circle")
       .attr("class", "node")
@@ -103,7 +104,7 @@ Network = function(){
       // .attr("stroke-width","0.4")
       // .attr("stroke","white")
       .attr("r", function(d){ return d.radius})
-      .style("fill",function(d){return d.color;})// function(d,i){ return d.kind ==="Router"?colors(0):colors(1) })
+      .style("fill",function(d){return d.color;})
       .call(force.drag);
       // .style("stroke", function(d){ return strokeFor(d); })
       // .style("stroke-width", 1.0)
@@ -144,8 +145,8 @@ Network = function(){
     // # public function
     force.stop()
     setLayout(newLayout)
-    setupData(allData);
-    update()
+    allData = setupData(allRawData);
+    update();
   }
 
   setLayout = function(newLayout){
@@ -155,7 +156,9 @@ Network = function(){
 
   network.updateData = function(newData){
       // force.stop();
+      allRawData = newData;
       allData = setupData(newData);
+      // console.log(allData[0]);
       link.remove()
       node.remove()
       update()
@@ -177,35 +180,54 @@ Network = function(){
   // called once to clean up raw data and switch links to
   // point to node instances
   // Returns modified data
-  setupData = function(data){
+  setupData = function(_data){
     // initialize circle radius scale
+    data = new Object();
     data.links = new Array();
     data.nodes = new Array();
+
     data.nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener"});
-    for (var i = 0; i < data.length; i++) {
+    for (var i = 0; i < _data.length; i++) {
 
-      var node = JSON.parse(data[i])
-
-
+      var node = JSON.parse(_data[i]);
       var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
 
       if(n.kind == "Client"){
         n.essid = node.AP;
         n.probedESSID = node.probedESSID;
         // console.log(node.probedESSID);
+        if(sort=="distance"){
+            var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
+            data.links.push(l);
+        }
+        else{
+          var AP = n.essid.split("|");
+          var networkName = $.trim(AP[0]);
+          if(networkName === "(not associated)" || networkName === ""){
+
+
+          }
+          else{
+
+            console.log(networkName);
+            // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+            var l = {'source' : networkName, 'target': $.trim(node.BSSID), 'power':node.power};
+            data.links.push(l);
+
+          }
+
+        }
       }
       else{
         n.essid =  node.ESSID;
       }
-      var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
       data.nodes.push(n);
-      data.links.push(l);
 
     }
 
     countExtent = d3.extent(data.nodes, function(d){ return d.power;});
     circleRadius = d3.scale.pow().range([3, 13]).domain(countExtent);
-    linkRadius = d3.scale.pow().range([300, 30]).domain(countExtent);
+    linkRadius = d3.scale.pow().range([30, 10]).domain(countExtent);
 
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
@@ -243,7 +265,10 @@ Network = function(){
     });
 
     // id's -> node objects
-    nodesMap  = mapNodes(data.nodes);
+    mapNodes(data.nodes);
+    console.log(nodesMap.size()+ " ," +data.nodes.length);
+    // console.log("\n");
+
 
     data.links.forEach( function(l){
       l.source = nodesMap.get(l.source);
@@ -252,6 +277,11 @@ Network = function(){
       linkedByIndex[l.source.name + " : "+l.target.name] = 1;
     });
 
+
+
+
+    console.log(data);
+    console.log("\n");
     return data;
   }
 
@@ -259,7 +289,27 @@ Network = function(){
   // Returns d3.map of ids -> nodes
   mapNodes = function(nodes){
     nodesMap = d3.map();
-    nodes.forEach (function(n){ nodesMap.set(n.name, n);});
+    routersMap = d3.map();
+    clientsMap = d3.map();
+// console.log(nodes.length);
+    nodes.forEach (function(n,i){
+
+      if(typeof(nodesMap.get(n.name)) !=="undefined"){
+        console.log(nodesMap.get(n.name) );
+      }
+      else{
+        nodesMap.set(n.name, n);
+      }
+
+
+      if(n.kind === "Router" ){
+        routersMap.set(n.name,n);
+      }
+      else if(n.kind == "Client"){
+        clientsMap.set(n.name, n);
+      }
+
+    });
     return nodesMap;
   }
 
@@ -275,7 +325,10 @@ Network = function(){
         networkName =  "AP: "+"unassociated";
       }
       else{
+
         networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+
+        if(nodesMap.get($.trim(AP[0])).essid== "Happy House"){console.log(d);}
       }
       content += '<p class="main">' + networkName    + '</span></p>';
       content += '<hr class="tooltip-hr">';
