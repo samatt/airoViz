@@ -37,7 +37,7 @@ Network = function(){
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
-    setLayout("Power");
+    setLayout("Kind");
 
     // format data
     allData = setupData(data)
@@ -50,12 +50,12 @@ Network = function(){
       .attr("width", "100%")
       .attr("height", "100%")
       .attr("fill", "black");
-console.log(vis);
+
+    console.log(vis);
     linksG = vis.append("g").attr("id", "links");
     nodesG = vis.append("g").attr("id", "nodes");
 
     force.size([width, height]);
-
 
     // setFilter("all")
 

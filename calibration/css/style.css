@@ -8,9 +8,9 @@ a, a:visited {
 }
 
 #container {
-  width: 940px;
-  padding: 5px 0 10px 0;
-  margin: auto;
+  width: 100%;
+  padding: 0px 0 0px 0;
+  margin:auto;
 }
 
 #main {
@@ -19,24 +19,45 @@ a, a:visited {
 
 #controls {
   width: 100%;
-  float: left;
-  margin-bottom: 10px;
+  height: 10%;
+  float: bottom;
+  margin:auto;
+/*  margin-bottom: 10px;*/
+background: rgba(23, 35, 59, 0.5);
+  color:white;
+
 }
 
 .control {
   float: left;
-  padding-left: 20px;
+  padding: 3px 3 3px 3;
+
+
 }
 
+.control h3 {
+
+  font-size: 14px;
+  padding: 5px;
+  margin-right: 3px;
+  text-align:center;
+  text-decoration: none;
+  color: white;
+  text-transform: uppercase;
+  font-weight: 500;
+}
 .control a {
-  color: black;
+
   font-size: 12px;
   padding: 5px;
-  background: #E2E2E2;
+/*  background: black;*/
+/*background: rgba(128,128,0128,0.8);*/
   cursor: pointer;
   margin-right: 3px;
+  margin-bottom: 3px;
   text-decoration: none;
-
+  color: white;
+  border: 1px solid #DDD;
 }
 
 .control a:hover {
@@ -45,7 +66,7 @@ a, a:visited {
 
 .control a.active {
   color: white;
-  background: #555;
+  background:rgba(218, 84, 84, 0.6)
 }
 
 p.search_title {
@@ -85,10 +106,10 @@ footer p {
 }
 
 .tooltip p.main {
-/*  font-size: 15px;*/
-opacity:0.9;
+  /*  font-size: 15px;*/
+  opacity:0.9;
   text-align: left;
-  color: White  ;
+  color: White;
   padding:0;
   margin:0;
   font-family: "Courier New", Courier, monospace;
