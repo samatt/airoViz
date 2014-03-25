@@ -72,3 +72,13 @@ Routers (as expected) are the devices that act as access points for logging on t
  	- Client: For Clients this is the name of the network the client is currently connected to. If client is not connected to any router this will say 'not associated'
  - probedESSIDs
  	These are the beacons that are found for an unassociated client. Not valid for routers
+
+##RaspberryPi Bring-up Guide
+ - Download PwnPi 3.0 http://pwnpi.sourceforge.net/
+ - Flash SD Card
+ - Install python 
+ 	-  ```apt-get install python-dev python-setuptools python-rpi.gpio python-pip``` 
+ - Install python modules
+ 	- ```pip install requests```
+ 	- ```pip install watchdog```
+ 	- ```pip install pyOSC```
