@@ -112,9 +112,7 @@ Network = function(){
       .duration(1000)
       .attr("class","node")
       .style("fill",function(d){return d.color;})
-      .attr("r",function(d){return d.radius;})
-      .attr("cx", function(d){ return d.x; })
-      .attr("cy", function(d){ return d.y; });
+      .attr("r",function(d){return d.radius;});
 
     node.enter().append("circle")
       .attr("class", "node")
@@ -142,13 +140,13 @@ Network = function(){
 
     link
       .attr("attr","update")
-      // .attr("class", "link")
-      .transition()
-      .duration(1000)
-      .attr("x1", function(d){ return d.source.x;})
-      .attr("y1", function(d){ return d.source.y;})
-      .attr("x2", function(d){ return d.target.x;})
-      .attr("y2", function(d){ return d.target.y;});
+      .attr("class", "link");
+      // .transition()
+      // .duration(1000)
+      // .attr("x1", function(d){ return d.source.x;})
+      // .attr("y1", function(d){ return d.source.y;})
+      // .attr("x2", function(d){ return d.target.x;})
+      // .attr("y2", function(d){ return d.target.y;});
       // .attr("stroke-width", 2)
       // .attr("stroke", "black");
 

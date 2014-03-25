@@ -16,7 +16,9 @@ a, a:visited {
 #main {
   clear: both;
 }
-
+#Power{
+  margin-right : 20px;
+}
 #controls {
   width: 100%;
   height: 10%;
