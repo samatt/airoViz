@@ -25,8 +25,8 @@ Network = function(){
 
   // variables to refect the current settings
   // of the visualization
-  var  layout = "force";
-  var sort = "other";
+  var  nodeColor = "Kind";
+  var layout = "Connections";
   var tooltip = Tooltip("vis-tooltip", 230)
 
   var  force = d3.layout.force()
@@ -41,7 +41,8 @@ Network = function(){
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
-    setLayout("Kind");
+    // setNodeColor("Power");
+    // setLayout("Distance");
 
     // format data
     allData = setupData(data)
@@ -81,7 +82,20 @@ Network = function(){
     updateNodes();
     updateLinks();
 
-    console.log(force.nodes().length);
+
+    if(layout == "Distance"){
+      force
+        .friction(.65)
+        .charge([-200])
+        .size([width, height]);
+    }
+    else if (layout == "Connections"){
+      force
+        .friction(.6)
+        .charge([-150])
+        .size([width, height]);
+    }
+
     // start me up!
     force.start();
   }
@@ -94,8 +108,13 @@ Network = function(){
 
     node
       .attr("attr","update")
-      .transition(750)
-      .style("fill",function(d){return d.color;});
+      .transition()
+      .duration(1000)
+      .attr("class","node")
+      .style("fill",function(d){return d.color;})
+      .attr("r",function(d){return d.radius;})
+      .attr("cx", function(d){ return d.x; })
+      .attr("cy", function(d){ return d.y; });
 
     node.enter().append("circle")
       .attr("class", "node")
@@ -120,8 +139,12 @@ Network = function(){
     link = linksG.selectAll("line.link")
       .data(curLinksData, function(d){ return (d.source.name + " : "+d.target.name) });
 
+
     link
       .attr("attr","update")
+      // .attr("class", "link")
+      .transition()
+      .duration(1000)
       .attr("x1", function(d){ return d.source.x;})
       .attr("y1", function(d){ return d.source.y;})
       .attr("x2", function(d){ return d.target.x;})
@@ -141,12 +164,25 @@ Network = function(){
 
     link.exit().remove();
   }
-  network.toggleLayout = function(newLayout){
+  network.toggleNodeColor = function(newColor){
     // # public function
     force.stop()
-    setLayout(newLayout)
+    setNodeColor(newColor);
+    console.log("Toggling color : "+ newColor);
     allData = setupData(allRawData);
     update();
+  }
+
+  network.toggleLayout = function(newLayout){
+    force.stop()
+    setLayout(newLayout);
+    allData = setupData(allRawData);
+    update();
+
+  }
+
+  setNodeColor = function(newColor){
+    nodeColor = newColor;
   }
 
   setLayout = function(newLayout){
@@ -159,8 +195,8 @@ Network = function(){
       allRawData = newData;
       allData = setupData(newData);
       // console.log(allData[0]);
-      link.remove()
-      node.remove()
+      // link.remove()
+      // node.remove()
       update()
   }
 
@@ -181,7 +217,7 @@ Network = function(){
   // point to node instances
   // Returns modified data
   setupData = function(_data){
-    // initialize circle radius scale
+
     data = new Object();
     data.links = new Array();
     data.nodes = new Array();
@@ -195,21 +231,20 @@ Network = function(){
       if(n.kind == "Client"){
         n.essid = node.AP;
         n.probedESSID = node.probedESSID;
-        // console.log(node.probedESSID);
-        if(sort=="distance"){
+
+        if(layout=="Distance"){
             var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
             data.links.push(l);
         }
-        else{
+        else if(layout = "Connections"){
           var AP = n.essid.split("|");
           var networkName = $.trim(AP[0]);
           if(networkName === "(not associated)" || networkName === ""){
 
-
           }
           else{
 
-            console.log(networkName);
+            // console.log(networksorName);
             // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
             var l = {'source' : networkName, 'target': $.trim(node.BSSID), 'power':node.power};
             data.links.push(l);
@@ -219,15 +254,20 @@ Network = function(){
         }
       }
       else{
+
+        if(layout=="Distance"){
+            var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
+            data.links.push(l);
+        }
         n.essid =  node.ESSID;
       }
       data.nodes.push(n);
-
     }
+    return refreshD3Data(data);
+  }
 
-    countExtent = d3.extent(data.nodes, function(d){ return d.power;});
-    circleRadius = d3.scale.pow().range([3, 13]).domain(countExtent);
-    linkRadius = d3.scale.pow().range([30, 10]).domain(countExtent);
+  refreshD3Data = function(data){
+
 
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
@@ -244,32 +284,55 @@ Network = function(){
         n.y = randomnumber=Math.floor(Math.random()*height);
       }
 
+      countExtent = d3.extent(data.nodes, function(d){ return d.power;});
 
-      if(layout =="Power"){
+      if(layout === "Distance"){
+        linkRadius = d3.scale.pow().range([300, 30]).domain(countExtent);
+        circleRadius = d3.scale.pow().range([ 5,10]).domain(countExtent);
+
+        n.radius = circleRadius(n.power);
+        n.linkPower = linkRadius(n.power);
+      }
+
+      else if(layout === "Connections" ){
+        // linkRadius = d3.scale.pow().range([10, 30]).domain(countExtent);
+        circleRadius = function(d){
+          if(d.kind === "Router"){ return 7;}
+          else if(d.kind === "Listener"){ return 5;}
+          else{return 3;}
+
+        }
+        n.linkPower = 10;
+        n.radius = circleRadius(n);
+      }
+
+
+
+      if(nodeColor ==="Power"){
+
         ramp = d3.scale.pow().domain(countExtent).range(["#8dbbd8","#acbc43"]);
         n.color = ramp(n.power);
       }
       else {
         ramp = function(d){
-          if(d.kind == "Router"){ return "#4c92c1";}
-          else if(d.kind == "Listener"){ return "White";}
+          if(d.kind === "Router"){ return "#4c92c1";}
+          else if(d.kind === "Listener"){ return "White";}
           else{return "#bb7646";}
         }
 
         n.color = ramp(n);
       }
       // add radius to the node so we can use it later
-      n.radius = circleRadius(n.power);
-      n.linkPower = linkRadius(n.power);;
+
+
 
     });
 
     // id's -> node objects
     mapNodes(data.nodes);
     console.log(nodesMap.size()+ " ," +data.nodes.length);
-    // console.log("\n");
 
-
+    console.log("Layout : "+ layout);
     data.links.forEach( function(l){
       l.source = nodesMap.get(l.source);
       l.target = nodesMap.get(l.target);
@@ -277,11 +340,6 @@ Network = function(){
       linkedByIndex[l.source.name + " : "+l.target.name] = 1;
     });
 
-
-
-
-    console.log(data);
-    console.log("\n");
     return data;
   }
 
@@ -289,24 +347,12 @@ Network = function(){
   // Returns d3.map of ids -> nodes
   mapNodes = function(nodes){
     nodesMap = d3.map();
-    routersMap = d3.map();
-    clientsMap = d3.map();
-// console.log(nodes.length);
     nodes.forEach (function(n,i){
 
       if(typeof(nodesMap.get(n.name)) !=="undefined"){
-        console.log(nodesMap.get(n.name) );
       }
       else{
         nodesMap.set(n.name, n);
-      }
-
-
-      if(n.kind === "Router" ){
-        routersMap.set(n.name,n);
-      }
-      else if(n.kind == "Client"){
-        clientsMap.set(n.name, n);
       }
 
     });

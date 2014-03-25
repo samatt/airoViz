@@ -41,23 +41,25 @@
 								console.log(err);
 							}
 					});
-					setInterval(myInterval,3500);
+					setInterval(myInterval,5000);
 
 					function activate(group, link){
-						d3.selectAll("#layouts a").classed({'active': false});
-						// d3.select("#layouts a").classed({'active': true});
+						d3.selectAll("#"+group+" a").classed({'active': false});
 						d3.select("#"+group+" #"+link).attr("id",link).classed('active', true)
-						console.log(link);
-
 					}
 
 
-					var test = d3.selectAll("#layouts a").on("click",function (d){
+					d3.selectAll("#nodeColor a").on("click",function (d){
+						newColor = d3.select(this).attr("id");
+						activate("nodeColor", newColor);
+						myNetwork.toggleNodeColor(newColor);
+
+					});
+
+					d3.selectAll("#layouts a").on("click",function (d){
 						newLayout = d3.select(this).attr("id");
-						console.log(newLayout);
 						activate("layouts", newLayout);
 						myNetwork.toggleLayout(newLayout);
-						console.log("Current Mode : " +newLayout);
 
 					});
 
@@ -96,12 +98,19 @@
 			<div id='vis'></div>
 		</div>
 		<div id="controls">
-      <div id="layouts" class="control">
+      <div id="nodeColor" class="control">
         <h3 >Node color</h3>
-        <a id="Kind" >Type</a>
-				<a id="Power" class="active">Power</a>
+        <a id="Kind" class="active" >Type</a>
+				<a id="Power" >Power</a>
 
       </div>
+
+			<div id="layouts" class="control">
+				<h3 >Node Layout</h3>
+				<a id="Distance" >Distance</a>
+				<a id="Connections" class="active">Connections</a>
+
+			</div>
 
 		</div>
 
