@@ -41,7 +41,7 @@ background: rgba(23, 35, 59, 0.5);
 
   font-size: 14px;
   padding: 5px;
-  margin-right: 3px;
+  margin-right: 20px;
   text-align:center;
   text-decoration: none;
   color: white;
@@ -50,7 +50,7 @@ background: rgba(23, 35, 59, 0.5);
 }
 .control a {
 
-  font-size: 12px;
+  font-size: 11px;
   padding: 5px;
 /*  background: black;*/
 /*background: rgba(128,128,0128,0.8);*/
@@ -58,6 +58,7 @@ background: rgba(23, 35, 59, 0.5);
   margin-right: 3px;
   margin-bottom: 3px;
   text-decoration: none;
+  text-transform: uppercase;
   color: white;
   border: 1px solid #DDD;
 }
