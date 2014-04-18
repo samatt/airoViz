@@ -119,6 +119,7 @@ class Node(object):
 
         #Updates for DB
         self.forDB["power"] = self.Power
+
         #Removing these because they seem redundent for the real time app.
         # self.forDB["times"].append(self.firstTimeSeen)
         # self.forDB["times"].append(self.lastTimeSeen)
@@ -137,7 +138,7 @@ class Node(object):
         self.Privacy = " "
         self.Power = self.updatePower(params[3])
         self.ESSID = " "
-        self.probedESSID = params[6:]
+        self.probedESSID.append( params[6:])
         if self.AP == params[5]:
             pass
         else:
@@ -146,15 +147,6 @@ class Node(object):
             #using the pipe to be keep track of when the client was associated to a router and update if it changes
             newAP = self.AP + "|" + self.lastTimeSeen
             self.forDB["essid"].append(newAP)
-
-        #Updates for DB
-        self.forDB["power"] = self.Power
-        # self.forDB["times"].append(self.firstTimeSeen)
-        # self.forDB["times"].append(self.lastTimeSeen)
-        self.forDB["times"] = self.lastTimeSeen
-
-        #Updates for OSC
-        self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
 
         newProbe = []
         for probe in self.probedESSID:
@@ -165,6 +157,16 @@ class Node(object):
             else:
                 probe = probe.strip()
                 newProbe.append(probe)
+
+        self.probedESSID = newProbe
+        #Updates for DB
+        self.forDB["power"] = self.Power
+        # self.forDB["times"].append(self.firstTimeSeen)
+        # self.forDB["times"].append(self.lastTimeSeen)
+        self.forDB["times"] = self.lastTimeSeen
+
+        # Updates for OSC
+        self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
 
         if len(newProbe) > 0:
             logging.debug("Updating probes for Client : " + self.BSSID)
@@ -210,21 +212,37 @@ class Node(object):
 
 
 
+def parseLine(line):
+  line.strip()
+  line = line.replace("\r\n"," ")
+  params = line.split(',')
+  node = Node("Client", params)
+  print node.printParams()
+
 if __name__ == '__main__' :
 
     url = 'http://localhost:8080'
     routerLine = "1C:AF:F7:D6:0E:0F, 2014-03-02 20:22:49, 2014-03-02 20:25:48,  3,  54, WEP , WEP,   , -34,      143,     1411,   0.  0.  0.  0,  16, Flying Spaghetti,"
     clientLine = "70:DE:E2:8C:47:53, 2014-03-02 20:23:29, 2014-03-02 20:23:29, -44,        6, 1C:AF:F7:D6:0E:0F,"
     clientLine2 = "00:24:2B:05:D1:A8, 2014-02-27 13:49:05, 2014-02-27 14:03:55, -95,      159, (not associated) , Carolyn Protass's Network,Melissa Protass's Network,DanaWireless,orchardhousecafe"
+    clientLine3 = "00:24:2B:05:D1:A8, 2014-02-27 13:49:05, 2014-02-27 14:03:55, -95,      159, (not associated) ,PACE-OPEN,TheatreRow,attwifi,Belkin.4554,Nittany 05,NWS Special Events,Guest,Delacorte,PACE-WIRELESS,LaMaMaBox"
 
-    clientLine2.strip()
-    clientLine2 = clientLine2.replace("\r\n"," ")
-    params = clientLine2.split(',')
-    node = Node("Client", params)
-    print node.postToDB(url)
+    lines = []
+    lines.append(routerLine)
+    lines.append(clientLine)
+    lines.append(clientLine2)
+    lines.append(clientLine3)
 
-    routerLine.strip()
-    routerLine = routerLine.replace("\r\n"," ")
-    params = routerLine.split(',')
-    node = Node("Router",params)
-    print node.postToDB(url)
+    for line in lines:
+      parseLine(line)
+    # clientLine2.strip()
+    # clientLine2 = clientLine2.replace("\r\n"," ")
+    # params = clientLine2.split(',')
+    # node = Node("Client", params)
+    # print node.printParams()
+    #
+    # routerLine.strip()
+    # routerLine = routerLine.replace("\r\n"," ")
+    # params = routerLine.split(',')
+    # node = Node("Router",params)
+    # print node.printParams()
