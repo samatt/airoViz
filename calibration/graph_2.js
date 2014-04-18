@@ -15,8 +15,8 @@ Network = function(){
   var  linksG = null;
   // these will point to the circles and lines
   // of the nodes and links
-  var  node = null;
-  var  link = null;
+  var  node = "Power";
+  var  link = "Distance";
 
   var nodesMap = d3.map();
   var routersMap = d3.map();
@@ -25,8 +25,8 @@ Network = function(){
 
   // variables to refect the current settings
   // of the visualization
-  var  nodeColor = "Kind";
-  var layout = "Connections";
+  var  nodeColor = null;
+  var layout = null;
   var tooltip = Tooltip("vis-tooltip", 230)
 
   var  force = d3.layout.force()
@@ -41,8 +41,8 @@ Network = function(){
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
-    // setNodeColor("Power");
-    // setLayout("Distance");
+    setNodeColor("Power");
+    setLayout("Distance");
 
     // format data
     allData = setupData(data)
@@ -56,13 +56,10 @@ Network = function(){
       .attr("height", "100%")
       .attr("fill", "black");
 
-    console.log(vis);
     linksG = vis.append("g").attr("id", "links");
     nodesG = vis.append("g").attr("id", "nodes");
 
     force.size([width, height]);
-
-    // setFilter("all")
 
     // perform rendering and start force layout
     update();
@@ -82,7 +79,6 @@ Network = function(){
     updateNodes();
     updateLinks();
 
-
     if(layout == "Distance"){
       force
         .friction(.65)
@@ -96,12 +92,9 @@ Network = function(){
         .size([width, height]);
     }
 
-    // start me up!
     force.start();
   }
 
-
-  // enter/exit display for nodes
   function updateNodes(){
     node = nodesG.selectAll("circle.node")
       .data(curNodesData, function(d) { return d.name ;});
@@ -118,13 +111,9 @@ Network = function(){
       .attr("class", "node")
       .attr("cx", function(d){ return d.x; })
       .attr("cy", function(d){ return d.y; })
-      // .attr("stroke-width","0.4")
-      // .attr("stroke","white")
       .attr("r", function(d){ return d.radius})
       .style("fill",function(d){return d.color;})
       .call(force.drag);
-      // .style("stroke", function(d){ return strokeFor(d); })
-      // .style("stroke-width", 1.0)
 
     node.on("mouseover", showDetails)
       .on("mouseout", hideDetails)
@@ -132,23 +121,13 @@ Network = function(){
     node.exit().remove();
   }
 
-  // enter/exit display for links
   function updateLinks(){
     link = linksG.selectAll("line.link")
       .data(curLinksData, function(d){ return (d.source.name + " : "+d.target.name) });
 
-
     link
       .attr("attr","update")
       .attr("class", "link");
-      // .transition()
-      // .duration(1000)
-      // .attr("x1", function(d){ return d.source.x;})
-      // .attr("y1", function(d){ return d.source.y;})
-      // .attr("x2", function(d){ return d.target.x;})
-      // .attr("y2", function(d){ return d.target.y;});
-      // .attr("stroke-width", 2)
-      // .attr("stroke", "black");
 
     link.enter().append("line")
       .attr("class", "link")
@@ -162,22 +141,6 @@ Network = function(){
 
     link.exit().remove();
   }
-  network.toggleNodeColor = function(newColor){
-    // # public function
-    force.stop()
-    setNodeColor(newColor);
-    console.log("Toggling color : "+ newColor);
-    allData = setupData(allRawData);
-    update();
-  }
-
-  network.toggleLayout = function(newLayout){
-    force.stop()
-    setLayout(newLayout);
-    allData = setupData(allRawData);
-    update();
-
-  }
 
   setNodeColor = function(newColor){
     nodeColor = newColor;
@@ -187,14 +150,24 @@ Network = function(){
     layout = newLayout;
   }
 
+  network.toggleNodeColor = function(newColor){
+    // # public function
+    force.stop()
+    setNodeColor(newColor);
+    allData = setupData(allRawData);
+    update();
+  }
+
+  network.toggleLayout = function(newLayout){
+    force.stop()
+    setLayout(newLayout);
+    allData = setupData(allRawData);
+    update();
+  }
 
   network.updateData = function(newData){
-      // force.stop();
       allRawData = newData;
       allData = setupData(newData);
-      // console.log(allData[0]);
-      // link.remove()
-      // node.remove()
       update()
   }
 
@@ -235,20 +208,21 @@ Network = function(){
             data.links.push(l);
         }
         else if(layout = "Connections"){
+
           var AP = n.essid.split("|");
           var networkName = $.trim(AP[0]);
-          if(networkName === "(not associated)" || networkName === ""){
 
+          if(networkName === "(not associated)" || networkName === ""){
+            // console.log(networkName);
           }
           else{
 
-            // console.log(networksorName);
-            // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+            // console.log(networkName);
+            // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid
             var l = {'source' : networkName, 'target': $.trim(node.BSSID), 'power':node.power};
             data.links.push(l);
 
           }
-
         }
       }
       else{
@@ -265,7 +239,6 @@ Network = function(){
   }
 
   refreshD3Data = function(data){
-
 
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
@@ -293,18 +266,17 @@ Network = function(){
       }
 
       else if(layout === "Connections" ){
-        // linkRadius = d3.scale.pow().range([10, 30]).domain(countExtent);
+        linkRadius = d3.scale.pow().range([10, 30]).domain(countExtent);
         circleRadius = function(d){
           if(d.kind === "Router"){ return 7;}
           else if(d.kind === "Listener"){ return 5;}
           else{return 3;}
 
         }
-        n.linkPower = 10;
+        // n.linkPower = 10;
+        n.linkPower = linkRadius(n.power);
         n.radius = circleRadius(n);
       }
-
-
 
       if(nodeColor ==="Power"){
 
@@ -320,22 +292,37 @@ Network = function(){
 
         n.color = ramp(n);
       }
-      // add radius to the node so we can use it later
-
-
-
     });
 
     // id's -> node objects
     mapNodes(data.nodes);
-    console.log(nodesMap.size()+ " ," +data.nodes.length);
 
-    console.log("Layout : "+ layout);
     data.links.forEach( function(l){
-      l.source = nodesMap.get(l.source);
-      l.target = nodesMap.get(l.target);
-      // linkedByIndex is used for link sorting
-      linkedByIndex[l.source.name + " : "+l.target.name] = 1;
+      // console.log(l.source + " : "+l.target);
+      if(nodesMap.has(l.source) && nodesMap.has(l.target)){
+        l.source = nodesMap.get(l.source);
+        l.target = nodesMap.get(l.target);
+        linkedByIndex[l.source.name + " : " +l.target.name] = 1;
+      }
+      else{
+        delete data.links[l];
+        console.log("here");
+      }
+
+
+
+
+      if(l.source === null || l.target ===null){
+
+        // l.remove();
+        // l =null;
+        // linkedByIndex["error" + " : "+"error"] = 1;
+      }
+      else{
+
+
+      }
+
     });
 
     return data;
@@ -370,9 +357,14 @@ Network = function(){
       }
       else{
 
-        networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
 
-        if(nodesMap.get($.trim(AP[0])).essid== "Happy House"){console.log(d);}
+        if(typeof(nodesMap.get($.trim(AP[0])).essid) !=="undefined"){
+          networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+        }
+        else{
+          networkName ="AP: "+ "Error";
+        }
+        // if(nodesMap.get($.trim(AP[0])).essid== "Happy House"){console.log(d);}
       }
       content += '<p class="main">' + networkName    + '</span></p>';
       content += '<hr class="tooltip-hr">';
@@ -399,12 +391,6 @@ Network = function(){
 
   hideDetails = function(d,i){
     tooltip.hideTooltip();
-    // # watch out - don't mess with node if search is currently matching
-    // node.style("stroke", (n) -> if !n.searched then strokeFor(n) else "#555")
-      // .style("stroke-width", (n) -> if !n.searched then 1.0 else 2.0)
-    // if link
-      // link.attr("stroke", "#ddd")
-        // .attr("stroke-opacity", 0.8)
   }
 
     return network

@@ -24,6 +24,9 @@ a, a:visited {
   height: 10%;
   float: bottom;
   margin:auto;
+  border: 1px solid #DDD;
+  -moz-border-radius:3px;
+  border-radius: 3px;
 /*  margin-bottom: 10px;*/
 background: rgba(23, 35, 59, 0.5);
   color:white;
