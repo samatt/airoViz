@@ -1,4 +1,4 @@
-application: nodendbstore
+application: direct-electron-537
 version: 1
 runtime: python27
 api_version: 1
