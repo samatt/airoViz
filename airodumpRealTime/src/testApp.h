@@ -6,7 +6,7 @@
 //#include "airodumpEvents.h"
 #include "airodumpGlobals.h"
 #include "ofxUI.h"
-#include "ofxTween.h";
+#include "ofxTween.h"
 
 class testApp : public ofBaseApp{
     
@@ -30,6 +30,10 @@ public:
     void guiEvent(ofxUIEventArgs& args);
     void updateIndices();
     void resetGrid();
+    void addColorToGui(ofxUISuperCanvas* gui,string prefix,ofFloatColor& col, bool doAlpha = true);
+    ofFloatColor getRGBfromHSV(ofFloatColor& hsv);
+    
+    map< ofFloatColor*, ofxUILabel*> labelColors;
 	
     vector<Node> nodes;
     vector <int> activeNodes;
@@ -48,7 +52,9 @@ public:
     map<string, ofPoint>routerPos;
     map<string, ofPoint>clientPos;
     map<string,vector<int> > routerClientLinks;
-    
+
+    ofTrueTypeFont font;
+    ofFloatColor fontColorHSV;
 
     ofxUISuperCanvas* gui;
     int routerX = 20;

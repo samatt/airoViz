@@ -1,9 +1,9 @@
 <Canvas>
     <Kind>42</Kind>
     <Name>OFX_UI_WIDGET_CANVAS</Name>
-    <IsMinified>0</IsMinified>
-    <XPosition>124.000000000</XPosition>
-    <YPosition>53.000000000</YPosition>
+    <IsMinified>1</IsMinified>
+    <XPosition>1139.000000000</XPosition>
+    <YPosition>34.000000000</YPosition>
 </Canvas>
 <Widget>
     <Kind>44</Kind>
@@ -33,17 +33,17 @@
 <Widget>
     <Kind>2</Kind>
     <Name>Show Duration</Name>
-    <Value>1</Value>
-</Widget>
-<Widget>
-    <Kind>2</Kind>
-    <Name>Show Duration</Name>
     <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>2</Kind>
     <Name>Show Duration</Name>
     <Value>1</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>Show Duration</Name>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
@@ -53,7 +53,7 @@
 <Widget>
     <Kind>44</Kind>
     <Name>ClientY :</Name>
-    <Value>100</Value>
+    <Value>0</Value>
 </Widget>
 <Widget>
     <Kind>44</Kind>
@@ -63,5 +63,25 @@
 <Widget>
     <Kind>44</Kind>
     <Name>client Height : </Name>
-    <Value>20</Value>
+    <Value>110</Value>
+</Widget>
+<Widget>
+    <Kind>25</Kind>
+    <Name>FC HUE</Name>
+    <Value>0.534031391</Value>
+</Widget>
+<Widget>
+    <Kind>25</Kind>
+    <Name>FC SAT</Name>
+    <Value>0.397906393</Value>
+</Widget>
+<Widget>
+    <Kind>25</Kind>
+    <Name>FC BRI</Name>
+    <Value>0.999999344</Value>
+</Widget>
+<Widget>
+    <Kind>25</Kind>
+    <Name>FC ALPHA</Name>
+    <Value>0.940886676</Value>
 </Widget>

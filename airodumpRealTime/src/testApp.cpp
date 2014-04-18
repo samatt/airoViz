@@ -13,9 +13,12 @@ void testApp::setup(){
     gui = new ofxUISuperCanvas("SUPER COMPACT", OFX_UI_FONT_MEDIUM);
     gui->addFPS();
     
+
+    font.loadFont("font/MateriaPro_Regular.ttf",15);
+
     maxPower = 0;
     minPower = INT_MAX;
-
+    fontColorHSV  = ofFloatColor(0,0,0);
     gui->addSpacer();
     gui->addIntSlider("Router X :", -10, 20, &routerX);
     gui->addIntSlider("RouterY :", -8000, 100, &routerY);
@@ -31,6 +34,8 @@ void testApp::setup(){
     gui->addIntSlider("ClientY :", -18000, 100, &clientY);
     gui->addIntSlider("client Width : ", 100, 800, &clientWidth);
     gui->addIntSlider("client Height : ", 20, 200, &clientHeight);
+    gui->addSpacer();
+    addColorToGui(gui,"FONT COLOR",fontColorHSV);
     gui->autoSizeToFitWidgets();
     gui->loadSettings("GUI/guiSettings.xml");
     ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
@@ -89,12 +94,45 @@ void testApp::update(){
     
 }
 
+void testApp::addColorToGui(ofxUISuperCanvas* gui,string prefix,ofFloatColor& col, bool doAlpha){
+    
+   	float length = (gui->getGlobalCanvasWidth() - gui->getWidgetSpacing()*5)/3.;
+    float dim    = gui->getGlobalSliderHeight();
+    
+    string shortprefix;
+    vector<string> comps = ofSplitString(prefix, " ", true,true);
+    for(int i = 0; i < comps.size(); i++) shortprefix += comps[i].at(0);
+    
+    ofxUILabel* label = gui->addLabel(prefix);
+    labelColors[&col] = label;
+    
+    gui->addMinimalSlider(shortprefix + " HUE", 0.0, 1.0, &col.r, length, dim)->setShowValue(false);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_RIGHT);
+    gui->addMinimalSlider(shortprefix + " SAT", 0.0, 1.0, &col.g, length, dim)->setShowValue(false);
+    gui->addMinimalSlider(shortprefix + " BRI", 0.0, 1.0, &col.b, length, dim)->setShowValue(false);
+    gui->setWidgetPosition(OFX_UI_WIDGET_POSITION_DOWN);
+    if(doAlpha){
+        gui->addMinimalSlider(shortprefix + " ALPHA", 0.0, 1.0, &col.a);
+    }
+}
+
+ofFloatColor testApp::getRGBfromHSV(ofFloatColor& hsv){
+    ofFloatColor col = ofFloatColor::fromHsb(hsv.r,hsv.g,hsv.b,hsv.a);
+    if(labelColors.find(&hsv) != labelColors.end()){
+        ofFloatColor colcpy = col;
+        colcpy.a = .5 + colcpy.a*.5;
+        labelColors[&hsv]->setColorFill(colcpy);
+    }
+    return col;
+}
+
 //--------------------------------------------------------------
 void testApp::draw(){
     
     ofBackground(0);
     x = 20;
     y = 10;
+    ofFloatColor addressColor = getRGBfromHSV(fontColorHSV);
     if (currentMode == 0) {
         for (int i =0; i<nodes.size(); i++) {
             
@@ -105,14 +143,14 @@ void testApp::draw(){
             Node& router = nodes[i];
             
             stringstream ss;
-            
+           
             if (showESSIDs) {
                 ofSetColor(ofColor::lightSkyBlue);
-                ofDrawBitmapString(router.ESSID +"\n", routerPos[router.BSSID]);
+                font.drawString(router.ESSID +"\n", routerPos[router.BSSID].x,routerPos[router.BSSID].y);
             }
             else{
                 ofSetColor(ofColor::lightSkyBlue);
-                ofDrawBitmapString(router.BSSID +"\n", routerPos[router.BSSID]);
+                font.drawString(router.BSSID +"\n", routerPos[router.BSSID].x,routerPos[router.BSSID].y);
                 
             }
 
@@ -125,7 +163,7 @@ void testApp::draw(){
             if (clientIndex.size() == 0) {
                 ofSetColor(ofColor::grey);
                 ss<<"\nNo Clients"<<endl;
-                ofDrawBitmapString(ss.str(), routerPos[router.BSSID]);
+                font.drawString(ss.str(), routerPos[router.BSSID].x,routerPos[router.BSSID].y);
                 continue;
             }
             
@@ -163,7 +201,7 @@ void testApp::draw(){
                 ofColor c1;
 //                cout<<nodes[clientIndex[j]].getDuration()   <<" : "<<alpha<<endl;
                 ofSetColor(255,255,255, 255 -alpha );
-                ofDrawBitmapString(ID, routerPos[router.BSSID]);
+                font.drawString(ID, routerPos[router.BSSID].x,routerPos[router.BSSID].y);
             }
             
         }
@@ -186,10 +224,10 @@ void testApp::draw(){
                 ofxEasingArgs a;
                 float sat =ofxTween::map((float)client.Power, 20, maxPower, 10 ,240., true, ofxEasingCubic(), ofxTween::easeIn);
                 c.setSaturation(sat);
-                ofSetColor(c);
+                ofSetColor(addressColor);
                 
-                ofDrawBitmapString(client.BSSID , clientPos[client.BSSID]);
-                ofDrawBitmapString( "                "+ofToString(client.Power)+"\n", clientPos[client.BSSID].x + client.BSSID.length() + 1, clientPos[client.BSSID].y);
+                font.drawString(client.BSSID , clientPos[client.BSSID].x, clientPos[client.BSSID].y);
+                font.drawString( "                "+ofToString(client.Power)+"\n", clientPos[client.BSSID].x + client.BSSID.length() + 1, clientPos[client.BSSID].y);
             }
             else{
 
@@ -198,9 +236,9 @@ void testApp::draw(){
                 ofxEasingArgs a;
                 float sat =ofxTween::map((float)client.Power, -maxPower, -20 , 10 ,235, true, ofxEasingCubic(), ofxTween::easeIn);
                 c.setSaturation(sat);
-                ofSetColor(c);
+                ofSetColor(addressColor);
 
-                ofDrawBitmapString(client.BSSID + "\n" , clientPos[client.BSSID]);
+                font.drawString(client.BSSID + "\n" , clientPos[client.BSSID].x, clientPos[client.BSSID].y);
             }
             
             if(!showSSIDs) continue;
@@ -210,7 +248,7 @@ void testApp::draw(){
             if (probedIDs.size() == 1 && probedIDs[0] == " ") {
                 ofSetColor(ofColor::grey);
 
-                ofDrawBitmapString("\nNo Stations Found yet", clientPos[client.BSSID]);
+                font.drawString("\nNo Stations Found yet", clientPos[client.BSSID].x, clientPos[client.BSSID].y);
                 continue;
                 
             }
@@ -234,7 +272,7 @@ void testApp::draw(){
                 ofColor c1;
                 
                 ofSetColor(255,255,255,255);
-                ofDrawBitmapString(ID, clientPos[client.BSSID]);
+                font.drawString(ID, clientPos[client.BSSID].x, clientPos[client.BSSID].y);
             }
         }
     }
