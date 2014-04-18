@@ -1,0 +1,166 @@
+body {
+font-family: "Courier New", Courier, monospace;
+}
+
+a, a:visited {
+  color: #4d4d4d;
+  text-decoration: underline;
+}
+
+#container {
+  width: 100%;
+  padding: 0px 0 0px 0;
+  margin:auto;
+}
+
+#main {
+  clear: both;
+  overflow: hidden;
+  width:100%;
+  height:auto;
+  overflow: hidden;
+  position: relative;
+   z-index: 2;
+}
+#Power{
+  margin-right : 20px;
+}
+#controls {
+  width: 100%;
+  height: 10%;
+  float: bottom;
+  margin:auto;
+  border: 1px solid #DDD;
+  -moz-border-radius:3px;
+  border-radius: 3px;
+/*  margin-bottom: 10px;*/
+background: rgba(23, 35, 59, 0.5);
+  color:white;
+
+}
+
+.control {
+  float: left;
+  padding: 3px 3 3px 3;
+
+
+}
+
+.control h3 {
+
+  font-size: 14px;
+  padding: 5px;
+  margin-right: 20px;
+  text-align:center;
+  text-decoration: none;
+  color: white;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.control a {
+
+  font-size: 11px;
+  padding: 5px;
+/*  background: black;*/
+/*background: rgba(128,128,0128,0.8);*/
+  cursor: pointer;
+  margin-right: 3px;
+  margin-bottom: 3px;
+  text-decoration: none;
+  text-transform: uppercase;
+  color: white;
+  border: 1px solid #DDD;
+}
+
+.control a:hover {
+  text-decoration: underline;
+}
+
+.control a.active {
+  color: white;
+  background:rgba(218, 84, 84, 0.6)
+}
+
+p.search_title {
+  display: inline;
+  text-align: left;
+  font-weight: normal;
+  color: #777;
+}
+
+#search_section {
+  padding-top: 23px;
+  padding-left: 20px;
+}
+
+#search_form #search {
+  margin-left: 10px;
+}
+
+footer p {
+  text-align: center;
+}
+
+.tooltip {
+  position: absolute;
+  top: 100px;
+  left: 100px;
+  -moz-border-radius:3px;
+  border-radius: 3px;
+  border: 1px solid #DDD;
+  background-color:rgba(138, 151, 177, 0.3);
+  opacity: 1.0;
+  color: #0000.5;
+  padding: 7px;
+  width: 250px;
+  font-size: 5px;
+  z-index: 120;
+}
+
+.tooltip p.main {
+  /*  font-size: 15px;*/
+  opacity:0.9;
+  text-align: left;
+  color: White;
+  padding:0;
+  margin:0;
+  font-family: "Courier New", Courier, monospace;
+
+}
+
+hr.tooltip-hr {
+  padding:0px 0 0 0;
+  margin:3px 0 3px 0;
+  border-bottom: 0px;
+}
+
+.tooltip .title {
+  font-size: 20px;
+  line-height: 24px;
+}
+
+.tooltip .name {
+  font-weight:normal;
+}
+
+
+line.link {
+  fill: none;
+  stroke-width: 1.5px;
+}
+
+#playerInfo {
+ display: block;
+ width: 350px;
+ padding: 8px 11px;
+ padding-top: 35px;
+ position: absolute;
+ top: 0;
+ left: 0;
+ height: 100%;
+}
+
+.close href{
+  font-style: normal;
+  font-family: "Courier New", Courier, monospace;
+}

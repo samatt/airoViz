@@ -1,0 +1,99 @@
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>WiFi Calibration</title>
+
+		<script type="text/javascript" src="../lib/d3/d3.js"></script>
+		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
+		<script type="text/javascript" src="../lib/jquery/jquery-ui-1.10.4.min.js"></script>
+<!-- 		// <script src="http://marvl.infotech.monash.edu/webcola/cola.v1.min.js"></script> -->
+	 <script type="text/javascript" src="../js/utils.js"></script>
+<!-- 		// <script type="text/javascript" src="../graph.js"></script> -->
+		<script type="text/javascript" src="../js/graph.js"></script>
+		<script type="text/javascript" src="../js/Tooltip.js"></script>
+		<link rel="stylesheet" href="css/reset.css">
+		<link rel="stylesheet" href="css/bootstrap.min.css">
+		<link rel="stylesheet" href="css/style.css">
+	</head>
+	<body>
+		<script type="text/javascript">
+
+		  $(document).ready(function() {
+
+					app.width = $(window).width();
+					app.height=$(window).height();
+					myNetwork = Network();
+					var time = setDuration(0,0,30);
+					url = 'http://'+app.server+'/lastseen?lastseen='+time;
+					// console.log(url);
+					$.ajax({
+						dataType: 'jsonp',
+						url: url,
+						type: 'GET',
+							success: function(postData) {
+
+								// Setup Network
+								console.log(postData)
+								myNetwork('#vis',postData);
+
+							},
+
+							error: function(err) {
+								console.log("GET failed ");
+								console.log(err);
+							}
+					});
+
+
+					setInterval(myInterval,3000);
+			});
+
+				var myInterval = function(){
+					// console.log("here")
+					var time = setDuration(0,10,0);
+					url = 'http://'+app.server+'/lastseen?lastseen='+time;
+					console.log(url);
+
+					$.ajax({
+						dataType: 'jsonp',
+						url: url,
+						type: 'GET',
+							success: function(postData) {
+								myNetwork.updateData(postData);
+							},
+
+							error: function(err) {
+								console.log("GET failed ");
+								console.log(err);
+							}
+					});
+				}
+
+
+
+
+
+		</script>
+		<div id="playerInfo">
+			"<a  id="closebtn" class="close">Close Me</a>";
+	</div>
+		<div id="main" role="main">
+			<div id='vis'></div>
+		</div>
+<!-- 		<div id="controls">
+      <div id="nodeColor" class="control">
+        <h3 >Node color</h3>
+        <a id="Kind"  >Type</a>
+				<a id="Power" class="active" >Power</a>
+      </div>
+
+			<div id="layouts" class="control">
+				<h3 >Node Layout</h3>
+				<a id="Distance" class="active" >Distance</a>
+				<a id="Connections" >Connections</a>
+			</div>
+
+		</div> -->
+
+	</body>
+</html>
