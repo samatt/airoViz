@@ -102,6 +102,16 @@ def readFile(fileName):
         addNewNode("Client",ID,params)
 
 
+def pickleData():
+  # for k,v in clients.iteritems():
+    print " No of routers added : "+ str(len(routers))
+    print " No of clients added : "  + str(len(clients))
+    # print " No of routers total  : "	+ str(len(routers))
+    # print " No of clients total  : "	+ str(len(clients))
+    print "Pickling files"
+    pickle.dump(routers, open( "pickled/routers.p", "wb" ) )
+    pickle.dump(clients, open( "pickled/client.p", "wb" ) )
+
 def postToDB(url):
   i =0
   for k,v in routers.iteritems():
@@ -116,26 +126,16 @@ def postToDB(url):
     print "Client :" + str(i) + " of "+ str(len(clients))
     i+=1
 
-  pickle.dump(routers, open( "routers.p", "wb" ) )
-  pickle.dump(clients, open( "client.p", "wb" ) )
-if __name__ == '__main__' :
-  requests_log = logging.getLogger("requests")
-  requests_log.setLevel(logging.WARNING)
+def loadPickledData( folder):
+  print "loading pickled data"
 
-  logging.basicConfig(level=logging.DEBUG)
-   # 	path = sys.argv[1] if len(sys.argv) > 1 else '.'
-  rootdir = sys.argv[1] if len(sys.argv) > 1 else '.'
+  routers = pickle.load( open( folder+"/routers.p", "r" ) )
+  clients = pickle.load( open( folder+"/client.p", "r" ) )
+  print " No of routers : "+ str(len(routers))
+  print " No of clients : "  + str(len(clients))
 
-  # print rootdir
-  url = 'http://localhost:8080'
-  # url = "http://direct-electron-537.appspot.com/"
-  # csv = open(path, 'r')
-  # readFile(csv)
-  # csv.close()
-  # postToDB(url)
-  #
-  # print "Done"
-  i =0
+def loadData(rootdir):
+
   for subdir, dirs, files in os.walk(rootdir):
     size = len(routers)
     sizeC = len(clients)
@@ -147,20 +147,36 @@ if __name__ == '__main__' :
         print "Reading File :" + file
 
         readFile(csv)
-      # killNodes()
         csv.close()
-        postToDB(url)
-
         print
       else:
         print "Ignoring file : "+file
 
+if __name__ == '__main__' :
 
-  # 		print "### " + str(i) + " of "+ str(len(files))
-  # 		print " No of routers added : "+ str(len(routers) - size)
-  # 		print " No of clients added : "  + str(len(clients) - sizeC)
-  # 		print " No of routers total  : "	+ len(routers)
-  # 		print " No of clients total  : "	+ len(clients)
-  # 		i += 1
+  mode = sys.argv[1]
+
+  url = 'http://localhost:8080'
+
+  requests_log = logging.getLogger("requests")
+  requests_log.setLevel(logging.WARNING)
+  logging.basicConfig(level=logging.DEBUG)
+
+  if mode == "Pickle":
+    rootdir = sys.argv[2] if len(sys.argv) > 2 else '.'
+    loadPickledData("pickled")
+    loadData(rootdir)
+    pickleData()
+    print "Complete"
+  elif mode=="Post":
+      loadPickledData("pickled")
+      # loadData(rootdir)
+      # postToDb(url)
+
+
+  else:
+    print "Mode is either Pickle or Post"
+
+
 
   # postToDB(url)
