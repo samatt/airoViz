@@ -17,22 +17,50 @@ a, a:visited {
   clear: both;
   overflow: hidden;
   width:100%;
-  height:auto;
+  height:100%;
   overflow: hidden;
   position: relative;
    z-index: 2;
 }
+/*#main nav{
+  opcacity: 0;
+}*/
+#main nav a {
+  font-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
+  font-size:0.8em;
+/*  font-size:22px;*/
+  line-height: 1.3em;
+  font-weight: bold;
+  text-transform: uppercase;
+/*  padding:10px 10px 10px 10px;*/
+/*  margin-bottom: 11px;*/
+  color: white;
+}
+
+#main nav ul {
+  font-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
+  font-size: 0.8 em;
+/*  font-size:22px;*/
+  line-height: 1.3em;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 11px;
+
+  color: black;
+}
+
 #Power{
-  margin-right : 20px;
+/*  margin-right : 20px;*/
 }
 #controls {
   width: 100%;
   height: 10%;
-  float: bottom;
+  float: right;
   margin:auto;
   border: 1px solid #DDD;
   -moz-border-radius:3px;
   border-radius: 3px;
+
 /*  margin-bottom: 10px;*/
 background: rgba(23, 35, 59, 0.5);
   color:white;
@@ -40,8 +68,12 @@ background: rgba(23, 35, 59, 0.5);
 }
 
 .control {
-  float: left;
-  padding: 3px 3 3px 3;
+  float: right;
+  padding: 10px 3 10px 0;
+  top: 2%;
+/*  align-contents: right;*/
+/*  position :relative;*/
+/*  right : 3%;*/
 
 
 }
@@ -49,9 +81,10 @@ background: rgba(23, 35, 59, 0.5);
 .control h3 {
 
   font-size: 14px;
-  padding: 5px;
-  margin-right: 20px;
-  text-align:center;
+/*  padding: 5px;*/
+/*  margin-right: 20px;*/
+margin: auto;
+  text-align:right;
   text-decoration: none;
   color: white;
   text-transform: uppercase;
@@ -64,9 +97,9 @@ background: rgba(23, 35, 59, 0.5);
 /*  background: black;*/
 /*background: rgba(128,128,0128,0.8);*/
   cursor: pointer;
-  margin-right: 3px;
+  margin-left: 3px;
   margin-bottom: 3px;
-  text-decoration: none;
+  text-align:right;
   text-transform: uppercase;
   color: white;
   border: 1px solid #DDD;
@@ -151,7 +184,7 @@ line.link {
 
 #playerInfo {
  display: block;
- width: 350px;
+ width: 15%;
  padding: 8px 11px;
  padding-top: 35px;
  position: absolute;
@@ -160,7 +193,48 @@ line.link {
  height: 100%;
 }
 
+
+#menu {
+ display: block;
+ width: 15%;
+ padding: 8px 11px;
+ padding-top: 35px;
+ position: absolute;
+ background: rgba(23, 35, 59, 0.5);
+ top: 0;
+ right:0;
+ height: 100%;
+}
+
 .close href{
   font-style: normal;
   font-family: "Courier New", Courier, monospace;
 }
+
+nav#right {
+  position: absolute;
+  width:15%;
+  min-height: 5%;
+  top: 0;
+  right:0;
+  opacity: 0.5;
+/*  padding: 0px 8px;*/
+/*  padding-top: 220px;*/
+  background: #343638;
+  text-align: right;
+  padding-top: 10px;
+
+}
+#menubtn{
+  text-decoration: none;
+}
+#menubtn a:hover{
+  text-decoration: underline;
+}
+
+/*#navigation {
+  list-style: none;
+}
+#navigation li { display: block; margin-bottom: 2px; font-size: 1.4em; font-weight: bold; }
+#navigation li a { display: block; padding: 8px 6px; width: 100%; color: #d1e0f8; text-decoration: none; }
+#navigation li a:hover, #navigation li a.open { color: #fff; background: #484e57; }*/

@@ -18,15 +18,18 @@ function Tooltip(tooltipId, width){
     $("#closebtn").empty();
 
     $("#playerInfo").html(content);
-
-    $(this).addClass("open");
+    // $("#closebtn").unbind("click",clickFunc);
+    // $(this).addClass("open");
     openSidepage();
 
-    $("#closebtn").on("click", function(e){
-      e.preventDefault();
-      console.log("closing ");
-      closeSidepage();
-    })
+    $("#closebtn").on("click", clickFunc);
+  }
+
+  function clickFunc(e){
+    e.preventDefault();
+    console.log("closing ");
+    closeSidepage();
+    //  $( this ).unbind( e );
   }
 
   function hideTooltip(){
@@ -35,15 +38,15 @@ function Tooltip(tooltipId, width){
   function openSidepage() {
     console.log("here");
    $('#main').animate({
-    left: '350px'
-   }, 400, 'easeOutBack');
+    left: '18%'
+  }, 400, 'easeOutSine');
   }
   function closeSidepage(){
     // $("#navigation li a").removeClass("open");
     console.log("Close sidepage");
     $('#main').animate({
     left: '0px'
-    }, 400, 'easeOutQuint'
+  }, 400, 'easeOutSine'
     );
   }
 

@@ -20,9 +20,9 @@
 
 		  $(document).ready(function() {
 
-					app.width = $(window).width();
-					app.height=$(window).height();
-					myNetwork = Network();
+					app.width = $("#main").width();
+					app.height=$("#main").height();
+					myNetwork = Network("#main");
 					var time = setDuration(0,0,30);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
 					// console.log(url);
@@ -44,8 +44,39 @@
 							}
 					});
 
+			$("#right").on("click", function(e){
+				e.preventDefault();
 
-					setInterval(myInterval,3000);
+				var hrefval = $(this).attr("href");
+			console.log(hrefval);
+				if(hrefval == "#menu") {
+					$('#main').css({'left':"auto"}) ;
+					var distance = $('#main').css('right');
+					console.log(distance);
+					if(distance == "auto" || distance == "0px") {
+						$(this).addClass("open");
+						openSidepage();
+					} else {
+						closeSidepage();
+					}
+				}
+			});
+
+			function openSidepage() {
+				console.log("open")
+				$('#main').animate({
+					right: '16.00%'
+				}, 400, 'easeOutSine');
+			}
+
+			function closeSidepage(){
+				$("#right").removeClass("open");
+				$('#main').animate({
+					right: '0px'
+				}, 400, 'easeOutSine');
+			}
+
+					setInterval(myInterval,30000);
 			});
 
 				var myInterval = function(){
@@ -67,6 +98,17 @@
 								console.log(err);
 							}
 					});
+
+ // end click event handler
+
+
+
+				  // $("#menubtn").on("click", function(e){
+				  //   e.preventDefault();
+				  //   closeSidepage();
+				  // }); // end close button event handler
+
+
 				}
 
 
@@ -76,11 +118,18 @@
 		</script>
 		<div id="playerInfo">
 			"<a  id="closebtn" class="close">Close Me</a>";
-	</div>
+		</div>
+
 		<div id="main" role="main">
 			<div id='vis'></div>
+			<nav id="right" href = "#menu"    >
+				<h1 ><a id="menubtn" >From The Dark</a></h1>
+			</nav>
 		</div>
-<!-- 		<div id="controls">
+
+
+
+		<div id="menu">
       <div id="nodeColor" class="control">
         <h3 >Node color</h3>
         <a id="Kind"  >Type</a>
@@ -93,7 +142,7 @@
 				<a id="Connections" >Connections</a>
 			</div>
 
-		</div> -->
+		</div>
 
 	</body>
 </html>

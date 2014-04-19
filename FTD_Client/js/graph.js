@@ -105,7 +105,8 @@ Network = function(){
 
     node
       .attr("attr","update")
-      .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  );
+      .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
+      .attr("height",  function(d){return d.size ;});
 
     node.enter().append("image")
       .attr("class", "node")
@@ -113,8 +114,8 @@ Network = function(){
       .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
       .attr("x", -8)
       .attr("y", -8)
-      .attr("width", 32)
-      .attr("height", 32)
+      .attr("width", function(d){ console.log(d.size); return d.size;})
+      .attr("height",  function(d){return d.size;})
       .call(force.drag);
 
     node.on("click", showDetails);
@@ -238,6 +239,17 @@ Network = function(){
 
   refreshD3Data = function(data){
 
+    // countExtent = d3.extent(data.nodes, function(d){ d.probedESSID.length;});
+    countExtent = d3.extent(data.nodes, function(d){
+        if(d.kind == "Client" && d.probedESSID.length >0){
+            return d.probedESSID.length;
+        }
+        else{
+          return 1;
+        }
+    });
+
+    range = [32,64,128,320]
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
@@ -252,12 +264,21 @@ Network = function(){
         n.x = randomnumber=Math.floor(Math.random()*width);
         n.y = randomnumber=Math.floor(Math.random()*height);
       }
+
+      if(n.kind == "Client" && n.probedESSID.length >0){
+        scale = d3.scale.linear().rangeRound([32,128]).domain(countExtent);//(range,n.probedESSID.length);
+        n.size = scale(n.probedESSID.length);
+      }
+      else{
+        n.size = 32;
+      }
     });
 
     // id's -> node objects
     mapNodes(data.nodes);
 
     return data;
+
   }
 
   // Helper function to map node id's to node objects.
