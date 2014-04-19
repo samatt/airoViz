@@ -4,7 +4,7 @@ class oscSender(object):
 
 	def __init__(self,port):
 		self.client = OSCClient()
-		self.client.connect( ("localhost", port) )
+		self.client.connect( ("172.16.1.110", port) )
 		print "Started server on port : " + str(port)
 
 	def newNode(self,args,BSSID,kind):
