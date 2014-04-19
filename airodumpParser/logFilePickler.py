@@ -112,19 +112,6 @@ def pickleData():
     pickle.dump(routers, open( "pickled/routers.p", "wb" ) )
     pickle.dump(clients, open( "pickled/client.p", "wb" ) )
 
-def postToDB(url):
-  i =0
-  for k,v in routers.iteritems():
-
-    routers[k].postToDB(url)
-    print "Router :" + str(i) + " of "+ str(len(routers))
-    i+=1
-
-  i =0
-  for k,v in clients.iteritems():
-    clients[k].postToDB(url)
-    print "Client :" + str(i) + " of "+ str(len(clients))
-    i+=1
 
 def loadPickledData( folder):
   print "loading pickled data"
@@ -152,6 +139,19 @@ def loadData(rootdir):
       else:
         print "Ignoring file : "+file
 
+def postToDB(url):
+  i =0
+  for k,v in routers.iteritems():
+
+    routers[k].postToDB(url)
+    print "Router :" + str(i) + " of "+ str(len(routers))
+    i+=1
+
+  i =0
+  for k,v in clients.iteritems():
+    clients[k].postToDB(url)
+    print "Client :" + str(i) + " of "+ str(len(clients))
+    i+=1
 if __name__ == '__main__' :
 
   mode = sys.argv[1]
@@ -160,7 +160,7 @@ if __name__ == '__main__' :
 
   requests_log = logging.getLogger("requests")
   requests_log.setLevel(logging.WARNING)
-  logging.basicConfig(level=logging.DEBUG)
+  logging.basicConfig(level=logging.WARNING)
 
   if mode == "Pickle":
     rootdir = sys.argv[2] if len(sys.argv) > 2 else '.'
@@ -171,7 +171,7 @@ if __name__ == '__main__' :
   elif mode=="Post":
       loadPickledData("pickled")
       # loadData(rootdir)
-      # postToDb(url)
+      postToDB(url)
 
 
   else:
