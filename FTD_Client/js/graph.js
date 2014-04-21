@@ -76,7 +76,6 @@ Network = function(){
     //  filter data to show based on current filter settings.
     curNodesData = allData.nodes;
     // curLinksData = allData.links;
-    console.log(curNodesData);
     // reset nodes
     force.nodes(curNodesData)
 
@@ -113,7 +112,7 @@ Network = function(){
       .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
       .attr("x", -8)
       .attr("y", -8)
-      .attr("width", function(d){ console.log(d.size); return d.size;})
+      .attr("width", function(d){ return d.size;})
       .attr("height",  function(d){return d.size;})
       .call(force.drag);
 
