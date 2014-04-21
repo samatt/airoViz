@@ -111,6 +111,7 @@ def pickleData():
     print "Pickling files"
     pickle.dump(routers, open( "pickled/routers.p", "wb" ) )
     pickle.dump(clients, open( "pickled/client.p", "wb" ) )
+    
 
 
 def loadPickledData( folder):
@@ -120,6 +121,8 @@ def loadPickledData( folder):
   clients = pickle.load( open( folder+"/client.p", "r" ) )
   print " No of routers : "+ str(len(routers))
   print " No of clients : "  + str(len(clients))
+  # return { "routers": routers,"clients":clients}
+  return routers,clients
 
 def loadData(rootdir):
 
@@ -139,18 +142,19 @@ def loadData(rootdir):
       else:
         print "Ignoring file : "+file
 
-def postToDB(url):
+def postToDB(url,data):
   i =0
-  for k,v in routers.iteritems():
-
-    routers[k].postToDB(url)
-    print "Router :" + str(i) + " of "+ str(len(routers))
+  print type(data[0])
+  for k,v in data[0].iteritems():
+    print "Im here"
+    # data[0][k].postToDB(url)
+    # print "Router :" + str(i) + " of "+ str(len(data[0]))
     i+=1
 
   i =0
-  for k,v in clients.iteritems():
-    clients[k].postToDB(url)
-    print "Client :" + str(i) + " of "+ str(len(clients))
+  for k,v in data[1].iteritems():
+    data[1][k].postToDB(url)
+    # print "Client :" + str(i) + " of "+ str(len(data[1]))
     i+=1
 if __name__ == '__main__' :
 
@@ -169,9 +173,10 @@ if __name__ == '__main__' :
     pickleData()
     print "Complete"
   elif mode=="Post":
-      loadPickledData("pickled")
-      # loadData(rootdir)
-      postToDB(url)
+    data = loadPickledData("pickled")
+    # print(data)
+    # loadData(rootdir)
+    postToDB(url,data)
 
 
   else:
