@@ -68,12 +68,21 @@ class NodeRecord(ndb.Expando) :
 			return device_records
 
 	@classmethod
+  
 	def queryNodesByESSID(cls,essid):
 		nodesWIthESSID = []
 		nodeRecordsQuery =  cls.query(cls.ESSID == essid)
 		device_records = nodeRecordsQuery.fetch()
 
 		return device_records
+
+	@classmethod
+	def queryNodesByBSSID(cls,bssid):
+		nodesWIthESSID = []
+		nodeRecordsQuery =  cls.query(cls.BSSID == bssid)
+		device_records = nodeRecordsQuery.fetch()
+		print device_records
+		return serialize(device_records)
 
 
 	@classmethod
@@ -242,28 +251,41 @@ class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
 		this.response.headers['Content-Type'] = 'text/plain'
 
 		try:
-			essid= self.request.GET['essid']
+			bssid= self.request.GET['bssid']
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
-			self.response.write(
-			NodeRecord.queryNodesByESSID(essid))
+			byBSSID = NodeRecord.queryNodesByBSSID(bssid)
+			self.response.out.write("%s(%s)" %
+                              (urllib2.unquote(self.request.get('callback')),
+                               byBSSID))
+			# self.response.write(
+			
 
-class ReadRecordsHandlerWithClientESSID(webapp2.RequestHandler):
+class ReadRecordsHandlerWithClientBSSID(webapp2.RequestHandler):
 
 	def get(self):
+		
 		this = self
-		this.response.headers['Content-Type'] = 'text/plain'
+		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+		self.response.headers['Content-Type'] = 'application/javascript'
+		# this.response.headers['Content-Type'] = 'text/plain'
 
 		try:
-			essid= self.request.GET['essid']
+			bssid= self.request.GET['bssid']
 
 		except KeyError: #bail if there is no argument for 'devicename' submitted
 			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
 		else:
 			self.response.write(
-			NodeRecord.queryNodesProbedESSID(essid))
+			# NodeRecord.queryNodesProbedESSID(essid))
+      		NodeRecord.queryNodesByBSSID(bssid))
+  
+	def post(self):
+		self.response.write('<html><body>You wrote:<pre>')
+		self.response.write(cgi.escape(self.request.get('content')))
+		self.response.write('</pre></body></html>')
 
 class LastSeenRecordsHandler(webapp2.RequestHandler):
 	def get(self):
@@ -291,7 +313,7 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/update', handler =  UpdateRecordHandler, name = 'update-node'),
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
-	webapp2.Route('/clientessid', handler = ReadRecordsHandlerWithClientESSID, name = 'client-by-essid'),
+	webapp2.Route('/client', handler = ReadRecordsHandlerWithClientBSSID, name = 'client-by-essid'),
 	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
 	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
 	# webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),
