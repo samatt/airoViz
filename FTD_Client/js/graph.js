@@ -51,7 +51,7 @@ Network = function(){
     setLayout("Connections");
 
     // format data
-    allData = setupData(data)
+    allData = setupData(data,true)
 
     // create svg and groups
     vis = d3.select(selection).append("svg")
@@ -76,7 +76,7 @@ Network = function(){
     //  filter data to show based on current filter settings.
     curNodesData = allData.nodes;
     // curLinksData = allData.links;
-
+    console.log(curNodesData);
     // reset nodes
     force.nodes(curNodesData)
 
@@ -101,7 +101,7 @@ Network = function(){
 
   function updateNodes(){
     node = nodesG.selectAll(".node")
-      .data(curNodesData, function(d) { return d.name ;});
+      .data(curNodesData, function(d) { return d.BSSID ;});
 
     node
       .attr("attr","update")
@@ -110,7 +110,6 @@ Network = function(){
 
     node.enter().append("image")
       .attr("class", "node")
-      // .attr("xlink:href", "../badgeIcons/2.png  ")
       .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
       .attr("x", -8)
       .attr("y", -8)
@@ -122,19 +121,6 @@ Network = function(){
 
     node.exit().remove();
   }
-
-  // Toggle children on click.
-  // function click(d) {
-  //   if (d3.event.defaultPrevented) return; // ignore drag
-  //   // if (d.children) {
-  //   //   d._children = d.children;
-  //   //   d.children = null;
-  //   // } else {
-  //   //   d.children = d._children;
-  //   //   d._children = null;
-  //   // }
-  //   showDetails();
-  // }
 
   setNodeColor = function(newColor){
     nodeColor = newColor;
@@ -148,20 +134,26 @@ Network = function(){
     // # public function
     force.stop()
     setNodeColor(newColor);
-    allData = setupData(allRawData);
+    allData = setupData(allRawData,true);
     update();
   }
 
   network.toggleLayout = function(newLayout){
     force.stop()
     setLayout(newLayout);
-    allData = setupData(allRawData);
+    allData = setupData(allRawData,true);
     update();
   }
 
   network.updateData = function(newData){
       allRawData = newData;
-      allData = setupData(newData);
+      allData = setupData(newData,true);
+      update()
+  }
+
+  network.updateNode = function(newData){
+      allRawData = newData;
+      allData = setupData(newData,false);
       update()
   }
 
@@ -181,60 +173,72 @@ Network = function(){
     //   .attr("y2", function(d){ return d.target.y;});
   }
 
+
+
   // called once to clean up raw data and switch links to
   // point to node instances
   // Returns modified data
-  setupData = function(_data){
+  setupData = function(_data, isArray){
 
-    data = new Object();
-    data.links = new Array();
-    data.nodes = new Array();
+    if(isArray){
+      data = new Object();
+      data.links = new Array();
+      data.nodes = new Array();
 
-    data.nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener"});
-    for (var i = 0; i < _data.length; i++) {
+      data.nodes.push({'name' : "Listener", 'power': -10, 'kind': "Listener"});
+      for (var i = 0; i < _data.length; i++) {
+        // console.log(_data[i]);
+        var node = JSON.parse(_data[i]);
+        var n = {'BSSID' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
 
-      var node = JSON.parse(_data[i]);
-      var n = {'name' : $.trim(node.BSSID), 'power': node.power, 'kind': node.kind};
+        if(n.kind == "Client"){
+          n.AP = node.AP;
+          n.probedESSID = node.probedESSID;
 
-      if(n.kind == "Client"){
-        n.essid = node.AP;
-        n.probedESSID = node.probedESSID;
-
-        if(layout=="Distance"){
-            var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
-            data.links.push(l);
-        }
-        else if(layout = "Connections"){
-
-          var AP = n.essid.split("|");
-          var networkName = $.trim(AP[0]);
-
-          if(networkName === "(not associated)" || networkName === ""){
-            // console.log(networkName);
+          if(layout=="Distance"){
+              var l = {'source' : data.nodes[0].BSSID, 'target': $.trim(node.BSSID), 'power':node.power};
+              data.links.push(l);
           }
-          else{
+          else if(layout = "Connections"){
 
-            // console.log(networkName);
-            // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid
-            var l = {'source' : networkName, 'target': $.trim(node.BSSID), 'power':node.power};
-            data.links.push(l);
+            var AP = n.AP.split("|");
+            var networkName = $.trim(AP[0]);
 
+              if(networkName === "(not associated)" || networkName === ""){
+                // console.log(networkName);
+              }
+              else{
+
+                // console.log(networkName);
+                // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid
+                var l = {'source' : networkName, 'target': $.trim(node.BSSID), 'power':node.power};
+                data.links.push(l);
+
+              }
+            }
+            data.nodes.push(n);
           }
-        }
-        data.nodes.push(n);
-      }
       // else{
-      //
-      //   if(layout=="Distance"){
-      //       var l = {'source' : data.nodes[0].name, 'target': $.trim(node.BSSID), 'power':node.power};
-      //       data.links.push(l);
-      //   }
-      //   n.essid =  node.ESSID;
-      // }
-      //clients only!!!
+            //
+            //   if(layout=="Distance"){
+            //       var l = {'source' : data.nodes[0].BSSID, 'target': $.trim(node.BSSID), 'power':node.power};
+            //       data.links.push(l);
+            //   }
+            //   n.essid =  node.ESSID;
+            // }
+           //clients only!!!
+      }
 
+      return refreshD3Data(data);
     }
-    return refreshD3Data(data);
+    else{
+      data = new Object();
+      data.links = new Array();
+      data.nodes = new Array();
+      data.nodes.push(_data);
+      return refreshD3Data(data);
+    }
+
   }
 
   refreshD3Data = function(data){
@@ -253,8 +257,8 @@ Network = function(){
     data.nodes.forEach( function(n){
       // set initial x/y to values within the width/height
       // of the visualization
-      if(nodesMap.has(n.name)){
-          _n = nodesMap.get(n.name);
+      if(nodesMap.has(n.BSSID)){
+          _n = nodesMap.get(n.BSSID);
           n.x = _n.x;
           n.y = _n.y;
           n.px = _n.px;
@@ -278,7 +282,6 @@ Network = function(){
     mapNodes(data.nodes);
 
     return data;
-
   }
 
   // Helper function to map node id's to node objects.
@@ -287,10 +290,10 @@ Network = function(){
     nodesMap = d3.map();
     nodes.forEach (function(n,i){
 
-      if(typeof(nodesMap.get(n.name)) !=="undefined"){
+      if(typeof(nodesMap.get(n.BSSID)) !=="undefined"){
       }
       else{
-        nodesMap.set(n.name, n);
+        nodesMap.set(n.BSSID, n);
       }
 
     });
@@ -301,11 +304,11 @@ Network = function(){
 
     content = '<img src =../badgeIcons/'+i%19+'.png width =160 height = 160 style = "position: relative; left: 70;"></img>';
     content += '<hr class="tooltip-hr">';
-    content += '<p class="main">' + d.kind.toUpperCase() + " : "+ d.name + '</span></p>';
+    content += '<p class="main">' + d.kind.toUpperCase() + " : "+ d.BSSID + '</span></p>';
     content += '<hr class="tooltip-hr">';
     if(d.kind == "Client"){
 
-      var AP = d.essid.split("|");
+      var AP = d.AP.split("|");
       //contains
       var networkName = $.trim(AP[0]);
       if(networkName === "(not associated)"){
@@ -336,7 +339,7 @@ Network = function(){
       }
     }
     else{
-      content += '<p class="main">' + "NAME:" + d.essid  + '</span></p>';
+      content += '<p class="main">' + "NAME:" + d.AP  + '</span></p>';
       content += '<hr class="tooltip-hr">';
       content += '<p class="main">' +"RSSI: " + d.power  + '</span></p>';
     }
