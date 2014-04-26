@@ -22,7 +22,7 @@
 					app.width = $(window).width();
 					app.height=$(window).height();
 					myNetwork = Network();
-					var time = setDuration(0,0,30);
+					var time = setDuration(0,10,00);
 					url = 'http://'+app.server+'/lastseen?lastseen='+time;
 					// console.log(url);
 					$.ajax({
@@ -41,7 +41,7 @@
 								console.log(err);
 							}
 					});
-					setInterval(myInterval,5000);
+					setInterval(myInterval,30000);
 
 					function activate(group, link){
 						d3.selectAll("#"+group+" a").classed({'active': false});

@@ -4,9 +4,10 @@ app.server = 'localhost:8080';
 // app.server ='direct-electron-537.appspot.com';
 app.nodes = [];
 app.links = [];
+app.refreshInterval = 10000;
 var node = null;
 var link = null;
-
+var numBadges = 19;
 function setDuration (numHours, numMinutes, numSeconds){
 
 	var ts = new Date();
@@ -16,11 +17,14 @@ function setDuration (numHours, numMinutes, numSeconds){
 	var hours 	= (ts.getHours()-numHours) >0 ? (ts.getHours()-numHours) : 0
 
 	//FIXME: Get rid off the -1 from getDate and -2 from hours
-	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-6)+" "+(hours)+":"+ minutes	+":"+seconds;
+	timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate())+" "+(hours)+":"+ minutes	+":"+seconds;
 	// timestamp = ts.getFullYear()+"-"+(ts.getMonth()+1)+"-"+(ts.getDate()-2)+" "+(13)+":"+ minutes	+":"+seconds;
 	return timestamp
 }
 
+function getRandomInt (min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 
 var scale = d3.scale.pow()

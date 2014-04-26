@@ -21,8 +21,8 @@
 		var myInterval = function(){
 			// console.log("here")
 			var time = setDuration(0,10,0);
-			url = 'http://'+app.server+'/lastseen?lastseen='+time;
-			// console.log(url);
+			url = 'http://localhost:8080/lastseen?lastseen='+time;
+			console.log(url);
 
 			$.ajax({
 				dataType: 'jsonp',
@@ -44,18 +44,16 @@
 					app.width = $("#main").width();
 					app.height=$("#main").height();
 					myNetwork = Network("#main");
-					var time = setDuration(0,0,30);
-					url = 'http://'+app.server+'/lastseen?lastseen='+time;
-					// console.log(url);
+					var time = setDuration(0,10,0);
+					// url = 'http://lastseen?lastseen='+time;
+					url = 'http://localhost:8080/lastseen?lastseen='+time;
+					console.log(url);
 					$.ajax({
 						dataType: 'jsonp',
 						url: url,
 						type: 'GET',
 							success: function(postData) {
-
-								// Setup Network
-								console.log(postData)
-								myNetwork('#vis',postData);
+								myNetwork('#main',postData);
 
 							},
 
@@ -81,6 +79,13 @@
 						closeSidepage();
 					}
 				}
+
+				$("macADD").on("click", function(e){
+					e.preventDefault();
+					$("#macADD").addClass("active");
+					$("#RealTime").removeClass("active");
+				});
+
 			});
 
 			function openSidepage() {
@@ -97,8 +102,9 @@
 				}, 400, 'easeOutSine');
 			}
 
-					intervalID = setInterval(myInterval,30000);
+					intervalID = setInterval(myInterval,3000);
 					console.log("Interval id : "+ intervalID);
+
 					$("#RealTime").on("click", function(e){
 						e.preventDefault();
 						console.log("in realtime click");
@@ -107,8 +113,10 @@
 						}
 						else{
 							console.log("Reset real time here");
-							intervalID = setInterval(myInterval,30000);
+							myInterval();
+							intervalID = setInterval(myInterval,3000);
 							$("#RealTime").addClass("active");
+							$("#macADD").removeClass("active");
 						}
 
 					});
@@ -131,35 +139,36 @@
 		<div id="menu">
 
 			<div id="layouts" class="control">
-				<a id = "RealTime" class="active" >Real Time</a>
+				<h3 id = "RealTimeHeading"  >Real Time</h3>
 <!-- 				<h3 class="active" >Real Time </h3> -->
+					<button id = "RealTime" class= "active">Enable </button>
 			</div>
 
 			<div id="search_section" class="control">
 					<form id="bssidForm" action="/client"  method="get">
-						<p class="search_title">Search By Mac </p>
+						<h3 class="control">Search By Mac </h3>
 						<input type="text" class="text-input" name="bssid" />
-  					<!-- <input type="submit" class = "control"> -->
-
 					</form>
-					<button id = "test">TEST</button>
+					<button id = "macADD">FIND MAC ADD</button>
 
 				<script>
-				$("button").click(function(){
-					var bssidReqUrl = 'http://'+app.server+'/client?bssid=';
+				$("#macADD").click(function(){
+					var bssidReqUrl = 'http://localhost:8080/client?bssid=';
 					bssidReqUrl+=encodeURIComponent($('#bssidForm input').val())
+					console.log(bssidReqUrl);
 					$.ajax({
 						dataType: 'json',
 						url: bssidReqUrl,
 						type: 'GET',
 							success: function(postData) {
 								// Setup Network
-								console.log(postData)
-								$("#RealTime").removeClass("active");
-								console.log("clearing interval" + intervalID);
-								clearInterval(intervalID);
-								myNetwork.updateNode(postData[0]);
-
+								if(postData.length >0){
+										console.log(postData)
+										$("#RealTime").removeClass("active");
+										console.log("clearing interval " + intervalID);
+										clearInterval(intervalID);
+										myNetwork.updateNode(postData[0]);
+								}
 							},
 
 							error: function(err) {

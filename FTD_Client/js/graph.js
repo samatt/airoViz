@@ -1,5 +1,5 @@
 app = new Object();
-app.server = 'localhost:8080';
+app.server = 'surya.local:8080';
 // app.server ='direct-electron-537.appspot.com';
 app.nodes = [];
 app.links = [];
@@ -24,6 +24,7 @@ Network = function(){
   // var  link = "Distance";
 
   var nodesMap = d3.map();
+  var badgesMap = d3.map();
   var routersMap = d3.map();
   var clientsMap = d3.map();
   var ramp = d3.map();
@@ -34,17 +35,33 @@ Network = function(){
   var layout = null;
   var tooltip = Tooltip("vis-tooltip", 230)
 
-
+// var zoom = d3.behavior.zoom()
+//     .translate([0, 0])
+//     .scale(1)
+//     .scaleExtent([1, 5])
+//     .on("zoom", zoomed);
 
   var  force = d3.layout.force()
       .friction(.65)
-      .charge([-200])
+      .charge([-100])
       .size([width, height]);
       force.on("tick", forceTick);
       force.on("end",function(){console.log("Over");});
 
   // color function used to color nodes
   var nodeColors = d3.scale.category20();
+
+  // function zoomed() {
+  // vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  //   // nodesG.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+  //   // nodesG.select(".node").style("stroke-width", 1.5 / d3.event.scale + "px");
+  //   // nodesG.select(".node").style("stroke-width", .5 / d3.event.scale + "px");
+  //     vis.attr("transform", transform);
+  // }
+
+  // function transform(d) {
+  //   return "translate(" + x(d[0]) + "," + y(d[1]) + ")";
+  // }
 
   function network(selection, data){
     setNodeColor("Power");
@@ -57,6 +74,9 @@ Network = function(){
     vis = d3.select(selection).append("svg")
       .attr("width", width)
       .attr("height", height);
+      // .append("g")
+      // .call(zoom);
+
 
     vis.append("rect")
       .attr("width", "100%")
@@ -91,7 +111,7 @@ Network = function(){
     else if (layout == "Connections"){
       force
         .friction(.9)
-        .charge([-250])
+        .charge([-60])
         .size([width, height]);
     }
 
@@ -104,12 +124,12 @@ Network = function(){
 
     node
       .attr("attr","update")
-      .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
+      .attr("xlink:href", function(d,i){return d.icon;}  )
       .attr("height",  function(d){return d.size ;});
 
     node.enter().append("image")
       .attr("class", "node")
-      .attr("xlink:href", function(d,i){return "../badgeIcons/"+i%19+".png"}  )
+      .attr("xlink:href", function(d,i){return d.icon;}  )
       .attr("x", -8)
       .attr("y", -8)
       .attr("width", function(d){ return d.size;})
@@ -264,12 +284,23 @@ Network = function(){
           n.py = _n.py;
       }
       else{
-        n.x = randomnumber=Math.floor(Math.random()*width);
-        n.y = randomnumber=Math.floor(Math.random()*height);
+        n.x = Math.floor(Math.random()*width);
+        n.y = Math.floor(Math.random()*height);
+      }
+
+      if(! badgesMap.has(n.BSSID)){
+        var index = getRandomInt (0, numBadges);
+        console.log("adding " + n.BSSID);
+        n.icon = "../badgeIcons/"+index+".png";
+        badgesMap.set(n.BSSID, n.icon);
+      }
+      else{
+        var icn = badgesMap.get(n.BSSID);
+        n.icon = icn;
       }
 
       if(n.kind == "Client" && n.probedESSID.length >0){
-        scale = d3.scale.linear().rangeRound([32,128]).domain(countExtent);//(range,n.probedESSID.length);
+        scale = d3.scale.linear().rangeRound([32,100]).domain(countExtent);//(range,n.probedESSID.length);
         n.size = scale(n.probedESSID.length);
       }
       else{
@@ -301,7 +332,7 @@ Network = function(){
 
   showDetails = function (d,i){
 
-    content = '<img src =../badgeIcons/'+i%19+'.png width =160 height = 160 style = "position: relative; left: 70;"></img>';
+    content = '<img src ='+ d.icon+ ' width =160 height = 160 style = "position: relative; left: 70;"></img>';
     content += '<hr class="tooltip-hr">';
     content += '<p class="main">' + d.kind.toUpperCase() + " : "+ d.BSSID + '</span></p>';
     content += '<hr class="tooltip-hr">';

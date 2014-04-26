@@ -25,6 +25,17 @@ a, a:visited {
 /*#main nav{
   opcacity: 0;
 }*/
+
+
+#search_section {
+  padding-top: 23px;
+  padding-left: 20px;
+}
+
+#search_form #search {
+  margin-left: 10px;
+}
+
 #main nav a {
   font-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
   font-size:0.8em;
@@ -66,16 +77,17 @@ background: rgba(23, 35, 59, 0.5);
   color:white;
 
 }
-
+.control p.search_title {
+ display: inline;
+ text-align: right;
+ font-weight: normal;
+ color: #777;
+ font-family: "Courier New", Courier, monospace;
+}
 .control {
   float: right;
   padding: 10px 3 10px 0;
   top: 2%;
-/*  align-contents: right;*/
-/*  position :relative;*/
-/*  right : 3%;*/
-
-
 }
 
 .control h3 {
@@ -83,12 +95,36 @@ background: rgba(23, 35, 59, 0.5);
   font-size: 14px;
 /*  padding: 5px;*/
 /*  margin-right: 20px;*/
-margin: auto;
+  font-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
+  margin: auto;
   text-align:right;
   text-decoration: none;
   color: white;
   text-transform: uppercase;
   font-weight: 500;
+}
+.control h3.active {
+  color: white;
+  background:rgba(218, 84, 84, 0.6)
+}
+.control button {
+
+  font-size: 11px;
+  padding: 5px;
+/*  background: black;*/
+/*background: rgba(128,128,0128,0.8);*/
+  font-family: "Courier New", Courier, monospace;
+  cursor: pointer;
+  margin-left: 3px;
+  margin-bottom: 3px;
+  text-align:right;
+  text-transform: uppercase;
+  color: white;
+  border: 1px solid #DDD;
+}
+.control button.active {
+  color: white;
+  background:rgba(218, 84, 84, 0.6)
 }
 .control a {
 
