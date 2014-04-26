@@ -68,7 +68,7 @@ class NodeRecord(ndb.Expando) :
 			return device_records
 
 	@classmethod
-  
+
 	def queryNodesByESSID(cls,essid):
 		nodesWIthESSID = []
 		nodeRecordsQuery =  cls.query(cls.ESSID == essid)
@@ -131,7 +131,13 @@ class NodeRecord(ndb.Expando) :
 
 			device_records = nodeRecordsQuery.fetch()
 
-			return device_records
+			nodeJSONArray = []
+			for device in device_records:
+				nodeJSONArray.append(serialize(device))
+
+			return nodeJSONArray
+
+			# return device_records
 
 class MainHandler(webapp2.RequestHandler):
 	def get(self):
@@ -261,12 +267,34 @@ class ReadRecordsHandlerWithESSID(webapp2.RequestHandler):
                               (urllib2.unquote(self.request.get('callback')),
                                byBSSID))
 			# self.response.write(
-			
+
+
+class ReadRecordsHandlerWithProbedESSID(webapp2.RequestHandler):
+
+  def get(self):
+
+    this = self
+    self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+    self.response.headers['Content-Type'] = 'application/javascript'
+    # this.response.headers['Content-Type'] = 'text/plain'
+
+    try:
+      essid= self.request.GET['essid']
+
+    except KeyError: #bail if there is no argument for 'devicename' submitted
+      self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+    else:
+      probed = NodeRecord.queryNodesProbedESSID(essid)
+      self.response.out.write("%s(%s)" %
+                              (urllib2.unquote(self.request.get('callback')),
+                               probed))
+      # self.response.write(
+      #   NodeRecord.queryNodesProbedESSID(essid))
 
 class ReadRecordsHandlerWithClientBSSID(webapp2.RequestHandler):
 
 	def get(self):
-		
+
 		this = self
 		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
 		self.response.headers['Content-Type'] = 'application/javascript'
@@ -281,7 +309,7 @@ class ReadRecordsHandlerWithClientBSSID(webapp2.RequestHandler):
 			self.response.write(
 			# NodeRecord.queryNodesProbedESSID(essid))
       		NodeRecord.queryNodesByBSSID(bssid))
-  
+
 	def post(self):
 		self.response.write('<html><body>You wrote:<pre>')
 		self.response.write(cgi.escape(self.request.get('content')))
@@ -314,6 +342,7 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/client', handler = ReadRecordsHandlerWithClientBSSID, name = 'client-by-essid'),
+  webapp2.Route('/probed', handler = ReadRecordsHandlerWithProbedESSID, name = 'client-by-probed'),
 	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
 	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
 	# webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),

@@ -95,7 +95,7 @@ background: rgba(23, 35, 59, 0.5);
   font-size: 14px;
 /*  padding: 5px;*/
 /*  margin-right: 20px;*/
-  font-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
+  font-family: Arial, "MS Trebuchet", sans-serif;-family: 'ABeeZee', 'Trebuchet MS', Arial, sans-serif;
   margin: auto;
   text-align:right;
   text-decoration: none;
@@ -120,6 +120,7 @@ background: rgba(23, 35, 59, 0.5);
   text-align:right;
   text-transform: uppercase;
   color: white;
+  float: right;
   border: 1px solid #DDD;
 }
 .control button.active {

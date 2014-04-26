@@ -117,6 +117,7 @@
 							intervalID = setInterval(myInterval,3000);
 							$("#RealTime").addClass("active");
 							$("#macADD").removeClass("active");
+							$("#probedNetworks").removeClass("active");
 						}
 
 					});
@@ -149,7 +150,7 @@
 						<h3 class="control">Search By Mac </h3>
 						<input type="text" class="text-input" name="bssid" />
 					</form>
-					<button id = "macADD">FIND MAC ADD</button>
+					<button id = "macADD">Search</button>
 
 				<script>
 				$("#macADD").click(function(){
@@ -164,10 +165,50 @@
 								// Setup Network
 								if(postData.length >0){
 										console.log(postData)
+										$("#macADD").addClass("active");
 										$("#RealTime").removeClass("active");
 										console.log("clearing interval " + intervalID);
 										clearInterval(intervalID);
 										myNetwork.updateNode(postData[0]);
+								}
+							},
+
+							error: function(err) {
+								console.log("GET failed ");
+								console.log(err);
+							}
+					});
+
+				});
+				</script>
+			</div>
+
+			<div id="search_probed" class="control">
+					<form id="probedForm" action="/probed"  method="get">
+						<h3 class="control">Search By Network </h3>
+						<input type="text" class="text-input" name="essid" />
+					</form>
+					<button id = "probedNetworks">Serach</button>
+
+				<script>
+				$("#probedNetworks").click(function(){
+					var probedReqUrl = 'http://localhost:8080/probed?essid=';
+					probedReqUrl+=encodeURIComponent($('#probedForm input').val())
+					console.log(probedReqUrl);
+					$.ajax({
+						dataType: 'jsonp',
+						url: probedReqUrl,
+						type: 'GET',
+							success: function(postData) {
+								// Setup Network
+								if(postData.length >0){
+										console.log(postData)
+										$("#probedNetworks").addClass("active");
+										$("#RealTime").removeClass("active");
+										$("#macADD").removeClass("active");
+										console.log("clearing interval " + intervalID);
+										clearInterval(intervalID);
+										myNetwork.updateData(postData);
 								}
 							},
 
