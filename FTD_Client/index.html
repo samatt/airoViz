@@ -1,7 +1,7 @@
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
-		<title>WiFi Calibration</title>
+		<title>From The Dark</title>
 
 		<script type="text/javascript" src="../lib/d3/d3.js"></script>
 		<script type="text/javascript" src="../lib/jquery/jquery-2.1.0.min.js"></script>
@@ -102,7 +102,7 @@
 				}, 400, 'easeOutSine');
 			}
 
-					intervalID = setInterval(myInterval,3000);
+					intervalID = setInterval(myInterval,15000);
 					console.log("Interval id : "+ intervalID);
 
 					$("#RealTime").on("click", function(e){
@@ -114,7 +114,7 @@
 						else{
 							console.log("Reset real time here");
 							myInterval();
-							intervalID = setInterval(myInterval,3000);
+							intervalID = setInterval(myInterval,15000);
 							$("#RealTime").addClass("active");
 							$("#macADD").removeClass("active");
 							$("#probedNetworks").removeClass("active");

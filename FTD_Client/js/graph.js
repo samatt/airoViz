@@ -43,7 +43,7 @@ Network = function(){
 
   var  force = d3.layout.force()
       .friction(.65)
-      .charge([-100])
+      .charge([-60])
       .size([width, height]);
       force.on("tick", forceTick);
       force.on("end",function(){console.log("Over");});
@@ -111,7 +111,7 @@ Network = function(){
     else if (layout == "Connections"){
       force
         .friction(.9)
-        .charge([-60])
+        .charge([-100])
         .size([width, height]);
     }
 

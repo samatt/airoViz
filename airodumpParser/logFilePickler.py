@@ -28,7 +28,6 @@ def parseLine(params,isRouter):
       node.trimParams()
       return node
 
-
 def updateIdleCount(kind,ID):
   if kind == "Router":
 
@@ -91,14 +90,18 @@ def readFile(fileName):
 
     if isRouter:
       if ID in routers:
+        pass
         routers[ID].updateRouterNode(params)
       else:
+        pass
         addNewNode("Router",ID, params)
 
     else:
       if ID in clients:
+        pass
         clients[ID].updateClientNode(params)
       else:
+        pass
         addNewNode("Client",ID,params)
 
 
@@ -111,7 +114,7 @@ def pickleData():
     print "Pickling files"
     pickle.dump(routers, open( "pickled/routers.p", "wb" ) )
     pickle.dump(clients, open( "pickled/client.p", "wb" ) )
-    
+
 
 
 def loadPickledData( folder):
@@ -146,16 +149,17 @@ def postToDB(url,data):
   i =0
   print type(data[0])
   for k,v in data[0].iteritems():
-    print "Im here"
+    # print "Im here"
     # data[0][k].postToDB(url)
-    # print "Router :" + str(i) + " of "+ str(len(data[0]))
+    print "Router :" + str(i) + " of "+ str(len(data[0]))
     i+=1
 
   i =0
   for k,v in data[1].iteritems():
-    data[1][k].postToDB(url)
-    # print "Client :" + str(i) + " of "+ str(len(data[1]))
-    i+=1
+    if len(data[1][k].forDB["probed"]) >3:
+      data[1][k].postToDB(url)
+      print "Client :" + str(i) + " of "+ str(len(data[1]))
+      i+=1
 if __name__ == '__main__' :
 
   mode = sys.argv[1]
@@ -168,7 +172,7 @@ if __name__ == '__main__' :
 
   if mode == "Pickle":
     rootdir = sys.argv[2] if len(sys.argv) > 2 else '.'
-    loadPickledData("pickled")
+    # loadPickledData("pickled")
     loadData(rootdir)
     pickleData()
     print "Complete"

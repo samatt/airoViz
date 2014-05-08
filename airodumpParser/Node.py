@@ -42,6 +42,7 @@ class Node(object):
             self.alive = True;
 
         else:
+            # print params
             self.kind = "Client"
             self.BSSID = params[0].strip()
             self.firstTimeSeen = params[1]
@@ -67,11 +68,17 @@ class Node(object):
             self.alive = True;
 
     def updatePower(self, newValue):
+      try:
         newValue = int(newValue)
         if newValue >= -1 and newValue <=    0:
             return -128
         else:
             return newValue
+
+      except ValueError:
+      #Handle the exception
+        print 'Bogus power value'
+
 
     def printParams(self):
         print self.kind
@@ -109,7 +116,13 @@ class Node(object):
         self.alive = True
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2].strip()
-        self.Channel = int(params[3])
+        # self.Channel = int(params[3])
+        try:
+          self.Channel = int(params[3])
+
+        except ValueError:
+        #Handle the exception
+          print 'Bogus channel value'
         self.Speed = int(params[4])
         self.Privacy = params[5]
         self.AP = "None"
@@ -129,7 +142,7 @@ class Node(object):
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,self.ESSID]
 
     def updateClientNode(self, params):
-
+        # print params
         self.alive = True
         self.firstTimeSeen = params[1]
         self.lastTimeSeen = params[2]
@@ -138,7 +151,7 @@ class Node(object):
         self.Privacy = " "
         self.Power = self.updatePower(params[3])
         self.ESSID = " "
-        self.probedESSID.append( params[6:])
+        self.probedESSID.extend( params[6:])
         if self.AP == params[5]:
             pass
         else:
@@ -150,13 +163,16 @@ class Node(object):
 
         newProbe = []
         for probe in self.probedESSID:
-            if probe == " ":
+            curprobe = probe.strip()
+            # print curprobe
+            if probe == " " or len(probe) < 1:
                 pass
-            elif probe in self.probedESSID:
-                pass
+            # elif probe in self.probedESSID:
+            #     pass
             else:
-                probe = probe.strip()
-                newProbe.append(probe)
+                # probe = probe.strip()
+                # print curprobe
+                newProbe.append(curprobe)
 
         self.probedESSID = newProbe
         #Updates for DB
@@ -169,8 +185,14 @@ class Node(object):
         self.forOSC = [self.kind, self.BSSID,self.firstTimeSeen,self.lastTimeSeen, str(self.Channel),str(self.Speed),self.Privacy,str(self.Power),self.AP,":".join(self.probedESSID)]
 
         if len(newProbe) > 0:
-            logging.debug("Updating probes for Client : " + self.BSSID)
-            self.forDB["probed"].append(newProbe)
+            # logging.debug("Updating probes for Client : " + self.BSSID)
+            # print "Updating probes for Client : " + self.BSSID + str(len(newProbe))
+
+            self.forDB["probed"].extend(newProbe)
+            # print self.forDB["probed"]
+            self.forDB["probed"]= list(set(self.forDB["probed"]))
+            # print self.forDB["probed"]
+
 
     def hasTimeChanged(self, newTime):
 
@@ -183,8 +205,8 @@ class Node(object):
         else:
 
           if (curTime - lastTimeSeen) > timedelta(seconds = 1):
-              logging.debug("Time since previous ping for "+self.BSSID +" with "+ self.AP +" : ")
-              logging.debug(curTime - lastTimeSeen)
+              # logging.debug("Time since previous ping for "+self.BSSID +" with "+ self.AP +" : ")
+              # logging.debug(curTime - lastTimeSeen)
               return True
           else:
               return False
@@ -196,6 +218,7 @@ class Node(object):
 
 
         try:
+
           r = requests.get(url+"/write", params=self.forDB)
         except requests.exceptions.RequestException as e:    # This is the correct syntax
             logging.error("Not Connected")
@@ -206,7 +229,7 @@ class Node(object):
 
         try:
             r = requests.get(url+"/update", params=self.forDB)
-            logging.debug("Updating : "+ self.BSSID)
+            # logging.debug("Updating : "+ self.BSSID)
         except requests.exceptions.RequestException as e:    # This is the correct syntax
             logging.error("Not Connected")
 

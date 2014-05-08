@@ -41,7 +41,7 @@ Network = function(){
   var nodeColors = d3.scale.category20();
 
   function network(selection, data){
-    setNodeColor("Power");
+    setNodeColor("Type");
     setLayout("Distance");
 
     // format data
@@ -356,10 +356,8 @@ Network = function(){
         networkName =  "AP: "+"unassociated";
       }
       else{
-
-
         if(typeof(nodesMap.get($.trim(AP[0])).essid) !=="undefined"){
-          networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
+          // networkName ="AP: "+ nodesMap.get($.trim(AP[0])).essid;
         }
         else{
           networkName ="AP: "+ "Error";

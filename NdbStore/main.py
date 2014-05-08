@@ -48,6 +48,7 @@ class NodeRecord(ndb.Expando) :
 	timeRanges = ndb.DateTimeProperty(repeated = True)
 	recordentrytime = ndb.DateTimeProperty(auto_now_add=True)
 	lastSeen = ndb.DateTimeProperty()
+	probedCount = ndb.ComputedProperty(lambda e: len(e.probedESSID))
 
 	# TODO: Implement hardware API
 	# hardware = ndb.JsonProperty()
@@ -81,7 +82,7 @@ class NodeRecord(ndb.Expando) :
 		nodesWIthESSID = []
 		nodeRecordsQuery =  cls.query(cls.BSSID == bssid)
 		device_records = nodeRecordsQuery.fetch()
-		print device_records
+		# print device_records
 		return serialize(device_records)
 
 
@@ -127,7 +128,7 @@ class NodeRecord(ndb.Expando) :
 	@classmethod
 	def queryNodesProbedESSID(cls, qrySSID):
 			probedESSIDList = []
-			nodeRecordsQuery = cls.query( cls.probedESSID.IN([qrySSID]))
+			nodeRecordsQuery = cls.query(cls.probedESSID.IN([qrySSID]))
 
 			device_records = nodeRecordsQuery.fetch()
 
@@ -136,6 +137,20 @@ class NodeRecord(ndb.Expando) :
 				nodeJSONArray.append(serialize(device))
 
 			return nodeJSONArray
+
+	@classmethod
+	def queryNodesbyNumProbedESSID(cls, num):
+		probedESSIDList = []
+		nodeRecordsQuery = cls.query(cls.probedCount  >= int(num))
+		# print "Min num network requested" + num
+
+		device_records = nodeRecordsQuery.fetch()
+		# print device_records
+		nodeJSONArray = []
+		for device in device_records:
+			nodeJSONArray.append(serialize(device))
+
+		return nodeJSONArray
 
 			# return device_records
 
@@ -308,7 +323,35 @@ class ReadRecordsHandlerWithClientBSSID(webapp2.RequestHandler):
 		else:
 			self.response.write(
 			# NodeRecord.queryNodesProbedESSID(essid))
-      		NodeRecord.queryNodesByBSSID(bssid))
+			NodeRecord.queryNodesByBSSID(bssid))
+
+	def post(self):
+		self.response.write('<html><body>You wrote:<pre>')
+		self.response.write(cgi.escape(self.request.get('content')))
+		self.response.write('</pre></body></html>')
+
+class ReadRecordsHandlerWithClients(webapp2.RequestHandler):
+	def get(self):
+
+		this = self
+		self.response.headers.add_header('Access-Control-Allow-Origin', '*')
+		self.response.headers['Content-Type'] = 'application/javascript'
+		# this.response.headers['Content-Type'] = 'text/plain'
+
+		try:
+			numNetworks= self.request.GET['minNetworks']
+			# print "IM HERE" + numNetworks
+		except KeyError: #bail if there is no argument for 'devicename' submitted
+			self.response.write ('NO DEVICE PARAMETER SUBMITTED')
+		else:
+			# self.response.write(
+		  # NodeRecord.queryNodesProbedESSID(essid))
+		# NodeRecord.queryNodesbyNumProbedESSID(numNetworks))
+			clients =NodeRecord.queryNodesbyNumProbedESSID(numNetworks)
+			self.response.out.write("%s(%s)" %
+                              (urllib2.unquote(self.request.get('callback')),
+                               clients))
+
 
 	def post(self):
 		self.response.write('<html><body>You wrote:<pre>')
@@ -342,8 +385,9 @@ app = webapp2.WSGIApplication([
 	webapp2.Route('/byid', handler = ReadRecordsHandler, name = 'by-id'),
 	webapp2.Route('/routeressid', handler = ReadRecordsHandlerWithESSID, name = 'router-by-essid'),
 	webapp2.Route('/client', handler = ReadRecordsHandlerWithClientBSSID, name = 'client-by-essid'),
+  webapp2.Route('/clients', handler = ReadRecordsHandlerWithClients, name = 'client-by-num'),
   webapp2.Route('/probed', handler = ReadRecordsHandlerWithProbedESSID, name = 'client-by-probed'),
-	webapp2.Route(	'/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
+	webapp2.Route('/deleteall', handler = DeleteAllRecordsHandler, name = 'delete-all'),
 	webapp2.Route('/lastseen', handler = LastSeenRecordsHandler, name = 'last-seen')
 	# webapp2.Route('/lastseenjs', handler = LastSeenJSRecordsHandler, name = 'last-seen-js'),
 
