@@ -1,3 +1,7 @@
+#UPDATE:
+If you came here after watching my airoViz video on vimeo the viz code is here:
+https://github.com/samatt/NSHeyy-Viz/blob/master/nw/app/scripts/graph.js
+
 #Overview
 This repository contains code for a platform for Wi-Fi based location tracking. It has three main components
 
